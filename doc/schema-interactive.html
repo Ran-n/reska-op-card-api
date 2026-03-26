@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TCG Schema Reference</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f7f6f2;
+      --surface: #ffffff;
+      --border: #e2e0d8;
+      --text: #1a1a1a;
+      --muted: #888880;
+      --accent: #2a52be;
+      --pk: #b45309;
+      --fk: #166534;
+      --junction-bg: #f3f0ff;
+      --junction-border: #c4b5fd;
+      --note-bg: #fffbeb;
+      --note-border: #fcd34d;
+      --note-active: #fef3c7;
+      --tag-bg: #f0f0ec;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 14px;
+      padding: 0 0 80px 0;
+    }
+
+    header {
+      background: var(--text);
+      color: #fff;
+      padding: 20px 40px;
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    header h1 {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    header span {
+      font-size: 0.75rem;
+      color: #aaa;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .save-indicator {
+      margin-left: auto;
+      font-size: 0.7rem;
+      color: #666;
+      font-family: 'IBM Plex Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.3s;
+    }
+
+    .save-indicator.saving {
+      color: #fcd34d;
+    }
+
+    .save-indicator.saved {
+      color: #86efac;
+    }
+
+    .dot-indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 40px;
+    }
+
+    .section-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 40px 0 12px 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-label:first-child {
+      margin-top: 0;
+    }
+
+    .table-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .table-block.junction {
+      background: var(--junction-bg);
+      border-color: var(--junction-border);
+    }
+
+    .table-title {
+      padding: 10px 16px;
+      background: rgba(0, 0, 0, 0.03);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .junction .table-title {
+      border-bottom-color: var(--junction-border);
+    }
+
+    .table-name {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .table-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      flex: 1;
+    }
+
+    .col-grid {
+      display: grid;
+      grid-template-columns: 160px 60px 80px 1fr;
+      align-items: stretch;
+    }
+
+    .col-header {
+      display: grid;
+      grid-template-columns: 160px 60px 80px 1fr;
+      padding: 4px 16px;
+      font-size: 0.65rem;
+      font-family: 'IBM Plex Mono', monospace;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.015);
+    }
+
+    .junction .col-header {
+      border-bottom-color: var(--junction-border);
+    }
+
+    .col-row {
+      display: contents;
+    }
+
+    .col-row>div {
+      padding: 6px 16px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      display: flex;
+      align-items: center;
+      min-height: 36px;
+      font-size: 0.8rem;
+    }
+
+    .col-row:last-child>div {
+      border-bottom: none;
+    }
+
+    .col-row:hover>div {
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .field-name {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+
+    .field-type {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .tags {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.58rem;
+      font-weight: 600;
+      padding: 2px 5px;
+      border-radius: 2px;
+      letter-spacing: 0.04em;
+    }
+
+    .tag-pk {
+      background: #fef3c7;
+      color: var(--pk);
+      border: 1px solid #fcd34d;
+    }
+
+    .tag-fk {
+      background: #dcfce7;
+      color: var(--fk);
+      border: 1px solid #86efac;
+    }
+
+    .tag-null {
+      background: var(--tag-bg);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    /* Note cell */
+    .note-cell {
+      padding: 4px 12px !important;
+      cursor: text;
+      position: relative;
+    }
+
+    .note-cell:hover .note-hint {
+      opacity: 1;
+    }
+
+    .note-hint {
+      position: absolute;
+      right: 14px;
+      font-size: 0.6rem;
+      color: #bbb;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .note-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.78rem;
+      color: var(--text);
+      resize: none;
+      min-height: 22px;
+      line-height: 1.5;
+      padding: 0;
+      cursor: text;
+    }
+
+    .note-input::placeholder {
+      color: #ccc;
+      font-style: italic;
+    }
+
+    .note-input:focus {
+      background: var(--note-active);
+      margin: -4px -8px;
+      padding: 4px 8px;
+      border-radius: 2px;
+      border: 1px solid var(--note-border);
+    }
+
+    .note-input.has-note {
+      color: #92400e;
+    }
+
+    /* Editable description */
+    .desc-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+      resize: none;
+      min-height: 20px;
+      line-height: 1.5;
+      padding: 0;
+      cursor: text;
+      width: 100%;
+    }
+
+    .desc-input:hover {
+      color: var(--text);
+    }
+
+    .desc-input:focus {
+      color: var(--text);
+      background: #f0f0ec;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      border-radius: 2px;
+      border: 1px solid var(--border);
+    }
+
+    /* Tag add button */
+    .tag-add-btn {
+      background: none;
+      border: 1px dashed var(--border);
+      color: var(--muted);
+      font-size: 0.65rem;
+      width: 18px;
+      height: 18px;
+      border-radius: 2px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      transition: all 0.15s;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .tag-add-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(42, 82, 190, 0.06);
+    }
+
+    /* Tag popup */
+    .tag-popup {
+      position: absolute;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      z-index: 999;
+      padding: 6px;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .tag-popup-opt {
+      padding: 5px 8px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.1s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tag-popup-desc {
+      font-size: 0.65rem;
+      color: var(--muted);
+      font-family: 'IBM Plex Sans', sans-serif;
+      white-space: nowrap;
+    }
+
+    .tag-popup-opt:hover {
+      background: var(--bg);
+    }
+
+    .tag-popup-opt:hover .tag-popup-desc {
+      color: var(--text);
+    }
+
+    .tag-popup-custom input {
+      width: 100%;
+      border: 1px solid var(--border);
+      padding: 3px 6px;
+      font-size: 0.7rem;
+      font-family: 'IBM Plex Mono', monospace;
+      outline: none;
+      margin-top: 2px;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .tag-popup-custom input:focus {
+      border-color: var(--accent);
+    }
+
+    /* Extra tag styles */
+    .tag-uk {
+      background: #ede9fe;
+      color: #5b21b6;
+      border: 1px solid #c4b5fd;
+    }
+
+    .tag-idx {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #7dd3fc;
+    }
+
+    .tag-custom {
+      background: var(--tag-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    /* Junction summary table */
+    .junction-summary {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    .junction-summary td {
+      padding: 7px 16px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      vertical-align: top;
+    }
+
+    .junction-summary tr:last-child td {
+      border-bottom: none;
+    }
+
+    .junction-summary tr:hover td {
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .junction-summary .jt-name {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 500;
+      font-size: 0.78rem;
+      width: 180px;
+      color: #6d28d9;
+    }
+
+    .junction-summary .jt-rel {
+      color: var(--muted);
+      font-size: 0.75rem;
+      width: 180px;
+    }
+
+    .junction-summary .jt-note {
+      padding: 4px 12px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>TCG Schema Reference</h1>
+    <span>MR.dia — relational model</span>
+    <div class="save-indicator" id="saveIndicator">
+      <div class="dot-indicator"></div>
+      <span id="saveText">notes autosaved</span>
+    </div>
+  </header>
+
+  <div class="content" id="content"></div>
+
+  <script>
+    const schema = [
+      {
+        section: "Core Tables",
+        tables: [
+          {
+            name: "Card",
+            desc: "Central entity. Represents a unique card identity, not a physical print.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "set_fk", type: "int", fk: true },
+              { name: "cardtype_fk", type: "int", fk: true },
+              { name: "number", type: "int" },
+              { name: "name", type: "str" },
+              { name: "desc", type: "str", nullable: true },
+              { name: "trigger", type: "str", nullable: true },
+              { name: "power", type: "int", nullable: true },
+              { name: "life", type: "int", nullable: true },
+              { name: "counter", type: "int", nullable: true },
+              { name: "cost", type: "int", nullable: true },
+            ]
+          },
+          {
+            name: "Set",
+            desc: "A card set or expansion (e.g. OP01, PRB02).",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "date" },
+              { name: "updated_ts", type: "date" },
+              { name: "type_fk", type: "int", fk: true },
+              { name: "code", type: "str" },
+              { name: "name", type: "str" },
+              { name: "desc", type: "str", nullable: true },
+              { name: "release_ts", type: "date" },
+            ]
+          },
+          {
+            name: "SetType",
+            desc: "Categorises sets — e.g. Booster, Starter Deck, Promo.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "date" },
+              { name: "updated_ts", type: "date" },
+              { name: "name", type: "str" },
+              { name: "desc", type: "str", nullable: true },
+            ]
+          },
+          {
+            name: "Naip",
+            desc: "A specific physical print of a card. Ties card + set + artist + rarity. One card can have many Naip entries.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "date" },
+              { name: "updated_ts", type: "date" },
+              { name: "card_fk", type: "int", fk: true },
+              { name: "set_fk", type: "int", fk: true },
+              { name: "artist_fk", type: "int", fk: true, nullable: true },
+              { name: "rarity_fk", type: "int", fk: true, nullable: true },
+              { name: "name", type: "str" },
+              { name: "desc", type: "str", nullable: true },
+            ]
+          },
+          {
+            name: "CardType",
+            desc: "Type of card — e.g. Character, Event, Stage, Leader.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "date" },
+              { name: "updated_ts", type: "date" },
+              { name: "symbol", type: "str" },
+              { name: "name", type: "str" },
+              { name: "desc", type: "str", nullable: true },
+            ]
+          },
+        ]
+      },
+      {
+        section: "Lookup Tables",
+        tables: [
+          {
+            name: "Artist",
+            desc: "Card illustrators.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "date" },
+              { name: "updated_ts", type: "date" },
+              { name: "name", type: "str" },
+              { name: "desc", type: "str", nullable: true },
+            ]
+          },
+          {
+            name: "Rarity",
+            desc: "Rarity levels — e.g. Common, Rare, Secret Rare.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "date" },
+              { name: "updated_ts", type: "date" },
+              { name: "symbol", type: "str" },
+              { name: "name", type: "str" },
+              { name: "desc", type: "str", nullable: true },
+            ]
+          },
+          {
+            name: "Tribe",
+            desc: "Creature subtypes — e.g. Straw Hat, Marine, Pirate.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "date" },
+              { name: "updated_ts", type: "date" },
+              { name: "name", type: "str" },
+              { name: "desc", type: "str", nullable: true },
+            ]
+          },
+          {
+            name: "Attribute",
+            desc: "Combat attributes — e.g. Strike, Slash, Special.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "date" },
+              { name: "updated_ts", type: "date" },
+              { name: "name", type: "str" },
+              { name: "desc", type: "str", nullable: true },
+            ]
+          },
+          {
+            name: "Color",
+            desc: "Card colors — e.g. Red, Blue, Green, Purple, Black, Yellow.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "date" },
+              { name: "updated_ts", type: "date" },
+              { name: "name", type: "str" },
+              { name: "desc", type: "str", nullable: true },
+            ]
+          },
+          {
+            name: "Block",
+            desc: "Groups of sets forming a competitive block or season.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "date" },
+              { name: "updated_ts", type: "date" },
+              { name: "name", type: "str" },
+              { name: "desc", type: "str", nullable: true },
+            ]
+          },
+          {
+            name: "Format",
+            desc: "Competitive formats — e.g. Standard, Block, Unlimited.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "date" },
+              { name: "updated_ts", type: "date" },
+              { name: "name", type: "str" },
+              { name: "desc", type: "str", nullable: true },
+            ]
+          },
+          {
+            name: "Keywords",
+            desc: "Keyword abilities — e.g. Rush, Banish, Blocker.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "date" },
+              { name: "updated_ts", type: "date" },
+              { name: "name", type: "str" },
+              { name: "desc", type: "str", nullable: true },
+            ]
+          },
+          {
+            name: "Reswords",
+            desc: "Reserved terminology in card text — e.g. 'DON!!', 'On Play'.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "date" },
+              { name: "updated_ts", type: "date" },
+              { name: "name", type: "str" },
+              { name: "desc", type: "str", nullable: true },
+            ]
+          },
+        ]
+      },
+      {
+        section: "Junction Tables (N:N)",
+        junction: true,
+        tables: [
+          { name: "CardTribe", rel: "Card ↔ Tribe" },
+          { name: "CardAttribute", rel: "Card ↔ Attribute" },
+          { name: "CardColor", rel: "Card ↔ Color" },
+          { name: "CardRarity", rel: "Card ↔ Rarity" },
+          { name: "CardBlock", rel: "Card ↔ Block" },
+          { name: "CardFormat", rel: "Card ↔ Format" },
+          { name: "CardKeywords", rel: "Card ↔ Keywords" },
+          { name: "CardReswords", rel: "Card ↔ Reswords" },
+        ]
+      }
+    ];
+
+    const STORAGE_KEY = 'tcg-schema-notes';
+    // stored shape: { notes: {}, descs: {}, tags: {} }
+    let store = { notes: {}, descs: {}, tags: {} };
+    let saveTimer = null;
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) store = Object.assign({ notes: {}, descs: {}, tags: {} }, JSON.parse(raw));
+      } catch (e) { }
+      renderAll();
+    }
+
+    function scheduleSave() {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+          setIndicator('saved');
+          setTimeout(() => setIndicator('idle'), 1500);
+        } catch (e) { setIndicator('error'); }
+      }, 600);
+      setIndicator('saving');
+    }
+
+    function setIndicator(state) {
+      const el = document.getElementById('saveIndicator');
+      const txt = document.getElementById('saveText');
+      el.className = 'save-indicator ' + state;
+      txt.textContent = state === 'saving' ? 'saving…' : state === 'saved' ? 'saved ✓' : state === 'error' ? 'save failed' : 'notes autosaved';
+    }
+
+    // ── helpers ──────────────────────────────────────────────
+    function getDesc(tableName, defaultDesc) {
+      return store.descs[tableName] !== undefined ? store.descs[tableName] : defaultDesc;
+    }
+
+    function getTags(tableName, colName, defaultTags) {
+      const key = `${tableName}::${colName}`;
+      return store.tags[key] !== undefined ? store.tags[key] : [...defaultTags];
+    }
+
+    function setDesc(tableName, value) {
+      store.descs[tableName] = value;
+      scheduleSave();
+    }
+
+    function setTags(tableName, colName, tags) {
+      store.tags[`${tableName}::${colName}`] = tags;
+      scheduleSave();
+    }
+
+    function setNote(tableName, colName, value) {
+      const key = `${tableName}::${colName}`;
+      if (value.trim()) store.notes[key] = value;
+      else delete store.notes[key];
+      scheduleSave();
+    }
+
+    function getNote(tableName, colName) {
+      return store.notes[`${tableName}::${colName}`] || '';
+    }
+
+    // ── tag popup ─────────────────────────────────────────────
+    const ALL_TAGS = [
+      { name: 'PK', style: 'tag-pk', desc: 'Primary Key — uniquely identifies each row' },
+      { name: 'FK', style: 'tag-fk', desc: 'Foreign Key — references a row in another table' },
+      { name: 'NULL', style: 'tag-null', desc: 'Nullable — this field is optional, can be empty' },
+      { name: 'UK', style: 'tag-uk', desc: 'Unique — value must be unique across all rows' },
+      { name: 'IDX', style: 'tag-idx', desc: 'Indexed — has a database index for faster queries' },
+    ];
+    const TAG_STYLES = Object.fromEntries(ALL_TAGS.map(t => [t.name, t.style]));
+
+    let activePopup = null;
+
+    function closePopup() {
+      if (activePopup) { activePopup.remove(); activePopup = null; }
+    }
+
+    function buildTagsCell(tableName, colName, defaultTags, container) {
+      container.innerHTML = '';
+      const tags = getTags(tableName, colName, defaultTags);
+
+      const wrap = document.createElement('div');
+      wrap.className = 'tags';
+
+      tags.forEach(t => {
+        const span = document.createElement('span');
+        span.className = `tag ${TAG_STYLES[t] || 'tag-custom'}`;
+        span.title = 'Click to remove';
+        span.style.cursor = 'pointer';
+        span.textContent = t;
+        span.addEventListener('click', e => {
+          e.stopPropagation();
+          const updated = getTags(tableName, colName, defaultTags).filter(x => x !== t);
+          setTags(tableName, colName, updated);
+          buildTagsCell(tableName, colName, defaultTags, container);
+        });
+        wrap.appendChild(span);
+      });
+
+      // + button
+      const addBtn = document.createElement('button');
+      addBtn.className = 'tag-add-btn';
+      addBtn.textContent = '+';
+      addBtn.title = 'Add tag';
+      addBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        closePopup();
+
+        const popup = document.createElement('div');
+        popup.className = 'tag-popup';
+        activePopup = popup;
+
+        const currentTags = getTags(tableName, colName, defaultTags);
+
+        ALL_TAGS.forEach(t => {
+          if (currentTags.includes(t.name)) return;
+          const opt = document.createElement('div');
+          opt.className = 'tag-popup-opt';
+          opt.innerHTML = `<span class="tag ${t.style}">${t.name}</span><span class="tag-popup-desc">${t.desc}</span>`;
+          opt.addEventListener('click', ev => {
+            ev.stopPropagation();
+            const updated = [...getTags(tableName, colName, defaultTags), t.name];
+            setTags(tableName, colName, updated);
+            buildTagsCell(tableName, colName, defaultTags, container);
+            closePopup();
+          });
+          popup.appendChild(opt);
+        });
+
+        // custom tag input
+        const customRow = document.createElement('div');
+        customRow.className = 'tag-popup-custom';
+        const inp = document.createElement('input');
+        inp.placeholder = 'custom…';
+        inp.maxLength = 8;
+        inp.addEventListener('keydown', ev => {
+          if (ev.key === 'Enter' && inp.value.trim()) {
+            const val = inp.value.trim().toUpperCase();
+            const updated = [...getTags(tableName, colName, defaultTags), val];
+            setTags(tableName, colName, updated);
+            buildTagsCell(tableName, colName, defaultTags, container);
+            closePopup();
+          }
+          if (ev.key === 'Escape') closePopup();
+        });
+        customRow.appendChild(inp);
+        popup.appendChild(customRow);
+
+        const rect = addBtn.getBoundingClientRect();
+        popup.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+        popup.style.left = rect.left + 'px';
+        document.body.appendChild(popup);
+        inp.focus();
+      });
+
+      wrap.appendChild(addBtn);
+      container.appendChild(wrap);
+    }
+
+    document.addEventListener('click', closePopup);
+
+    // ── rendering ─────────────────────────────────────────────
+    function autoResize(ta) {
+      ta.style.height = 'auto';
+      ta.style.height = ta.scrollHeight + 'px';
+    }
+
+    function makeNoteInput(tableName, colName, placeholder) {
+      const ta = document.createElement('textarea');
+      ta.className = 'note-input';
+      ta.placeholder = placeholder;
+      ta.rows = 1;
+      const saved = getNote(tableName, colName);
+      if (saved) { ta.value = saved; ta.classList.add('has-note'); }
+      ta.addEventListener('input', () => {
+        setNote(tableName, colName, ta.value);
+        ta.classList.toggle('has-note', !!ta.value.trim());
+        autoResize(ta);
+      });
+      setTimeout(() => autoResize(ta), 0);
+      return ta;
+    }
+
+    function makeDescInput(tableName, defaultDesc) {
+      const ta = document.createElement('textarea');
+      ta.className = 'desc-input';
+      ta.rows = 1;
+      ta.value = getDesc(tableName, defaultDesc);
+      ta.addEventListener('input', () => {
+        setDesc(tableName, ta.value);
+        autoResize(ta);
+      });
+      setTimeout(() => autoResize(ta), 0);
+      return ta;
+    }
+
+    function renderAll() {
+      const content = document.getElementById('content');
+      content.innerHTML = '';
+
+      for (const group of schema) {
+        const label = document.createElement('div');
+        label.className = 'section-label';
+        label.textContent = group.section;
+        content.appendChild(label);
+
+        if (group.junction) {
+          const block = document.createElement('div');
+          block.className = 'table-block junction';
+
+          const title = document.createElement('div');
+          title.className = 'table-title';
+          title.innerHTML = `<span class="table-desc">Each resolves a many-to-many relationship with Card. Structure: <code style="font-family:IBM Plex Mono,monospace;font-size:0.75rem">card_fk (PK/FK)</code> + <code style="font-family:IBM Plex Mono,monospace;font-size:0.75rem">*_fk (PK/FK)</code> + timestamps.</span>`;
+          block.appendChild(title);
+
+          const table = document.createElement('table');
+          table.className = 'junction-summary';
+
+          const hrow = document.createElement('tr');
+          hrow.style.cssText = 'background:rgba(0,0,0,0.03);border-bottom:1px solid var(--junction-border)';
+          hrow.innerHTML = `
+        <td style="padding:4px 16px;font-size:0.65rem;font-family:IBM Plex Mono,monospace;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Table</td>
+        <td style="padding:4px 16px;font-size:0.65rem;font-family:IBM Plex Mono,monospace;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Resolves</td>
+        <td style="padding:4px 16px;font-size:0.65rem;font-family:IBM Plex Mono,monospace;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Notes</td>
+      `;
+          table.appendChild(hrow);
+
+          for (const jt of group.tables) {
+            const tr = document.createElement('tr');
+            const nameTd = document.createElement('td');
+            nameTd.className = 'jt-name';
+            nameTd.textContent = jt.name;
+            const relTd = document.createElement('td');
+            relTd.className = 'jt-rel';
+            relTd.textContent = jt.rel;
+            const noteTd = document.createElement('td');
+            noteTd.className = 'jt-note';
+            noteTd.appendChild(makeNoteInput(jt.name, '_table', 'Add a note…'));
+            tr.appendChild(nameTd); tr.appendChild(relTd); tr.appendChild(noteTd);
+            table.appendChild(tr);
+          }
+
+          block.appendChild(table);
+          content.appendChild(block);
+
+        } else {
+          for (const tbl of group.tables) {
+            const block = document.createElement('div');
+            block.className = 'table-block';
+
+            // Title row with editable description
+            const titleEl = document.createElement('div');
+            titleEl.className = 'table-title';
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'table-name';
+            nameSpan.textContent = tbl.name;
+            titleEl.appendChild(nameSpan);
+            titleEl.appendChild(makeDescInput(tbl.name, tbl.desc));
+            block.appendChild(titleEl);
+
+            // Column header
+            const colHeader = document.createElement('div');
+            colHeader.className = 'col-header';
+            colHeader.innerHTML = `<div>Field</div><div>Type</div><div>Tags</div><div>Notes</div>`;
+            block.appendChild(colHeader);
+
+            const grid = document.createElement('div');
+            grid.className = 'col-grid';
+
+            for (const col of tbl.columns) {
+              const defaultTags = [];
+              if (col.pk) defaultTags.push('PK');
+              if (col.fk) defaultTags.push('FK');
+              if (col.nullable) defaultTags.push('NULL');
+
+              const row = document.createElement('div');
+              row.className = 'col-row';
+
+              const nameDiv = document.createElement('div');
+              nameDiv.className = 'field-name';
+              nameDiv.textContent = col.name;
+
+              const typeDiv = document.createElement('div');
+              typeDiv.className = 'field-type';
+              typeDiv.textContent = col.type;
+
+              const tagsDiv = document.createElement('div');
+              buildTagsCell(tbl.name, col.name, defaultTags, tagsDiv);
+
+              const noteDiv = document.createElement('div');
+              noteDiv.className = 'note-cell';
+              noteDiv.appendChild(makeNoteInput(tbl.name, col.name, 'Why does this field exist?'));
+              const hint = document.createElement('span');
+              hint.className = 'note-hint';
+              hint.textContent = 'click to edit';
+              noteDiv.appendChild(hint);
+
+              row.appendChild(nameDiv);
+              row.appendChild(typeDiv);
+              row.appendChild(tagsDiv);
+              row.appendChild(noteDiv);
+              grid.appendChild(row);
+            }
+
+            block.appendChild(grid);
+            content.appendChild(block);
+          }
+        }
+      }
+    }
+
+    load();
+  </script>
+</body>
+
+</html>

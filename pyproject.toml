@@ -1,21 +1,19 @@
 [project]
-name = "optcg_api"
+name = "optcg-api"
 version = "0.1.0"
-description = "OPTCG API."
+description = "API for information of the One Piece TCG"
+readme = "README.md"
 authors = [{ name = "Ran#" }]
-license = { text = "GPLv3" }
-requires-python = ">=3.13.7,<3.14"
+license = { file = "LICENSE" }
+requires-python = ">=3.13"
 dependencies = []
 
-[project.optional-dependencies]
-dev = ["ruff>=0.15.2,<0.16.0", "pytest>=9.0.2,<10.0.0"]
+[dependency-groups]
+dev = ["pytest>=9.0.2", "ruff>=0.15.7"]
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry]
-package-mode = false
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
 
 [tool.ruff]
 line-length = 120
