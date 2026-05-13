@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:26:17 )
-[//]: # (+ Revised: 	2026/05/13 )
+[//]: # (+ Revised: 	2026/05/13 13:16:54.876907 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # optcg_api
@@ -43,11 +43,17 @@ Interactive docs available at `http://localhost:8000/docs`.
 
 ## API
 
-| Prefix | Description |
-|--------|-------------|
+| Endpoint | Description |
+|----------|-------------|
 | `GET /` | Health check |
-| `GET/POST /cards/` | List or create cards |
-| `GET/PUT/DELETE /cards/{id}` | Get, update, or delete a card |
+| `GET /cards/` | List cards (filter: `name`, `set_id`, `cardtype_id`; paginate: `offset`, `limit`) |
+| `POST /cards/` | Create a card |
+| `GET /cards/{id}` | Get card with enriched detail |
+| `PUT /cards/{id}` | Update a card |
+| `DELETE /cards/{id}` | Delete a card |
+| `POST /cards/{id}/image` | Upload card image (multipart file) |
+| `POST /cards/{id}/image-url` | Fetch and store card image from URL |
+| `GET /card_images/{filename}` | Serve stored card images (static) |
 | `GET /sets/` | List all sets |
 | `GET /sets/{id}` | Get a set |
 | `GET /lookups/{resource}` | Lookup table values |
