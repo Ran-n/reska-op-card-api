@@ -37,3 +37,7 @@ Thumbs.db
 # Environment files
 .env
 .env.*
+
+# Local dev data
+*.db
+*.log

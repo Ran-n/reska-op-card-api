@@ -1,8 +1,0 @@
-#!/usr/bin/env python3
-"""
-Authors: Ran# <ran.hash@proton.me>
-Created: 2026/03/26 14:48:29.996145
-Revised: 2026/03/26 14:48:29.996145
-"""
-
-from optcg_api.app import app  # noqa: F401

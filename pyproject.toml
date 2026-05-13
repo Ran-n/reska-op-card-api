@@ -5,8 +5,16 @@ description = "API for information of the One Piece TCG"
 readme = "README.md"
 authors = [{ name = "Ran#" }]
 license = { file = "LICENSE" }
-requires-python = ">=3.13"
-dependencies = ["fastapi>=0.135.2", "uvicorn>=0.42.0"]
+requires-python = ">=3.14"
+dependencies = [
+    "alembic>=1.18.4",
+    "beautifulsoup4>=4.14.3",
+    "fastapi>=0.135.2",
+    "httpx>=0.28.1",
+    "python-multipart>=0.0.28",
+    "sqlmodel>=0.0.38",
+    "uvicorn>=0.42.0",
+]
 
 [dependency-groups]
 dev = ["pytest>=9.0.2", "ruff>=0.15.7"]
@@ -19,7 +27,7 @@ where = ["src"]
 
 [tool.ruff]
 line-length = 120
-target-version = "py313"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
@@ -31,5 +39,3 @@ indent-style = "space"
 line-ending = "auto"
 docstring-code-format = true
 
-[project.scripts]
-opapi = "optcg_api.main:main"
