@@ -479,16 +479,18 @@
         section: "Core Tables",
         tables: [
           {
-            name: "Card",
+            name: "card",
             desc: "Central entity. Represents a unique card identity, not a physical print.",
             columns: [
               { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
               { name: "set_fk", type: "int", fk: true },
               { name: "cardtype_fk", type: "int", fk: true },
+              { name: "name_fk", type: "int", fk: true },
+              { name: "effect_fk", type: "int", fk: true, nullable: true },
+              { name: "trigger_fk", type: "int", fk: true, nullable: true },
               { name: "number", type: "int" },
-              { name: "name", type: "str" },
-              { name: "desc", type: "str", nullable: true },
-              { name: "trigger", type: "str", nullable: true },
               { name: "power", type: "int", nullable: true },
               { name: "life", type: "int", nullable: true },
               { name: "counter", type: "int", nullable: true },
@@ -496,55 +498,101 @@
             ]
           },
           {
-            name: "Set",
-            desc: "A card set or expansion (e.g. OP01, PRB02).",
+            name: "naip",
+            desc: "A specific physical print of a card. Ties card + set + artist + rarity + image. One card can have many naip entries.",
             columns: [
               { name: "id", type: "int", pk: true },
-              { name: "created_ts", type: "date" },
-              { name: "updated_ts", type: "date" },
-              { name: "type_fk", type: "int", fk: true },
-              { name: "code", type: "str" },
-              { name: "name", type: "str" },
-              { name: "desc", type: "str", nullable: true },
-              { name: "release_ts", type: "date" },
-            ]
-          },
-          {
-            name: "SetType",
-            desc: "Categorises sets — e.g. Booster, Starter Deck, Promo.",
-            columns: [
-              { name: "id", type: "int", pk: true },
-              { name: "created_ts", type: "date" },
-              { name: "updated_ts", type: "date" },
-              { name: "name", type: "str" },
-              { name: "desc", type: "str", nullable: true },
-            ]
-          },
-          {
-            name: "Naip",
-            desc: "A specific physical print of a card. Ties card + set + artist + rarity. One card can have many Naip entries.",
-            columns: [
-              { name: "id", type: "int", pk: true },
-              { name: "created_ts", type: "date" },
-              { name: "updated_ts", type: "date" },
-              { name: "card_fk", type: "int", fk: true },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
+              { name: "card_fk", type: "int", fk: true, idx: true },
               { name: "set_fk", type: "int", fk: true },
               { name: "artist_fk", type: "int", fk: true, nullable: true },
               { name: "rarity_fk", type: "int", fk: true, nullable: true },
-              { name: "name", type: "str" },
-              { name: "desc", type: "str", nullable: true },
+              { name: "name_fk", type: "int", fk: true, nullable: true },
+              { name: "image_fk", type: "int", fk: true, nullable: true },
+              { name: "effect_fk", type: "int", fk: true, nullable: true },
+              { name: "trigger_fk", type: "int", fk: true, nullable: true },
+              { name: "is_default", type: "bool", note: "partial UK index: one default per card" },
             ]
           },
           {
-            name: "CardType",
-            desc: "Type of card — e.g. Character, Event, Stage, Leader.",
+            name: "set",
+            desc: "A card set or expansion (e.g. OP01, PRB02).",
             columns: [
               { name: "id", type: "int", pk: true },
-              { name: "created_ts", type: "date" },
-              { name: "updated_ts", type: "date" },
-              { name: "symbol", type: "str" },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
+              { name: "type_fk", type: "int", fk: true, nullable: true },
+              { name: "code", type: "str", uk: true },
               { name: "name", type: "str" },
               { name: "desc", type: "str", nullable: true },
+              { name: "release_ts", type: "date", nullable: true },
+            ]
+          },
+          {
+            name: "name",
+            desc: "Deduplicated card name strings. Shared by card and naip to avoid redundant storage.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
+              { name: "name", type: "str", uk: true },
+            ]
+          },
+          {
+            name: "effect",
+            desc: "Deduplicated card effect text strings.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
+              { name: "effect", type: "str", uk: true },
+            ]
+          },
+          {
+            name: "trigger",
+            desc: "Deduplicated card trigger text strings.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
+              { name: "trigger", type: "str", uk: true },
+            ]
+          },
+          {
+            name: "image",
+            desc: "Stored card image file paths.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
+              { name: "path", type: "str", uk: true },
+            ]
+          },
+          {
+            name: "card_effect_history",
+            desc: "Audit log of effect text changes per card with validity windows.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
+              { name: "card_fk", type: "int", fk: true },
+              { name: "effect_fk", type: "int", fk: true },
+              { name: "valid_from", type: "date" },
+              { name: "valid_to", type: "date", nullable: true },
+            ]
+          },
+          {
+            name: "card_trigger_history",
+            desc: "Audit log of trigger text changes per card with validity windows.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
+              { name: "card_fk", type: "int", fk: true },
+              { name: "trigger_fk", type: "int", fk: true },
+              { name: "valid_from", type: "date" },
+              { name: "valid_to", type: "date", nullable: true },
             ]
           },
         ]
@@ -553,101 +601,124 @@
         section: "Lookup Tables",
         tables: [
           {
-            name: "Artist",
-            desc: "Card illustrators.",
+            name: "set_type",
+            desc: "Categorises sets — e.g. Booster, Starter Deck, Promo.",
             columns: [
               { name: "id", type: "int", pk: true },
-              { name: "created_ts", type: "date" },
-              { name: "updated_ts", type: "date" },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
               { name: "name", type: "str" },
               { name: "desc", type: "str", nullable: true },
             ]
           },
           {
-            name: "Rarity",
-            desc: "Rarity levels — e.g. Common, Rare, Secret Rare.",
+            name: "card_type",
+            desc: "Type of card — e.g. Character, Event, Stage, Leader.",
             columns: [
               { name: "id", type: "int", pk: true },
-              { name: "created_ts", type: "date" },
-              { name: "updated_ts", type: "date" },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
               { name: "symbol", type: "str" },
               { name: "name", type: "str" },
               { name: "desc", type: "str", nullable: true },
             ]
           },
           {
-            name: "Tribe",
+            name: "artist",
+            desc: "Card illustrators.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
+              { name: "name", type: "str" },
+              { name: "desc", type: "str", nullable: true },
+            ]
+          },
+          {
+            name: "rarity",
+            desc: "Rarity levels — e.g. Common, Rare, Secret Rare.",
+            columns: [
+              { name: "id", type: "int", pk: true },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
+              { name: "symbol", type: "str" },
+              { name: "name", type: "str" },
+              { name: "desc", type: "str", nullable: true },
+            ]
+          },
+          {
+            name: "tribe",
             desc: "Creature subtypes — e.g. Straw Hat, Marine, Pirate.",
             columns: [
               { name: "id", type: "int", pk: true },
-              { name: "created_ts", type: "date" },
-              { name: "updated_ts", type: "date" },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
               { name: "name", type: "str" },
               { name: "desc", type: "str", nullable: true },
             ]
           },
           {
-            name: "Attribute",
+            name: "attribute",
             desc: "Combat attributes — e.g. Strike, Slash, Special.",
             columns: [
               { name: "id", type: "int", pk: true },
-              { name: "created_ts", type: "date" },
-              { name: "updated_ts", type: "date" },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
               { name: "name", type: "str" },
               { name: "desc", type: "str", nullable: true },
             ]
           },
           {
-            name: "Color",
+            name: "color",
             desc: "Card colors — e.g. Red, Blue, Green, Purple, Black, Yellow.",
             columns: [
               { name: "id", type: "int", pk: true },
-              { name: "created_ts", type: "date" },
-              { name: "updated_ts", type: "date" },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
               { name: "name", type: "str" },
               { name: "desc", type: "str", nullable: true },
             ]
           },
           {
-            name: "Block",
+            name: "block",
             desc: "Groups of sets forming a competitive block or season.",
             columns: [
               { name: "id", type: "int", pk: true },
-              { name: "created_ts", type: "date" },
-              { name: "updated_ts", type: "date" },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
               { name: "name", type: "str" },
               { name: "desc", type: "str", nullable: true },
             ]
           },
           {
-            name: "Format",
+            name: "format",
             desc: "Competitive formats — e.g. Standard, Block, Unlimited.",
             columns: [
               { name: "id", type: "int", pk: true },
-              { name: "created_ts", type: "date" },
-              { name: "updated_ts", type: "date" },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
               { name: "name", type: "str" },
               { name: "desc", type: "str", nullable: true },
             ]
           },
           {
-            name: "Keywords",
+            name: "keyword",
             desc: "Keyword abilities — e.g. Rush, Banish, Blocker.",
             columns: [
               { name: "id", type: "int", pk: true },
-              { name: "created_ts", type: "date" },
-              { name: "updated_ts", type: "date" },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
               { name: "name", type: "str" },
               { name: "desc", type: "str", nullable: true },
             ]
           },
           {
-            name: "Reswords",
+            name: "resword",
             desc: "Reserved terminology in card text — e.g. 'DON!!', 'On Play'.",
             columns: [
               { name: "id", type: "int", pk: true },
-              { name: "created_ts", type: "date" },
-              { name: "updated_ts", type: "date" },
+              { name: "created_ts", type: "datetime", nullable: true },
+              { name: "updated_ts", type: "datetime", nullable: true },
               { name: "name", type: "str" },
               { name: "desc", type: "str", nullable: true },
             ]
@@ -658,14 +729,14 @@
         section: "Junction Tables (N:N)",
         junction: true,
         tables: [
-          { name: "CardTribe", rel: "Card ↔ Tribe" },
-          { name: "CardAttribute", rel: "Card ↔ Attribute" },
-          { name: "CardColor", rel: "Card ↔ Color" },
-          { name: "CardRarity", rel: "Card ↔ Rarity" },
-          { name: "CardBlock", rel: "Card ↔ Block" },
-          { name: "CardFormat", rel: "Card ↔ Format" },
-          { name: "CardKeywords", rel: "Card ↔ Keywords" },
-          { name: "CardReswords", rel: "Card ↔ Reswords" },
+          { name: "card_tribe", rel: "card ↔ tribe" },
+          { name: "card_attribute", rel: "card ↔ attribute" },
+          { name: "card_color", rel: "card ↔ color" },
+          { name: "card_rarity", rel: "card ↔ rarity" },
+          { name: "card_block", rel: "card ↔ block" },
+          { name: "card_format", rel: "card ↔ format" },
+          { name: "card_keyword", rel: "card ↔ keyword" },
+          { name: "card_resword", rel: "card ↔ resword" },
         ]
       }
     ];
@@ -839,13 +910,14 @@
       ta.style.height = ta.scrollHeight + 'px';
     }
 
-    function makeNoteInput(tableName, colName, placeholder) {
+    function makeNoteInput(tableName, colName, placeholder, schemaNote) {
       const ta = document.createElement('textarea');
       ta.className = 'note-input';
       ta.placeholder = placeholder;
       ta.rows = 1;
       const saved = getNote(tableName, colName);
-      if (saved) { ta.value = saved; ta.classList.add('has-note'); }
+      const initial = saved || schemaNote || '';
+      if (initial) { ta.value = initial; ta.classList.add('has-note'); }
       ta.addEventListener('input', () => {
         setNote(tableName, colName, ta.value);
         ta.classList.toggle('has-note', !!ta.value.trim());
@@ -884,7 +956,7 @@
 
           const title = document.createElement('div');
           title.className = 'table-title';
-          title.innerHTML = `<span class="table-desc">Each resolves a many-to-many relationship with Card. Structure: <code style="font-family:IBM Plex Mono,monospace;font-size:0.75rem">card_fk (PK/FK)</code> + <code style="font-family:IBM Plex Mono,monospace;font-size:0.75rem">*_fk (PK/FK)</code> + timestamps.</span>`;
+          title.innerHTML = `<span class="table-desc">Each resolves a many-to-many relationship with Card. Structure: id (PK) + timestamps + <code style="font-family:IBM Plex Mono,monospace;font-size:0.75rem">card_fk (FK, IDX)</code> + <code style="font-family:IBM Plex Mono,monospace;font-size:0.75rem">*_fk (FK, IDX)</code>. UniqueConstraint on (card_fk, *_fk).</span>`;
           block.appendChild(title);
 
           const table = document.createElement('table');
@@ -946,6 +1018,8 @@
               if (col.pk) defaultTags.push('PK');
               if (col.fk) defaultTags.push('FK');
               if (col.nullable) defaultTags.push('NULL');
+              if (col.uk) defaultTags.push('UK');
+              if (col.idx) defaultTags.push('IDX');
 
               const row = document.createElement('div');
               row.className = 'col-row';
@@ -963,7 +1037,7 @@
 
               const noteDiv = document.createElement('div');
               noteDiv.className = 'note-cell';
-              noteDiv.appendChild(makeNoteInput(tbl.name, col.name, 'Why does this field exist?'));
+              noteDiv.appendChild(makeNoteInput(tbl.name, col.name, 'Why does this field exist?', col.note));
               const hint = document.createElement('span');
               hint.className = 'note-hint';
               hint.textContent = 'click to edit';

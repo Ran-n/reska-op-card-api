@@ -39,5 +39,6 @@ Thumbs.db
 .env.*
 
 # Local dev data
+data/
 *.db
 *.log

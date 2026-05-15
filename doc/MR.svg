@@ -1,0 +1,871 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="1082" viewBox="0 0 1700 1082">
+<rect width="1700" height="1082" fill="#f7f6f2"/>
+<defs><marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#2a52be" opacity="0.8"/></marker></defs>
+<!-- FK edges -->
+<path d="M 230 239 L 210 239 L 210 184 L 190 184" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 230 239 L 210 239 L 210 642 L 190 642" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 315 398 L 315 398 L 315 420 L 315 420" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 400 239 L 435 239 L 435 480 L 470 480" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 400 239 L 555 239 L 555 480 L 710 480" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 470 228 L 435 228 L 435 239 L 400 239" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 470 228 L 330 228 L 330 184 L 190 184" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 640 228 L 800 228 L 800 151 L 960 151" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 640 228 L 800 228 L 800 362 L 960 362" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 470 228 L 435 228 L 435 480 L 400 480" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 640 228 L 675 228 L 675 140 L 710 140" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 555 376 L 555 376 L 555 420 L 555 420" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 640 228 L 675 228 L 675 480 L 710 480" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 105 288 L 105 288 L 105 380 L 105 380" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 315 620 L 315 620 L 315 398 L 315 398" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 400 713 L 435 713 L 435 480 L 470 480" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 470 713 L 435 713 L 435 239 L 400 239" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 640 713 L 675 713 L 675 480 L 710 480" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 190 971 L 210 971 L 210 239 L 230 239" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 190 971 L 575 971 L 575 531 L 960 531" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 315 900 L 315 900 L 315 398 L 315 398" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 400 971 L 680 971 L 680 711 L 960 711" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 440 971 L 420 971 L 420 239 L 400 239" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 610 971 L 785 971 L 785 891 L 960 891" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 650 971 L 525 971 L 525 239 L 400 239" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 820 971 L 890 971 L 890 362 L 960 362" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 860 971 L 630 971 L 630 239 L 400 239" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 1030 971 L 1115 971 L 1115 151 L 1200 151" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 1070 971 L 735 971 L 735 239 L 400 239" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 1240 971 L 1220 971 L 1220 331 L 1200 331" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 1280 971 L 840 971 L 840 239 L 400 239" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 1365 900 L 1325 900 L 1325 582 L 1285 582" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 1490 971 L 945 971 L 945 239 L 400 239" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<path d="M 1490 971 L 1430 971 L 1430 691 L 1370 691" fill="none" stroke="#2a52be" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#arrow)"/>
+<!-- Tables -->
+<rect x="23" y="83" width="170" height="208" rx="3" fill="#00000018"/>
+<rect x="20" y="80" width="170" height="208" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="20" y="80" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="20" y="104" width="170" height="4" fill="#1a1a1a"/>
+<text x="30" y="98" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">set</text>
+<text x="30" y="124" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="180" y="124" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="160" y="113" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="170" y="122" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="21" y="132" width="168" height="22" fill="#00000008"/>
+<line x1="20" y1="132" x2="190" y2="132" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="146" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="180" y="146" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="148" y="135" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="164" y="144" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="20" y1="154" x2="190" y2="154" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="168" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="180" y="168" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="148" y="157" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="164" y="166" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="21" y="176" width="168" height="22" fill="#00000008"/>
+<line x1="20" y1="176" x2="190" y2="176" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="190" font-family="monospace" font-size="10" fill="#1a1a1a">type_fk</text>
+<text x="180" y="190" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="148" y="179" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="164" y="188" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="125" y="179" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="135" y="188" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="20" y1="198" x2="190" y2="198" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="212" font-family="monospace" font-size="10" fill="#1a1a1a">code</text>
+<text x="180" y="212" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="160" y="201" width="20" height="13" rx="2" fill="#ede9fe" stroke="#c4b5fd" stroke-width="0.8"/><text x="170" y="210" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#5b21b6">UK</text>
+<rect x="21" y="220" width="168" height="22" fill="#00000008"/>
+<line x1="20" y1="220" x2="190" y2="220" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="234" font-family="monospace" font-size="10" fill="#1a1a1a">name</text>
+<text x="180" y="234" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<line x1="20" y1="242" x2="190" y2="242" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="256" font-family="monospace" font-size="10" fill="#1a1a1a">desc</text>
+<text x="180" y="256" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="148" y="245" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="164" y="254" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="21" y="264" width="168" height="22" fill="#00000008"/>
+<line x1="20" y1="264" x2="190" y2="264" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="278" font-family="monospace" font-size="10" fill="#1a1a1a">release_ts</text>
+<text x="180" y="278" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">date</text>
+<rect x="148" y="267" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="164" y="276" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="233" y="83" width="170" height="318" rx="3" fill="#00000018"/>
+<rect x="230" y="80" width="170" height="318" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="230" y="80" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="230" y="104" width="170" height="4" fill="#1a1a1a"/>
+<text x="240" y="98" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">card</text>
+<text x="240" y="124" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="390" y="124" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="370" y="113" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="380" y="122" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="231" y="132" width="168" height="22" fill="#00000008"/>
+<line x1="230" y1="132" x2="400" y2="132" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="146" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="390" y="146" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="358" y="135" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="374" y="144" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="230" y1="154" x2="400" y2="154" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="168" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="390" y="168" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="358" y="157" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="374" y="166" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="231" y="176" width="168" height="22" fill="#00000008"/>
+<line x1="230" y1="176" x2="400" y2="176" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="190" font-family="monospace" font-size="10" fill="#1a1a1a">set_fk</text>
+<text x="390" y="190" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="370" y="179" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="380" y="188" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="230" y1="198" x2="400" y2="198" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="212" font-family="monospace" font-size="10" fill="#1a1a1a">cardtype_fk</text>
+<text x="390" y="212" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="370" y="201" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="380" y="210" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<rect x="231" y="220" width="168" height="22" fill="#00000008"/>
+<line x1="230" y1="220" x2="400" y2="220" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="234" font-family="monospace" font-size="10" fill="#1a1a1a">name_fk</text>
+<text x="390" y="234" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="370" y="223" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="380" y="232" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="230" y1="242" x2="400" y2="242" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="256" font-family="monospace" font-size="10" fill="#1a1a1a">effect_fk</text>
+<text x="390" y="256" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="358" y="245" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="374" y="254" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="335" y="245" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="345" y="254" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<rect x="231" y="264" width="168" height="22" fill="#00000008"/>
+<line x1="230" y1="264" x2="400" y2="264" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="278" font-family="monospace" font-size="10" fill="#1a1a1a">trigger_fk</text>
+<text x="390" y="278" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="358" y="267" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="374" y="276" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="335" y="267" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="345" y="276" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="230" y1="286" x2="400" y2="286" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="300" font-family="monospace" font-size="10" fill="#1a1a1a">number</text>
+<text x="390" y="300" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="231" y="308" width="168" height="22" fill="#00000008"/>
+<line x1="230" y1="308" x2="400" y2="308" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="322" font-family="monospace" font-size="10" fill="#1a1a1a">power</text>
+<text x="390" y="322" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="358" y="311" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="374" y="320" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="230" y1="330" x2="400" y2="330" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="344" font-family="monospace" font-size="10" fill="#1a1a1a">life</text>
+<text x="390" y="344" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="358" y="333" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="374" y="342" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="231" y="352" width="168" height="22" fill="#00000008"/>
+<line x1="230" y1="352" x2="400" y2="352" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="366" font-family="monospace" font-size="10" fill="#1a1a1a">counter</text>
+<text x="390" y="366" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="358" y="355" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="374" y="364" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="230" y1="374" x2="400" y2="374" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="388" font-family="monospace" font-size="10" fill="#1a1a1a">cost</text>
+<text x="390" y="388" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="358" y="377" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="374" y="386" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="473" y="83" width="170" height="296" rx="3" fill="#00000018"/>
+<rect x="470" y="80" width="170" height="296" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="470" y="80" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="470" y="104" width="170" height="4" fill="#1a1a1a"/>
+<text x="480" y="98" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">naip</text>
+<text x="480" y="124" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="630" y="124" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="610" y="113" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="620" y="122" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="471" y="132" width="168" height="22" fill="#00000008"/>
+<line x1="470" y1="132" x2="640" y2="132" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="146" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="630" y="146" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="598" y="135" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="614" y="144" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="470" y1="154" x2="640" y2="154" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="168" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="630" y="168" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="598" y="157" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="614" y="166" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="471" y="176" width="168" height="22" fill="#00000008"/>
+<line x1="470" y1="176" x2="640" y2="176" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="190" font-family="monospace" font-size="10" fill="#1a1a1a">card_fk</text>
+<text x="630" y="190" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="604" y="179" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="617" y="188" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="581" y="179" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="591" y="188" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="470" y1="198" x2="640" y2="198" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="212" font-family="monospace" font-size="10" fill="#1a1a1a">set_fk</text>
+<text x="630" y="212" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="610" y="201" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="620" y="210" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<rect x="471" y="220" width="168" height="22" fill="#00000008"/>
+<line x1="470" y1="220" x2="640" y2="220" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="234" font-family="monospace" font-size="10" fill="#1a1a1a">artist_fk</text>
+<text x="630" y="234" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="598" y="223" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="614" y="232" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="575" y="223" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="585" y="232" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="470" y1="242" x2="640" y2="242" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="256" font-family="monospace" font-size="10" fill="#1a1a1a">rarity_fk</text>
+<text x="630" y="256" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="598" y="245" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="614" y="254" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="575" y="245" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="585" y="254" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<rect x="471" y="264" width="168" height="22" fill="#00000008"/>
+<line x1="470" y1="264" x2="640" y2="264" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="278" font-family="monospace" font-size="10" fill="#1a1a1a">name_fk</text>
+<text x="630" y="278" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="598" y="267" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="614" y="276" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="575" y="267" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="585" y="276" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="470" y1="286" x2="640" y2="286" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="300" font-family="monospace" font-size="10" fill="#1a1a1a">image_fk</text>
+<text x="630" y="300" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="598" y="289" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="614" y="298" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="575" y="289" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="585" y="298" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<rect x="471" y="308" width="168" height="22" fill="#00000008"/>
+<line x1="470" y1="308" x2="640" y2="308" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="322" font-family="monospace" font-size="10" fill="#1a1a1a">effect_fk</text>
+<text x="630" y="322" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="598" y="311" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="614" y="320" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="575" y="311" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="585" y="320" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="470" y1="330" x2="640" y2="330" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="344" font-family="monospace" font-size="10" fill="#1a1a1a">trigger_fk</text>
+<text x="630" y="344" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="598" y="333" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="614" y="342" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="575" y="333" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="585" y="342" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<rect x="471" y="352" width="168" height="22" fill="#00000008"/>
+<line x1="470" y1="352" x2="640" y2="352" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="366" font-family="monospace" font-size="10" fill="#1a1a1a">is_default</text>
+<text x="630" y="366" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">bool</text>
+<rect x="713" y="83" width="170" height="120" rx="3" fill="#00000018"/>
+<rect x="710" y="80" width="170" height="120" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="710" y="80" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="710" y="104" width="170" height="4" fill="#1a1a1a"/>
+<text x="720" y="98" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">image</text>
+<text x="720" y="124" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="870" y="124" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="850" y="113" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="860" y="122" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="711" y="132" width="168" height="22" fill="#00000008"/>
+<line x1="710" y1="132" x2="880" y2="132" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="720" y="146" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="870" y="146" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="838" y="135" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="854" y="144" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="710" y1="154" x2="880" y2="154" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="720" y="168" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="870" y="168" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="838" y="157" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="854" y="166" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="711" y="176" width="168" height="22" fill="#00000008"/>
+<line x1="710" y1="176" x2="880" y2="176" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="720" y="190" font-family="monospace" font-size="10" fill="#1a1a1a">path</text>
+<text x="870" y="190" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="850" y="179" width="20" height="13" rx="2" fill="#ede9fe" stroke="#c4b5fd" stroke-width="0.8"/><text x="860" y="188" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#5b21b6">UK</text>
+<rect x="233" y="423" width="170" height="120" rx="3" fill="#00000018"/>
+<rect x="230" y="420" width="170" height="120" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="230" y="420" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="230" y="444" width="170" height="4" fill="#1a1a1a"/>
+<text x="240" y="438" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">name</text>
+<text x="240" y="464" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="390" y="464" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="370" y="453" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="380" y="462" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="231" y="472" width="168" height="22" fill="#00000008"/>
+<line x1="230" y1="472" x2="400" y2="472" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="486" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="390" y="486" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="358" y="475" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="374" y="484" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="230" y1="494" x2="400" y2="494" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="508" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="390" y="508" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="358" y="497" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="374" y="506" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="231" y="516" width="168" height="22" fill="#00000008"/>
+<line x1="230" y1="516" x2="400" y2="516" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="530" font-family="monospace" font-size="10" fill="#1a1a1a">name</text>
+<text x="390" y="530" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="370" y="519" width="20" height="13" rx="2" fill="#ede9fe" stroke="#c4b5fd" stroke-width="0.8"/><text x="380" y="528" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#5b21b6">UK</text>
+<rect x="473" y="423" width="170" height="120" rx="3" fill="#00000018"/>
+<rect x="470" y="420" width="170" height="120" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="470" y="420" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="470" y="444" width="170" height="4" fill="#1a1a1a"/>
+<text x="480" y="438" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">effect</text>
+<text x="480" y="464" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="630" y="464" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="610" y="453" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="620" y="462" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="471" y="472" width="168" height="22" fill="#00000008"/>
+<line x1="470" y1="472" x2="640" y2="472" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="486" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="630" y="486" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="598" y="475" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="614" y="484" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="470" y1="494" x2="640" y2="494" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="508" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="630" y="508" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="598" y="497" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="614" y="506" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="471" y="516" width="168" height="22" fill="#00000008"/>
+<line x1="470" y1="516" x2="640" y2="516" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="530" font-family="monospace" font-size="10" fill="#1a1a1a">effect</text>
+<text x="630" y="530" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="610" y="519" width="20" height="13" rx="2" fill="#ede9fe" stroke="#c4b5fd" stroke-width="0.8"/><text x="620" y="528" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#5b21b6">UK</text>
+<rect x="713" y="423" width="170" height="120" rx="3" fill="#00000018"/>
+<rect x="710" y="420" width="170" height="120" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="710" y="420" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="710" y="444" width="170" height="4" fill="#1a1a1a"/>
+<text x="720" y="438" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">trigger</text>
+<text x="720" y="464" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="870" y="464" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="850" y="453" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="860" y="462" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="711" y="472" width="168" height="22" fill="#00000008"/>
+<line x1="710" y1="472" x2="880" y2="472" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="720" y="486" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="870" y="486" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="838" y="475" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="854" y="484" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="710" y1="494" x2="880" y2="494" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="720" y="508" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="870" y="508" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="838" y="497" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="854" y="506" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="711" y="516" width="168" height="22" fill="#00000008"/>
+<line x1="710" y1="516" x2="880" y2="516" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="720" y="530" font-family="monospace" font-size="10" fill="#1a1a1a">trigger</text>
+<text x="870" y="530" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="850" y="519" width="20" height="13" rx="2" fill="#ede9fe" stroke="#c4b5fd" stroke-width="0.8"/><text x="860" y="528" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#5b21b6">UK</text>
+<rect x="233" y="623" width="170" height="186" rx="3" fill="#00000018"/>
+<rect x="230" y="620" width="170" height="186" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="230" y="620" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="230" y="644" width="170" height="4" fill="#1a1a1a"/>
+<text x="240" y="638" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">card_effect_history</text>
+<text x="240" y="664" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="390" y="664" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="370" y="653" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="380" y="662" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="231" y="672" width="168" height="22" fill="#00000008"/>
+<line x1="230" y1="672" x2="400" y2="672" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="686" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="390" y="686" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="358" y="675" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="374" y="684" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="230" y1="694" x2="400" y2="694" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="708" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="390" y="708" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="358" y="697" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="374" y="706" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="231" y="716" width="168" height="22" fill="#00000008"/>
+<line x1="230" y1="716" x2="400" y2="716" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="730" font-family="monospace" font-size="10" fill="#1a1a1a">card_fk</text>
+<text x="390" y="730" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="370" y="719" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="380" y="728" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="230" y1="738" x2="400" y2="738" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="752" font-family="monospace" font-size="10" fill="#1a1a1a">effect_fk</text>
+<text x="390" y="752" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="370" y="741" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="380" y="750" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<rect x="231" y="760" width="168" height="22" fill="#00000008"/>
+<line x1="230" y1="760" x2="400" y2="760" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="774" font-family="monospace" font-size="10" fill="#1a1a1a">valid_from</text>
+<text x="390" y="774" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">date</text>
+<line x1="230" y1="782" x2="400" y2="782" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="796" font-family="monospace" font-size="10" fill="#1a1a1a">valid_to</text>
+<text x="390" y="796" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">date</text>
+<rect x="358" y="785" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="374" y="794" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="473" y="623" width="170" height="186" rx="3" fill="#00000018"/>
+<rect x="470" y="620" width="170" height="186" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="470" y="620" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="470" y="644" width="170" height="4" fill="#1a1a1a"/>
+<text x="480" y="638" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">card_trigger_history</text>
+<text x="480" y="664" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="630" y="664" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="610" y="653" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="620" y="662" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="471" y="672" width="168" height="22" fill="#00000008"/>
+<line x1="470" y1="672" x2="640" y2="672" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="686" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="630" y="686" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="598" y="675" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="614" y="684" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="470" y1="694" x2="640" y2="694" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="708" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="630" y="708" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="598" y="697" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="614" y="706" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="471" y="716" width="168" height="22" fill="#00000008"/>
+<line x1="470" y1="716" x2="640" y2="716" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="730" font-family="monospace" font-size="10" fill="#1a1a1a">card_fk</text>
+<text x="630" y="730" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="610" y="719" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="620" y="728" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="470" y1="738" x2="640" y2="738" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="752" font-family="monospace" font-size="10" fill="#1a1a1a">trigger_fk</text>
+<text x="630" y="752" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="610" y="741" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="620" y="750" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<rect x="471" y="760" width="168" height="22" fill="#00000008"/>
+<line x1="470" y1="760" x2="640" y2="760" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="774" font-family="monospace" font-size="10" fill="#1a1a1a">valid_from</text>
+<text x="630" y="774" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">date</text>
+<line x1="470" y1="782" x2="640" y2="782" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="480" y="796" font-family="monospace" font-size="10" fill="#1a1a1a">valid_to</text>
+<text x="630" y="796" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">date</text>
+<rect x="598" y="785" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="614" y="794" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="23" y="383" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="20" y="380" width="170" height="142" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="20" y="380" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="20" y="404" width="170" height="4" fill="#1a1a1a"/>
+<text x="30" y="398" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">set_type</text>
+<text x="30" y="424" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="180" y="424" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="160" y="413" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="170" y="422" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="21" y="432" width="168" height="22" fill="#00000008"/>
+<line x1="20" y1="432" x2="190" y2="432" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="446" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="180" y="446" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="148" y="435" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="164" y="444" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="20" y1="454" x2="190" y2="454" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="468" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="180" y="468" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="148" y="457" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="164" y="466" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="21" y="476" width="168" height="22" fill="#00000008"/>
+<line x1="20" y1="476" x2="190" y2="476" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="490" font-family="monospace" font-size="10" fill="#1a1a1a">name</text>
+<text x="180" y="490" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<line x1="20" y1="498" x2="190" y2="498" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="512" font-family="monospace" font-size="10" fill="#1a1a1a">desc</text>
+<text x="180" y="512" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="148" y="501" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="164" y="510" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="23" y="563" width="170" height="164" rx="3" fill="#00000018"/>
+<rect x="20" y="560" width="170" height="164" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="20" y="560" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="20" y="584" width="170" height="4" fill="#1a1a1a"/>
+<text x="30" y="578" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">card_type</text>
+<text x="30" y="604" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="180" y="604" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="160" y="593" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="170" y="602" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="21" y="612" width="168" height="22" fill="#00000008"/>
+<line x1="20" y1="612" x2="190" y2="612" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="626" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="180" y="626" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="148" y="615" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="164" y="624" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="20" y1="634" x2="190" y2="634" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="648" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="180" y="648" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="148" y="637" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="164" y="646" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="21" y="656" width="168" height="22" fill="#00000008"/>
+<line x1="20" y1="656" x2="190" y2="656" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="670" font-family="monospace" font-size="10" fill="#1a1a1a">symbol</text>
+<text x="180" y="670" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<line x1="20" y1="678" x2="190" y2="678" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="692" font-family="monospace" font-size="10" fill="#1a1a1a">name</text>
+<text x="180" y="692" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="21" y="700" width="168" height="22" fill="#00000008"/>
+<line x1="20" y1="700" x2="190" y2="700" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="714" font-family="monospace" font-size="10" fill="#1a1a1a">desc</text>
+<text x="180" y="714" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="148" y="703" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="164" y="712" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="963" y="83" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="960" y="80" width="170" height="142" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="960" y="80" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="960" y="104" width="170" height="4" fill="#1a1a1a"/>
+<text x="970" y="98" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">artist</text>
+<text x="970" y="124" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="1120" y="124" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1100" y="113" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="1110" y="122" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="961" y="132" width="168" height="22" fill="#00000008"/>
+<line x1="960" y1="132" x2="1130" y2="132" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="146" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="1120" y="146" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1088" y="135" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1104" y="144" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="960" y1="154" x2="1130" y2="154" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="168" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="1120" y="168" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1088" y="157" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1104" y="166" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="961" y="176" width="168" height="22" fill="#00000008"/>
+<line x1="960" y1="176" x2="1130" y2="176" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="190" font-family="monospace" font-size="10" fill="#1a1a1a">name</text>
+<text x="1120" y="190" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<line x1="960" y1="198" x2="1130" y2="198" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="212" font-family="monospace" font-size="10" fill="#1a1a1a">desc</text>
+<text x="1120" y="212" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="1088" y="201" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1104" y="210" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="963" y="283" width="170" height="164" rx="3" fill="#00000018"/>
+<rect x="960" y="280" width="170" height="164" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="960" y="280" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="960" y="304" width="170" height="4" fill="#1a1a1a"/>
+<text x="970" y="298" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">rarity</text>
+<text x="970" y="324" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="1120" y="324" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1100" y="313" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="1110" y="322" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="961" y="332" width="168" height="22" fill="#00000008"/>
+<line x1="960" y1="332" x2="1130" y2="332" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="346" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="1120" y="346" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1088" y="335" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1104" y="344" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="960" y1="354" x2="1130" y2="354" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="368" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="1120" y="368" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1088" y="357" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1104" y="366" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="961" y="376" width="168" height="22" fill="#00000008"/>
+<line x1="960" y1="376" x2="1130" y2="376" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="390" font-family="monospace" font-size="10" fill="#1a1a1a">symbol</text>
+<text x="1120" y="390" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<line x1="960" y1="398" x2="1130" y2="398" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="412" font-family="monospace" font-size="10" fill="#1a1a1a">name</text>
+<text x="1120" y="412" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="961" y="420" width="168" height="22" fill="#00000008"/>
+<line x1="960" y1="420" x2="1130" y2="420" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="434" font-family="monospace" font-size="10" fill="#1a1a1a">desc</text>
+<text x="1120" y="434" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="1088" y="423" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1104" y="432" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="963" y="463" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="960" y="460" width="170" height="142" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="960" y="460" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="960" y="484" width="170" height="4" fill="#1a1a1a"/>
+<text x="970" y="478" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">tribe</text>
+<text x="970" y="504" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="1120" y="504" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1100" y="493" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="1110" y="502" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="961" y="512" width="168" height="22" fill="#00000008"/>
+<line x1="960" y1="512" x2="1130" y2="512" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="526" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="1120" y="526" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1088" y="515" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1104" y="524" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="960" y1="534" x2="1130" y2="534" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="548" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="1120" y="548" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1088" y="537" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1104" y="546" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="961" y="556" width="168" height="22" fill="#00000008"/>
+<line x1="960" y1="556" x2="1130" y2="556" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="570" font-family="monospace" font-size="10" fill="#1a1a1a">name</text>
+<text x="1120" y="570" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<line x1="960" y1="578" x2="1130" y2="578" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="592" font-family="monospace" font-size="10" fill="#1a1a1a">desc</text>
+<text x="1120" y="592" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="1088" y="581" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1104" y="590" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="963" y="643" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="960" y="640" width="170" height="142" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="960" y="640" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="960" y="664" width="170" height="4" fill="#1a1a1a"/>
+<text x="970" y="658" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">attribute</text>
+<text x="970" y="684" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="1120" y="684" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1100" y="673" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="1110" y="682" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="961" y="692" width="168" height="22" fill="#00000008"/>
+<line x1="960" y1="692" x2="1130" y2="692" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="706" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="1120" y="706" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1088" y="695" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1104" y="704" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="960" y1="714" x2="1130" y2="714" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="728" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="1120" y="728" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1088" y="717" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1104" y="726" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="961" y="736" width="168" height="22" fill="#00000008"/>
+<line x1="960" y1="736" x2="1130" y2="736" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="750" font-family="monospace" font-size="10" fill="#1a1a1a">name</text>
+<text x="1120" y="750" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<line x1="960" y1="758" x2="1130" y2="758" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="772" font-family="monospace" font-size="10" fill="#1a1a1a">desc</text>
+<text x="1120" y="772" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="1088" y="761" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1104" y="770" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="963" y="823" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="960" y="820" width="170" height="142" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="960" y="820" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="960" y="844" width="170" height="4" fill="#1a1a1a"/>
+<text x="970" y="838" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">color</text>
+<text x="970" y="864" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="1120" y="864" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1100" y="853" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="1110" y="862" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="961" y="872" width="168" height="22" fill="#00000008"/>
+<line x1="960" y1="872" x2="1130" y2="872" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="886" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="1120" y="886" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1088" y="875" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1104" y="884" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="960" y1="894" x2="1130" y2="894" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="908" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="1120" y="908" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1088" y="897" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1104" y="906" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="961" y="916" width="168" height="22" fill="#00000008"/>
+<line x1="960" y1="916" x2="1130" y2="916" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="930" font-family="monospace" font-size="10" fill="#1a1a1a">name</text>
+<text x="1120" y="930" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<line x1="960" y1="938" x2="1130" y2="938" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="970" y="952" font-family="monospace" font-size="10" fill="#1a1a1a">desc</text>
+<text x="1120" y="952" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="1088" y="941" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1104" y="950" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="1203" y="83" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="1200" y="80" width="170" height="142" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="1200" y="80" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="1200" y="104" width="170" height="4" fill="#1a1a1a"/>
+<text x="1210" y="98" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">block</text>
+<text x="1210" y="124" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="1360" y="124" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1340" y="113" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="1350" y="122" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="1201" y="132" width="168" height="22" fill="#00000008"/>
+<line x1="1200" y1="132" x2="1370" y2="132" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="1210" y="146" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="1360" y="146" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1328" y="135" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1344" y="144" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="1200" y1="154" x2="1370" y2="154" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="1210" y="168" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="1360" y="168" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1328" y="157" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1344" y="166" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="1201" y="176" width="168" height="22" fill="#00000008"/>
+<line x1="1200" y1="176" x2="1370" y2="176" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="1210" y="190" font-family="monospace" font-size="10" fill="#1a1a1a">name</text>
+<text x="1360" y="190" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<line x1="1200" y1="198" x2="1370" y2="198" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="1210" y="212" font-family="monospace" font-size="10" fill="#1a1a1a">desc</text>
+<text x="1360" y="212" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="1328" y="201" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1344" y="210" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="1203" y="263" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="1200" y="260" width="170" height="142" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="1200" y="260" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="1200" y="284" width="170" height="4" fill="#1a1a1a"/>
+<text x="1210" y="278" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">format</text>
+<text x="1210" y="304" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="1360" y="304" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1340" y="293" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="1350" y="302" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="1201" y="312" width="168" height="22" fill="#00000008"/>
+<line x1="1200" y1="312" x2="1370" y2="312" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="1210" y="326" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="1360" y="326" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1328" y="315" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1344" y="324" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="1200" y1="334" x2="1370" y2="334" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="1210" y="348" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="1360" y="348" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1328" y="337" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1344" y="346" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="1201" y="356" width="168" height="22" fill="#00000008"/>
+<line x1="1200" y1="356" x2="1370" y2="356" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="1210" y="370" font-family="monospace" font-size="10" fill="#1a1a1a">name</text>
+<text x="1360" y="370" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<line x1="1200" y1="378" x2="1370" y2="378" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="1210" y="392" font-family="monospace" font-size="10" fill="#1a1a1a">desc</text>
+<text x="1360" y="392" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="1328" y="381" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1344" y="390" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="1203" y="443" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="1200" y="440" width="170" height="142" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="1200" y="440" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="1200" y="464" width="170" height="4" fill="#1a1a1a"/>
+<text x="1210" y="458" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">keyword</text>
+<text x="1210" y="484" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="1360" y="484" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1340" y="473" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="1350" y="482" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="1201" y="492" width="168" height="22" fill="#00000008"/>
+<line x1="1200" y1="492" x2="1370" y2="492" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="1210" y="506" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="1360" y="506" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1328" y="495" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1344" y="504" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="1200" y1="514" x2="1370" y2="514" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="1210" y="528" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="1360" y="528" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1328" y="517" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1344" y="526" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="1201" y="536" width="168" height="22" fill="#00000008"/>
+<line x1="1200" y1="536" x2="1370" y2="536" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="1210" y="550" font-family="monospace" font-size="10" fill="#1a1a1a">name</text>
+<text x="1360" y="550" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<line x1="1200" y1="558" x2="1370" y2="558" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="1210" y="572" font-family="monospace" font-size="10" fill="#1a1a1a">desc</text>
+<text x="1360" y="572" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="1328" y="561" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1344" y="570" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="1203" y="623" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="1200" y="620" width="170" height="142" rx="3" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="1200" y="620" width="170" height="28" rx="3" fill="#1a1a1a"/>
+<rect x="1200" y="644" width="170" height="4" fill="#1a1a1a"/>
+<text x="1210" y="638" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">resword</text>
+<text x="1210" y="664" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="1360" y="664" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1340" y="653" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="1350" y="662" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="1201" y="672" width="168" height="22" fill="#00000008"/>
+<line x1="1200" y1="672" x2="1370" y2="672" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="1210" y="686" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="1360" y="686" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1328" y="675" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1344" y="684" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="1200" y1="694" x2="1370" y2="694" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="1210" y="708" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="1360" y="708" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1328" y="697" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1344" y="706" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="1201" y="716" width="168" height="22" fill="#00000008"/>
+<line x1="1200" y1="716" x2="1370" y2="716" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="1210" y="730" font-family="monospace" font-size="10" fill="#1a1a1a">name</text>
+<text x="1360" y="730" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<line x1="1200" y1="738" x2="1370" y2="738" stroke="#1a1a1a" stroke-width="0.4" opacity="0.4"/>
+<text x="1210" y="752" font-family="monospace" font-size="10" fill="#1a1a1a">desc</text>
+<text x="1360" y="752" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">str</text>
+<rect x="1328" y="741" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1344" y="750" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="23" y="903" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="20" y="900" width="170" height="142" rx="3" fill="#f3f0ff" stroke="#c4b5fd" stroke-width="1.2"/>
+<rect x="20" y="900" width="170" height="28" rx="3" fill="#4c1d95"/>
+<rect x="20" y="924" width="170" height="4" fill="#4c1d95"/>
+<text x="30" y="918" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">card_tribe</text>
+<text x="30" y="944" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="180" y="944" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="160" y="933" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="170" y="942" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="21" y="952" width="168" height="22" fill="#00000008"/>
+<line x1="20" y1="952" x2="190" y2="952" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="966" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="180" y="966" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="148" y="955" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="164" y="964" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="20" y1="974" x2="190" y2="974" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="988" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="180" y="988" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="148" y="977" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="164" y="986" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="21" y="996" width="168" height="22" fill="#00000008"/>
+<line x1="20" y1="996" x2="190" y2="996" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="1010" font-family="monospace" font-size="10" fill="#1a1a1a">card_fk</text>
+<text x="180" y="1010" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="154" y="999" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="167" y="1008" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="131" y="999" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="141" y="1008" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="20" y1="1018" x2="190" y2="1018" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="30" y="1032" font-family="monospace" font-size="10" fill="#1a1a1a">tribe_fk</text>
+<text x="180" y="1032" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="154" y="1021" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="167" y="1030" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="131" y="1021" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="141" y="1030" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<rect x="233" y="903" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="230" y="900" width="170" height="142" rx="3" fill="#f3f0ff" stroke="#c4b5fd" stroke-width="1.2"/>
+<rect x="230" y="900" width="170" height="28" rx="3" fill="#4c1d95"/>
+<rect x="230" y="924" width="170" height="4" fill="#4c1d95"/>
+<text x="240" y="918" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">card_attribute</text>
+<text x="240" y="944" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="390" y="944" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="370" y="933" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="380" y="942" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="231" y="952" width="168" height="22" fill="#00000008"/>
+<line x1="230" y1="952" x2="400" y2="952" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="966" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="390" y="966" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="358" y="955" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="374" y="964" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="230" y1="974" x2="400" y2="974" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="988" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="390" y="988" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="358" y="977" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="374" y="986" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="231" y="996" width="168" height="22" fill="#00000008"/>
+<line x1="230" y1="996" x2="400" y2="996" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="1010" font-family="monospace" font-size="10" fill="#1a1a1a">card_fk</text>
+<text x="390" y="1010" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="364" y="999" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="377" y="1008" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="341" y="999" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="351" y="1008" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="230" y1="1018" x2="400" y2="1018" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="240" y="1032" font-family="monospace" font-size="10" fill="#1a1a1a">attribute_fk</text>
+<text x="390" y="1032" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="364" y="1021" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="377" y="1030" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="341" y="1021" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="351" y="1030" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<rect x="443" y="903" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="440" y="900" width="170" height="142" rx="3" fill="#f3f0ff" stroke="#c4b5fd" stroke-width="1.2"/>
+<rect x="440" y="900" width="170" height="28" rx="3" fill="#4c1d95"/>
+<rect x="440" y="924" width="170" height="4" fill="#4c1d95"/>
+<text x="450" y="918" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">card_color</text>
+<text x="450" y="944" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="600" y="944" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="580" y="933" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="590" y="942" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="441" y="952" width="168" height="22" fill="#00000008"/>
+<line x1="440" y1="952" x2="610" y2="952" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="450" y="966" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="600" y="966" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="568" y="955" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="584" y="964" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="440" y1="974" x2="610" y2="974" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="450" y="988" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="600" y="988" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="568" y="977" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="584" y="986" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="441" y="996" width="168" height="22" fill="#00000008"/>
+<line x1="440" y1="996" x2="610" y2="996" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="450" y="1010" font-family="monospace" font-size="10" fill="#1a1a1a">card_fk</text>
+<text x="600" y="1010" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="574" y="999" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="587" y="1008" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="551" y="999" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="561" y="1008" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="440" y1="1018" x2="610" y2="1018" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="450" y="1032" font-family="monospace" font-size="10" fill="#1a1a1a">color_fk</text>
+<text x="600" y="1032" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="574" y="1021" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="587" y="1030" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="551" y="1021" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="561" y="1030" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<rect x="653" y="903" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="650" y="900" width="170" height="142" rx="3" fill="#f3f0ff" stroke="#c4b5fd" stroke-width="1.2"/>
+<rect x="650" y="900" width="170" height="28" rx="3" fill="#4c1d95"/>
+<rect x="650" y="924" width="170" height="4" fill="#4c1d95"/>
+<text x="660" y="918" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">card_rarity</text>
+<text x="660" y="944" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="810" y="944" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="790" y="933" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="800" y="942" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="651" y="952" width="168" height="22" fill="#00000008"/>
+<line x1="650" y1="952" x2="820" y2="952" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="660" y="966" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="810" y="966" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="778" y="955" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="794" y="964" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="650" y1="974" x2="820" y2="974" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="660" y="988" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="810" y="988" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="778" y="977" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="794" y="986" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="651" y="996" width="168" height="22" fill="#00000008"/>
+<line x1="650" y1="996" x2="820" y2="996" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="660" y="1010" font-family="monospace" font-size="10" fill="#1a1a1a">card_fk</text>
+<text x="810" y="1010" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="784" y="999" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="797" y="1008" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="761" y="999" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="771" y="1008" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="650" y1="1018" x2="820" y2="1018" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="660" y="1032" font-family="monospace" font-size="10" fill="#1a1a1a">rarity_fk</text>
+<text x="810" y="1032" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="784" y="1021" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="797" y="1030" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="761" y="1021" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="771" y="1030" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<rect x="863" y="903" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="860" y="900" width="170" height="142" rx="3" fill="#f3f0ff" stroke="#c4b5fd" stroke-width="1.2"/>
+<rect x="860" y="900" width="170" height="28" rx="3" fill="#4c1d95"/>
+<rect x="860" y="924" width="170" height="4" fill="#4c1d95"/>
+<text x="870" y="918" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">card_block</text>
+<text x="870" y="944" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="1020" y="944" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1000" y="933" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="1010" y="942" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="861" y="952" width="168" height="22" fill="#00000008"/>
+<line x1="860" y1="952" x2="1030" y2="952" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="870" y="966" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="1020" y="966" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="988" y="955" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1004" y="964" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="860" y1="974" x2="1030" y2="974" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="870" y="988" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="1020" y="988" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="988" y="977" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1004" y="986" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="861" y="996" width="168" height="22" fill="#00000008"/>
+<line x1="860" y1="996" x2="1030" y2="996" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="870" y="1010" font-family="monospace" font-size="10" fill="#1a1a1a">card_fk</text>
+<text x="1020" y="1010" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="994" y="999" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="1007" y="1008" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="971" y="999" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="981" y="1008" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="860" y1="1018" x2="1030" y2="1018" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="870" y="1032" font-family="monospace" font-size="10" fill="#1a1a1a">block_fk</text>
+<text x="1020" y="1032" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="994" y="1021" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="1007" y="1030" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="971" y="1021" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="981" y="1030" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<rect x="1073" y="903" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="1070" y="900" width="170" height="142" rx="3" fill="#f3f0ff" stroke="#c4b5fd" stroke-width="1.2"/>
+<rect x="1070" y="900" width="170" height="28" rx="3" fill="#4c1d95"/>
+<rect x="1070" y="924" width="170" height="4" fill="#4c1d95"/>
+<text x="1080" y="918" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">card_format</text>
+<text x="1080" y="944" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="1230" y="944" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1210" y="933" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="1220" y="942" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="1071" y="952" width="168" height="22" fill="#00000008"/>
+<line x1="1070" y1="952" x2="1240" y2="952" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="1080" y="966" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="1230" y="966" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1198" y="955" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1214" y="964" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="1070" y1="974" x2="1240" y2="974" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="1080" y="988" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="1230" y="988" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1198" y="977" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1214" y="986" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="1071" y="996" width="168" height="22" fill="#00000008"/>
+<line x1="1070" y1="996" x2="1240" y2="996" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="1080" y="1010" font-family="monospace" font-size="10" fill="#1a1a1a">card_fk</text>
+<text x="1230" y="1010" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1204" y="999" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="1217" y="1008" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="1181" y="999" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="1191" y="1008" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="1070" y1="1018" x2="1240" y2="1018" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="1080" y="1032" font-family="monospace" font-size="10" fill="#1a1a1a">format_fk</text>
+<text x="1230" y="1032" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1204" y="1021" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="1217" y="1030" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="1181" y="1021" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="1191" y="1030" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<rect x="1283" y="903" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="1280" y="900" width="170" height="142" rx="3" fill="#f3f0ff" stroke="#c4b5fd" stroke-width="1.2"/>
+<rect x="1280" y="900" width="170" height="28" rx="3" fill="#4c1d95"/>
+<rect x="1280" y="924" width="170" height="4" fill="#4c1d95"/>
+<text x="1290" y="918" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">card_keyword</text>
+<text x="1290" y="944" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="1440" y="944" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1420" y="933" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="1430" y="942" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="1281" y="952" width="168" height="22" fill="#00000008"/>
+<line x1="1280" y1="952" x2="1450" y2="952" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="1290" y="966" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="1440" y="966" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1408" y="955" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1424" y="964" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="1280" y1="974" x2="1450" y2="974" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="1290" y="988" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="1440" y="988" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1408" y="977" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1424" y="986" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="1281" y="996" width="168" height="22" fill="#00000008"/>
+<line x1="1280" y1="996" x2="1450" y2="996" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="1290" y="1010" font-family="monospace" font-size="10" fill="#1a1a1a">card_fk</text>
+<text x="1440" y="1010" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1414" y="999" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="1427" y="1008" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="1391" y="999" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="1401" y="1008" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="1280" y1="1018" x2="1450" y2="1018" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="1290" y="1032" font-family="monospace" font-size="10" fill="#1a1a1a">keyword_fk</text>
+<text x="1440" y="1032" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1414" y="1021" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="1427" y="1030" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="1391" y="1021" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="1401" y="1030" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<rect x="1493" y="903" width="170" height="142" rx="3" fill="#00000018"/>
+<rect x="1490" y="900" width="170" height="142" rx="3" fill="#f3f0ff" stroke="#c4b5fd" stroke-width="1.2"/>
+<rect x="1490" y="900" width="170" height="28" rx="3" fill="#4c1d95"/>
+<rect x="1490" y="924" width="170" height="4" fill="#4c1d95"/>
+<text x="1500" y="918" font-family="monospace" font-size="12" font-weight="bold" fill="#ffffff">card_resword</text>
+<text x="1500" y="944" font-family="monospace" font-size="10" fill="#1a1a1a">id</text>
+<text x="1650" y="944" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1630" y="933" width="20" height="13" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.8"/><text x="1640" y="942" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#b45309">PK</text>
+<rect x="1491" y="952" width="168" height="22" fill="#00000008"/>
+<line x1="1490" y1="952" x2="1660" y2="952" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="1500" y="966" font-family="monospace" font-size="10" fill="#1a1a1a">created_ts</text>
+<text x="1650" y="966" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1618" y="955" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1634" y="964" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<line x1="1490" y1="974" x2="1660" y2="974" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="1500" y="988" font-family="monospace" font-size="10" fill="#1a1a1a">updated_ts</text>
+<text x="1650" y="988" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">datetime</text>
+<rect x="1618" y="977" width="32" height="13" rx="2" fill="#f0f0ec" stroke="#d0d0c8" stroke-width="0.8"/><text x="1634" y="986" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#888880">NULL</text>
+<rect x="1491" y="996" width="168" height="22" fill="#00000008"/>
+<line x1="1490" y1="996" x2="1660" y2="996" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="1500" y="1010" font-family="monospace" font-size="10" fill="#1a1a1a">card_fk</text>
+<text x="1650" y="1010" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1624" y="999" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="1637" y="1008" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="1601" y="999" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="1611" y="1008" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+<line x1="1490" y1="1018" x2="1660" y2="1018" stroke="#c4b5fd" stroke-width="0.4" opacity="0.4"/>
+<text x="1500" y="1032" font-family="monospace" font-size="10" fill="#1a1a1a">resword_fk</text>
+<text x="1650" y="1032" text-anchor="end" font-family="monospace" font-size="9" fill="#666660">int</text>
+<rect x="1624" y="1021" width="26" height="13" rx="2" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8"/><text x="1637" y="1030" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#0369a1">IDX</text>
+<rect x="1601" y="1021" width="20" height="13" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.8"/><text x="1611" y="1030" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#166534">FK</text>
+</svg>

@@ -1,136 +1,161 @@
-from datetime import date
-from typing import Optional
+#!/usr/bin/env python3
+"""
+Authors: Ran# <ran.hash@proton.me>
+Created: 2026/05/13 13:13:00.000000
+Revised: 2026/05/15 13:33:58.453060
+"""
+
+from datetime import UTC, date, datetime
 
 import sqlalchemy as sa
+from sqlalchemy import Index, UniqueConstraint
+from sqlalchemy.types import TypeDecorator
 from sqlmodel import Field, SQLModel
 
 
+class _DateTimeMs(TypeDecorator):
+    """Stores datetime as 'YYYY-MM-DD HH:MM:SS.mmm' (3 decimal places)."""
+
+    impl = sa.String
+    cache_ok = True
+
+    def process_bind_param(self, value, _dialect):
+        if value is None:
+            return None
+        return value.strftime("%Y-%m-%d %H:%M:%S.") + f"{value.microsecond // 1000:03d}"
+
+    def process_result_value(self, value, _dialect):
+        if value is None:
+            return None
+        return datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
+
+
+def _now_ms() -> datetime:
+    dt = datetime.now(UTC)
+    return dt.replace(tzinfo=None, microsecond=(dt.microsecond // 1000) * 1000)
+
+
 def _created_col() -> sa.Column:
-    return sa.Column(sa.Date, nullable=True, server_default=sa.text("CURRENT_DATE"))
+    return sa.Column(_DateTimeMs, nullable=True, default=_now_ms)
 
 
 def _updated_col() -> sa.Column:
-    return sa.Column(
-        sa.Date,
-        nullable=True,
-        server_default=sa.text("CURRENT_DATE"),
-        onupdate=sa.func.current_date(),
-    )
+    return sa.Column(_DateTimeMs, nullable=True, default=_now_ms, onupdate=_now_ms)
 
 
 # ── Lookup tables ────────────────────────────────────────────────────────────
 
 
 class SetType(SQLModel, table=True):
-    __tablename__ = "settype"
+    __tablename__ = "set_type"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     name: str
-    desc: Optional[str] = None
+    desc: str | None = None
 
 
 class CardType(SQLModel, table=True):
-    __tablename__ = "cardtype"
+    __tablename__ = "card_type"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     symbol: str
     name: str
-    desc: Optional[str] = None
+    desc: str | None = None
 
 
 class Artist(SQLModel, table=True):
     __tablename__ = "artist"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     name: str
-    desc: Optional[str] = None
+    desc: str | None = None
 
 
 class Rarity(SQLModel, table=True):
     __tablename__ = "rarity"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     symbol: str
     name: str
-    desc: Optional[str] = None
+    desc: str | None = None
 
 
 class Tribe(SQLModel, table=True):
     __tablename__ = "tribe"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     name: str
-    desc: Optional[str] = None
+    desc: str | None = None
 
 
 class Attribute(SQLModel, table=True):
     __tablename__ = "attribute"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     name: str
-    desc: Optional[str] = None
+    desc: str | None = None
 
 
 class Color(SQLModel, table=True):
     __tablename__ = "color"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     name: str
-    desc: Optional[str] = None
+    desc: str | None = None
 
 
 class Block(SQLModel, table=True):
     __tablename__ = "block"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     name: str
-    desc: Optional[str] = None
+    desc: str | None = None
 
 
 class Format(SQLModel, table=True):
     __tablename__ = "format"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     name: str
-    desc: Optional[str] = None
+    desc: str | None = None
 
 
-class Keywords(SQLModel, table=True):
-    __tablename__ = "keywords"
+class Keyword(SQLModel, table=True):
+    __tablename__ = "keyword"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     name: str
-    desc: Optional[str] = None
+    desc: str | None = None
 
 
-class Reswords(SQLModel, table=True):
-    __tablename__ = "reswords"
+class Resword(SQLModel, table=True):
+    __tablename__ = "resword"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     name: str
-    desc: Optional[str] = None
+    desc: str | None = None
 
 
 # ── Core tables ──────────────────────────────────────────────────────────────
@@ -139,127 +164,235 @@ class Reswords(SQLModel, table=True):
 class Set(SQLModel, table=True):
     __tablename__ = "set"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
-    type_fk: Optional[int] = Field(default=None, foreign_key="settype.id")
-    code: str
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
+    type_fk: int | None = Field(default=None, foreign_key="set_type.id")
+    code: str = Field(sa_column=sa.Column(sa.String, nullable=False, unique=True))
     name: str
-    desc: Optional[str] = None
-    release_ts: Optional[date] = None
+    desc: str | None = None
+    release_ts: date | None = None
+
+
+class Name(SQLModel, table=True):
+    __tablename__ = "name"
+
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
+    name: str = Field(sa_column=sa.Column(sa.String, nullable=False, unique=True))
+
+
+class Image(SQLModel, table=True):
+    __tablename__ = "image"
+
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
+    path: str = Field(sa_column=sa.Column(sa.String, nullable=False, unique=True))
+
+
+class Effect(SQLModel, table=True):
+    __tablename__ = "effect"
+
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
+    effect: str = Field(sa_column=sa.Column(sa.String, nullable=False, unique=True))
+
+
+class Trigger(SQLModel, table=True):
+    __tablename__ = "trigger"
+
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
+    trigger: str = Field(sa_column=sa.Column(sa.String, nullable=False, unique=True))
 
 
 class Card(SQLModel, table=True):
     __tablename__ = "card"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     set_fk: int = Field(foreign_key="set.id")
-    cardtype_fk: int = Field(foreign_key="cardtype.id")
+    cardtype_fk: int = Field(foreign_key="card_type.id")
+    name_fk: int = Field(foreign_key="name.id")
+    effect_fk: int | None = Field(default=None, foreign_key="effect.id")
+    trigger_fk: int | None = Field(default=None, foreign_key="trigger.id")
     number: int
-    name: str
-    desc: Optional[str] = None
-    trigger: Optional[str] = None
-    power: Optional[int] = None
-    life: Optional[int] = None
-    counter: Optional[int] = None
-    cost: Optional[int] = None
-    image_path: Optional[str] = None
+    power: int | None = None
+    life: int | None = None
+    counter: int | None = None
+    cost: int | None = None
 
 
 class Naip(SQLModel, table=True):
     """A specific physical print of a card (card + set + artist + rarity)."""
 
     __tablename__ = "naip"
+    __table_args__ = (
+        # at most one default print per card
+        Index("ix_naip_one_default_per_card", "card_fk", unique=True, sqlite_where=sa.text("is_default = 1")),
+    )
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     card_fk: int = Field(foreign_key="card.id")
     set_fk: int = Field(foreign_key="set.id")
-    artist_fk: Optional[int] = Field(default=None, foreign_key="artist.id")
-    rarity_fk: Optional[int] = Field(default=None, foreign_key="rarity.id")
-    name: str
-    desc: Optional[str] = None
+    artist_fk: int | None = Field(default=None, foreign_key="artist.id")
+    rarity_fk: int | None = Field(default=None, foreign_key="rarity.id")
+    name_fk: int | None = Field(default=None, foreign_key="name.id")
+    image_fk: int | None = Field(default=None, foreign_key="image.id")
+    effect_fk: int | None = Field(default=None, foreign_key="effect.id")
+    trigger_fk: int | None = Field(default=None, foreign_key="trigger.id")
+    is_default: bool = Field(default=False)
+
+
+class CardEffectHistory(SQLModel, table=True):
+    __tablename__ = "card_effect_history"
+
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
+    card_fk: int = Field(foreign_key="card.id")
+    effect_fk: int = Field(foreign_key="effect.id")
+    valid_from: date
+    valid_to: date | None = None
+
+
+class CardTriggerHistory(SQLModel, table=True):
+    __tablename__ = "card_trigger_history"
+
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
+    card_fk: int = Field(foreign_key="card.id")
+    trigger_fk: int = Field(foreign_key="trigger.id")
+    valid_from: date
+    valid_to: date | None = None
 
 
 # ── Junction tables ──────────────────────────────────────────────────────────
 
 
 class CardTribe(SQLModel, table=True):
-    __tablename__ = "cardtribe"
+    __tablename__ = "card_tribe"
+    __table_args__ = (
+        UniqueConstraint("card_fk", "tribe_fk"),
+        Index("ix_card_tribe_card_fk", "card_fk"),
+        Index("ix_card_tribe_tribe_fk", "tribe_fk"),
+    )
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     card_fk: int = Field(foreign_key="card.id")
     tribe_fk: int = Field(foreign_key="tribe.id")
 
 
 class CardAttribute(SQLModel, table=True):
-    __tablename__ = "cardattribute"
+    __tablename__ = "card_attribute"
+    __table_args__ = (
+        UniqueConstraint("card_fk", "attribute_fk"),
+        Index("ix_card_attribute_card_fk", "card_fk"),
+        Index("ix_card_attribute_attribute_fk", "attribute_fk"),
+    )
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     card_fk: int = Field(foreign_key="card.id")
     attribute_fk: int = Field(foreign_key="attribute.id")
 
 
 class CardColor(SQLModel, table=True):
-    __tablename__ = "cardcolor"
+    __tablename__ = "card_color"
+    __table_args__ = (
+        UniqueConstraint("card_fk", "color_fk"),
+        Index("ix_card_color_card_fk", "card_fk"),
+        Index("ix_card_color_color_fk", "color_fk"),
+    )
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     card_fk: int = Field(foreign_key="card.id")
     color_fk: int = Field(foreign_key="color.id")
 
 
 class CardRarity(SQLModel, table=True):
-    __tablename__ = "cardrarity"
+    __tablename__ = "card_rarity"
+    __table_args__ = (
+        UniqueConstraint("card_fk", "rarity_fk"),
+        Index("ix_card_rarity_card_fk", "card_fk"),
+        Index("ix_card_rarity_rarity_fk", "rarity_fk"),
+    )
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     card_fk: int = Field(foreign_key="card.id")
     rarity_fk: int = Field(foreign_key="rarity.id")
 
 
 class CardBlock(SQLModel, table=True):
-    __tablename__ = "cardblock"
+    __tablename__ = "card_block"
+    __table_args__ = (
+        UniqueConstraint("card_fk", "block_fk"),
+        Index("ix_card_block_card_fk", "card_fk"),
+        Index("ix_card_block_block_fk", "block_fk"),
+    )
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     card_fk: int = Field(foreign_key="card.id")
     block_fk: int = Field(foreign_key="block.id")
 
 
 class CardFormat(SQLModel, table=True):
-    __tablename__ = "cardformat"
+    __tablename__ = "card_format"
+    __table_args__ = (
+        UniqueConstraint("card_fk", "format_fk"),
+        Index("ix_card_format_card_fk", "card_fk"),
+        Index("ix_card_format_format_fk", "format_fk"),
+    )
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     card_fk: int = Field(foreign_key="card.id")
     format_fk: int = Field(foreign_key="format.id")
 
 
-class CardKeywords(SQLModel, table=True):
-    __tablename__ = "cardkeywords"
+class CardKeyword(SQLModel, table=True):
+    __tablename__ = "card_keyword"
+    __table_args__ = (
+        UniqueConstraint("card_fk", "keyword_fk"),
+        Index("ix_card_keyword_card_fk", "card_fk"),
+        Index("ix_card_keyword_keyword_fk", "keyword_fk"),
+    )
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     card_fk: int = Field(foreign_key="card.id")
-    keywords_fk: int = Field(foreign_key="keywords.id")
+    keyword_fk: int = Field(foreign_key="keyword.id")
 
 
-class CardReswords(SQLModel, table=True):
-    __tablename__ = "cardreswords"
+class CardResword(SQLModel, table=True):
+    __tablename__ = "card_resword"
+    __table_args__ = (
+        UniqueConstraint("card_fk", "resword_fk"),
+        Index("ix_card_resword_card_fk", "card_fk"),
+        Index("ix_card_resword_resword_fk", "resword_fk"),
+    )
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_ts: Optional[date] = Field(default=None, sa_column=_created_col())
-    updated_ts: Optional[date] = Field(default=None, sa_column=_updated_col())
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_created_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_updated_col())
     card_fk: int = Field(foreign_key="card.id")
-    reswords_fk: int = Field(foreign_key="reswords.id")
+    resword_fk: int = Field(foreign_key="resword.id")

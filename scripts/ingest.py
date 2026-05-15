@@ -1,4 +1,9 @@
+#!/usr/bin/env python3
 """
+Authors: Ran# <ran.hash@proton.me>
+Created: 2026/05/13 13:13:00.000000
+Revised: 2026/05/15 13:17:09.998719
+
 Populate the optcg.db database by scraping en.onepiece-cardgame.com/cardlist/.
 
 For each series in the site's dropdown, fetches the card list page and parses
@@ -13,7 +18,7 @@ import logging
 import re
 import sys
 from pathlib import Path
-from typing import Any, Optional, Type, TypeVar
+from typing import Any
 
 import httpx
 from bs4 import BeautifulSoup, Tag
@@ -22,27 +27,30 @@ from sqlmodel import Session, SQLModel, select
 # Add src/ to path so we can import the package without installing
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from optcg_api.database import engine, init_db  # noqa: E402
-from optcg_api.models import (  # noqa: E402
+from optcg_api.database import engine, init_db  # noqa: E402, I001
+from optcg_api.models import (  # noqa: E402, I001
     Attribute,
     Card,
     CardAttribute,
     CardColor,
-    CardRarity,
     CardTribe,
     CardType,
     Color,
+    Effect,
+    Name,
+    Naip,
     Rarity,
     Set,
     SetType,
     Tribe,
+    Trigger,
 )
 
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
 
-DB_PATH = Path(__file__).parent.parent / "optcg.db"
+DB_PATH = Path(__file__).parent.parent / "data" / "optcg.db"
 OFFICIAL_BASE = "https://en.onepiece-cardgame.com"
 CARDLIST_URL = f"{OFFICIAL_BASE}/cardlist/"
 
@@ -71,10 +79,8 @@ _CARD_TYPE_MAP = {
 _SET_ID_RE = re.compile(r"\[([A-Z0-9\-]+)\]")
 _CARD_NUM_RE = re.compile(r"-(\d+)")
 
-T = TypeVar("T", bound=SQLModel)
 
-
-def _get_or_create(session: Session, model: Type[T], **kwargs) -> T:
+def _get_or_create[T: SQLModel](session: Session, model: type[T], **kwargs) -> T:
     """Fetch an existing row matching kwargs, or create and flush a new one."""
     stmt = select(model)
     for k, v in kwargs.items():
@@ -118,7 +124,7 @@ def _int(val: Any) -> int | None:
         return None
     try:
         return int(s)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return None
 
 
@@ -156,9 +162,7 @@ async def _fetch_series_list(client: httpx.AsyncClient) -> list[tuple[str, str, 
     return results
 
 
-async def _fetch_series_cards(
-    client: httpx.AsyncClient, series_value: str, set_code: str
-) -> list[dict]:
+async def _fetch_series_cards(client: httpx.AsyncClient, series_value: str, set_code: str) -> list[dict]:
     r = await client.get(CARDLIST_URL, params={"series": series_value})
     r.raise_for_status()
     soup = BeautifulSoup(r.text, "html.parser")
@@ -298,7 +302,29 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
     rarity_cache: dict[str, Rarity] = {}
     attribute_cache: dict[str, Attribute] = {}
     tribe_cache: dict[str, Tribe] = {}
+    name_cache: dict[str, Name] = {}
+    effect_cache: dict[str, Effect] = {}
+    trigger_cache: dict[str, Trigger] = {}
     upserted = 0
+
+    def _get_name_fk(text: str) -> int:
+        if text not in name_cache:
+            name_cache[text] = _get_or_create(session, Name, name=text)
+        return name_cache[text].id
+
+    def _get_effect_fk(text: str | None) -> int | None:
+        if not text:
+            return None
+        if text not in effect_cache:
+            effect_cache[text] = _get_or_create(session, Effect, effect=text)
+        return effect_cache[text].id
+
+    def _get_trigger_fk(text: str | None) -> int | None:
+        if not text:
+            return None
+        if text not in trigger_cache:
+            trigger_cache[text] = _get_or_create(session, Trigger, trigger=text)
+        return trigger_cache[text].id
 
     for cd in cards_data:
         set_pk = set_pk_by_code.get(cd["set_code"])
@@ -310,13 +336,15 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
         symbol, _ = _CARD_TYPE_MAP.get(cat, ("CHARACTER", "Character"))
         ct = card_type_cache.get(symbol) or _get_or_create(session, CardType, symbol=symbol)
 
-        existing = session.exec(
-            select(Card).where(Card.set_fk == set_pk, Card.number == number)
-        ).first()
+        name_fk = _get_name_fk(cd["name"])
+        effect_fk = _get_effect_fk(cd.get("desc"))
+        trigger_fk = _get_trigger_fk(cd.get("trigger"))
+
+        existing = session.exec(select(Card).where(Card.set_fk == set_pk, Card.number == number)).first()
         if existing:
-            existing.name = cd["name"]
-            existing.desc = cd.get("desc")
-            existing.trigger = cd.get("trigger")
+            existing.name_fk = name_fk
+            existing.effect_fk = effect_fk
+            existing.trigger_fk = trigger_fk
             existing.power = cd.get("power")
             existing.life = cd.get("life")
             existing.counter = cd.get("counter")
@@ -328,9 +356,9 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
                 set_fk=set_pk,
                 cardtype_fk=ct.id,
                 number=number,
-                name=cd["name"],
-                desc=cd.get("desc"),
-                trigger=cd.get("trigger"),
+                name_fk=name_fk,
+                effect_fk=effect_fk,
+                trigger_fk=trigger_fk,
                 power=cd.get("power"),
                 life=cd.get("life"),
                 counter=cd.get("counter"),
@@ -343,8 +371,7 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
 
         # Colors
         existing_colors = {
-            row.color_fk
-            for row in session.exec(select(CardColor).where(CardColor.card_fk == card_pk)).all()
+            row.color_fk for row in session.exec(select(CardColor).where(CardColor.card_fk == card_pk)).all()
         }
         for color_name in cd.get("colors", []):
             if not color_name:
@@ -355,13 +382,12 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
             if color_pk not in existing_colors:
                 session.add(CardColor(card_fk=card_pk, color_fk=color_pk))
 
-        # Rarity
+        # Rarity (resolved here; written to Naip below)
+        rarity_fk: int | None = None
         rarity_text = cd.get("rarity")
         if rarity_text:
             if rarity_text not in rarity_cache:
-                existing_r = session.exec(
-                    select(Rarity).where(Rarity.symbol == rarity_text)
-                ).first()
+                existing_r = session.exec(select(Rarity).where(Rarity.symbol == rarity_text)).first()
                 if existing_r:
                     rarity_cache[rarity_text] = existing_r
                 else:
@@ -369,37 +395,24 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
                     session.add(r)
                     session.flush()
                     rarity_cache[rarity_text] = r
-            rarity = rarity_cache[rarity_text]
-            existing_rarities = {
-                row.rarity_fk
-                for row in session.exec(
-                    select(CardRarity).where(CardRarity.card_fk == card_pk)
-                ).all()
-            }
-            if rarity.id not in existing_rarities:
-                session.add(CardRarity(card_fk=card_pk, rarity_fk=rarity.id))
+            rarity_fk = rarity_cache[rarity_text].id
 
         # Attribute
         attribute_text = cd.get("attribute")
         if attribute_text:
             if attribute_text not in attribute_cache:
-                attribute_cache[attribute_text] = _get_or_create(
-                    session, Attribute, name=attribute_text
-                )
+                attribute_cache[attribute_text] = _get_or_create(session, Attribute, name=attribute_text)
             attr_pk = attribute_cache[attribute_text].id
             existing_attrs = {
                 row.attribute_fk
-                for row in session.exec(
-                    select(CardAttribute).where(CardAttribute.card_fk == card_pk)
-                ).all()
+                for row in session.exec(select(CardAttribute).where(CardAttribute.card_fk == card_pk)).all()
             }
             if attr_pk not in existing_attrs:
                 session.add(CardAttribute(card_fk=card_pk, attribute_fk=attr_pk))
 
         # Tribes (subtypes)
         existing_tribes = {
-            row.tribe_fk
-            for row in session.exec(select(CardTribe).where(CardTribe.card_fk == card_pk)).all()
+            row.tribe_fk for row in session.exec(select(CardTribe).where(CardTribe.card_fk == card_pk)).all()
         }
         for tribe_name in cd.get("subtypes", []):
             if not tribe_name:
@@ -409,6 +422,26 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
             tribe_pk = tribe_cache[tribe_name].id
             if tribe_pk not in existing_tribes:
                 session.add(CardTribe(card_fk=card_pk, tribe_fk=tribe_pk))
+
+        # Naip — default print record for this card
+        existing_naip = session.exec(
+            select(Naip).where(Naip.card_fk == card_pk, Naip.set_fk == set_pk, Naip.is_default == True)  # noqa: E712
+        ).first()
+        if existing_naip:
+            existing_naip.rarity_fk = rarity_fk
+            existing_naip.effect_fk = effect_fk
+            existing_naip.trigger_fk = trigger_fk
+        else:
+            session.add(
+                Naip(
+                    card_fk=card_pk,
+                    set_fk=set_pk,
+                    rarity_fk=rarity_fk,
+                    effect_fk=effect_fk,
+                    trigger_fk=trigger_fk,
+                    is_default=True,
+                )
+            )
 
         upserted += 1
 
@@ -431,9 +464,7 @@ async def run(only_set: str | None = None) -> None:
 
     target = _normalise(only_set) if only_set else None
 
-    async with httpx.AsyncClient(
-        timeout=30, follow_redirects=True, headers={"User-Agent": "Mozilla/5.0"}
-    ) as client:
+    async with httpx.AsyncClient(timeout=30, follow_redirects=True, headers={"User-Agent": "Mozilla/5.0"}) as client:
         log.info("Fetching series list...")
         series_list = await _fetch_series_list(client)
         log.info("Found %d series", len(series_list))
@@ -450,9 +481,7 @@ async def run(only_set: str | None = None) -> None:
         seen_card_ids: set[str] = set()
 
         for series_value, set_code, set_name, set_type_name in series_list:
-            sets_data.append(
-                {"code": set_code, "name": set_name, "set_type_name": set_type_name}
-            )
+            sets_data.append({"code": set_code, "name": set_name, "set_type_name": set_type_name})
             log.info("Fetching %s (%s)...", set_code, set_name[:50])
             try:
                 series_cards = await _fetch_series_cards(client, series_value, set_code)
@@ -474,9 +503,7 @@ async def run(only_set: str | None = None) -> None:
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Ingest One Piece TCG card data from the official site."
-    )
+    parser = argparse.ArgumentParser(description="Ingest One Piece TCG card data from the official site.")
     parser.add_argument(
         "--set",
         metavar="SET_ID",

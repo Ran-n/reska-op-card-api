@@ -28,10 +28,11 @@ where = ["src"]
 [tool.ruff]
 line-length = 120
 target-version = "py314"
+exclude = ["alembic/versions"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
-ignore = []
+ignore = ["B008", "B904"]
 
 [tool.ruff.format]
 quote-style = "double"

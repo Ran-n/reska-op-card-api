@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1390" height="760" viewBox="0 0 1390 760">
+<rect width="1390" height="760" fill="#f7f6f2"/>
+<!-- Relationships -->
+<line x1="155" y1="320" x2="395" y2="320" stroke="#2a52be" stroke-width="1.5" />
+<text x="191" y="316" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">1</text>
+<text x="359" y="316" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="241" y="310" width="68" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="275" y="324" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">contains</text>
+<line x1="155" y1="540" x2="155" y2="320" stroke="#2a52be" stroke-width="1.5" />
+<text x="155" y="503" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">1</text>
+<text x="155" y="349" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="111" y="420" width="89" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="155" y="434" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">categorises</text>
+<line x1="155" y1="460" x2="395" y2="320" stroke="#2a52be" stroke-width="1.5" />
+<text x="191" y="435" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">1</text>
+<text x="359" y="337" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="252" y="380" width="47" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="275" y="394" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">types</text>
+<line x1="395" y1="540" x2="395" y2="320" stroke="#2a52be" stroke-width="1.5" />
+<text x="395" y="503" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">1</text>
+<text x="395" y="349" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="372" y="420" width="47" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="395" y="434" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">names</text>
+<line x1="615" y1="540" x2="395" y2="320" stroke="#2a52be" stroke-width="1.5" />
+<text x="582" y="503" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">1</text>
+<text x="428" y="349" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="475" y="420" width="61" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="505" y="434" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">effects</text>
+<line x1="835" y1="540" x2="395" y2="320" stroke="#2a52be" stroke-width="1.5" />
+<text x="769" y="503" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">1</text>
+<text x="461" y="349" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="581" y="420" width="68" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="615" y="434" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">triggers</text>
+<line x1="395" y1="320" x2="735" y2="320" stroke="#2a52be" stroke-width="1.5" />
+<text x="446" y="316" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">1</text>
+<text x="684" y="316" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="524" y="310" width="82" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="565" y="324" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">printed_as</text>
+<line x1="955" y1="320" x2="735" y2="320" stroke="#2a52be" stroke-width="1.5" />
+<text x="922" y="316" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">1</text>
+<text x="768" y="316" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="811" y="310" width="68" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="845" y="324" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">drawn_by</text>
+<line x1="1115" y1="200" x2="735" y2="320" stroke="#2a52be" stroke-width="1.5" />
+<text x="1058" y="214" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">1</text>
+<text x="792" y="298" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="888" y="250" width="75" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="925" y="264" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">rarity_of</text>
+<line x1="955" y1="200" x2="735" y2="320" stroke="#2a52be" stroke-width="1.5" />
+<text x="922" y="214" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">1</text>
+<text x="768" y="298" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="811" y="250" width="68" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="845" y="264" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">image_of</text>
+<line x1="395" y1="540" x2="735" y2="320" stroke="#2a52be" stroke-width="1.5" />
+<text x="446" y="503" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">0..1</text>
+<text x="684" y="349" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="542" y="420" width="47" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="565" y="434" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">names</text>
+<line x1="615" y1="540" x2="735" y2="320" stroke="#2a52be" stroke-width="1.5" />
+<text x="633" y="503" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">0..1</text>
+<text x="717" y="349" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="645" y="420" width="61" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="675" y="434" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">effects</text>
+<line x1="835" y1="540" x2="735" y2="320" stroke="#2a52be" stroke-width="1.5" />
+<text x="820" y="503" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">0..1</text>
+<text x="750" y="349" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="751" y="420" width="68" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="785" y="434" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">triggers</text>
+<line x1="155" y1="320" x2="735" y2="320" stroke="#2a52be" stroke-width="1.5" />
+<text x="242" y="316" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">1</text>
+<text x="648" y="316" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="418" y="310" width="54" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="445" y="324" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">in_set</text>
+<line x1="395" y1="320" x2="1115" y2="320" stroke="#2a52be" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="503" y="316" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<text x="1007" y="316" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="718" y="310" width="75" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="755" y="324" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">has_tribe</text>
+<line x1="395" y1="320" x2="1115" y2="440" stroke="#2a52be" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="503" y="334" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<text x="1007" y="418" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="704" y="370" width="103" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="755" y="384" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">has_attribute</text>
+<line x1="395" y1="320" x2="1115" y2="560" stroke="#2a52be" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="503" y="352" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<text x="1007" y="520" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="718" y="430" width="75" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="755" y="444" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">has_color</text>
+<line x1="395" y1="320" x2="1115" y2="200" stroke="#2a52be" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="503" y="298" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<text x="1007" y="214" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="714" y="250" width="82" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="755" y="264" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">has_rarity</text>
+<line x1="395" y1="320" x2="1115" y2="680" stroke="#2a52be" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="503" y="370" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<text x="1007" y="622" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="721" y="490" width="68" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="755" y="504" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">in_block</text>
+<line x1="395" y1="320" x2="1275" y2="200" stroke="#2a52be" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="527" y="298" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<text x="1143" y="214" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="798" y="250" width="75" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="835" y="264" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">in_format</text>
+<line x1="395" y1="320" x2="1275" y2="320" stroke="#2a52be" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="527" y="316" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<text x="1143" y="316" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="791" y="310" width="89" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="835" y="324" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">has_keyword</text>
+<line x1="395" y1="320" x2="1275" y2="440" stroke="#2a52be" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="527" y="334" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<text x="1143" y="418" text-anchor="middle" font-family="monospace" font-size="10" fill="#b45309">N</text>
+<rect x="791" y="370" width="89" height="18" rx="4" fill="white" stroke="#2a52be" stroke-width="0.8"/>
+<text x="835" y="384" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a52be">has_resword</text>
+<!-- Entities -->
+<rect x="340" y="300" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="395" y="325" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">Card</text>
+<rect x="680" y="300" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="735" y="325" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">Naip</text>
+<rect x="100" y="300" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="155" y="325" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">Set</text>
+<rect x="340" y="520" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="395" y="545" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">Name</text>
+<rect x="560" y="520" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="615" y="545" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">Effect</text>
+<rect x="780" y="520" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="835" y="545" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">Trigger</text>
+<rect x="900" y="180" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="955" y="205" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">Image</text>
+<rect x="100" y="520" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="155" y="545" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">SetType</text>
+<rect x="100" y="440" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="155" y="465" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">CardType</text>
+<rect x="900" y="300" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="955" y="325" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">Artist</text>
+<rect x="1060" y="180" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="1115" y="205" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">Rarity</text>
+<rect x="1060" y="300" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="1115" y="325" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">Tribe</text>
+<rect x="1060" y="420" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="1115" y="445" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">Attribute</text>
+<rect x="1060" y="540" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="1115" y="565" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">Color</text>
+<rect x="1060" y="660" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="1115" y="685" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">Block</text>
+<rect x="1220" y="180" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="1275" y="205" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">Format</text>
+<rect x="1220" y="300" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="1275" y="325" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">Keyword</text>
+<rect x="1220" y="420" width="110" height="40" rx="4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/><text x="1275" y="445" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a1a1a">Resword</text>
+</svg>

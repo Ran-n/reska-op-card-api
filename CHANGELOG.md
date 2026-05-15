@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:27:41 )
-[//]: # (+ Revised: 	2026/05/13 13:16:54.935173 )
+[//]: # (+ Revised: 	2026/05/15 13:50:20.236841 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # Changelog
@@ -14,6 +14,29 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+- `.gitignore`: added `data/` rule so local card images and database files are never tracked
+
+### Added
+
+- `Name`, `Effect`, `Trigger`, `Image` dedup tables — shared string values referenced by FK from `Card` and `Naip` to avoid redundancy
+- `CardEffectHistory`, `CardTriggerHistory` audit tables with `valid_from` / `valid_to` validity windows
+- `_DateTimeMs` custom SQLAlchemy type — stores `datetime` as `YYYY-MM-DD HH:MM:SS.mmm` (millisecond precision) in SQLite
+- `ingest.py`: name/effect/trigger dedup caches; `Naip` creation with rarity FK; Python 3.12 generic function syntax (`_get_or_create[T]`)
+- `ruff` exclusion for `alembic/versions/`; suppressed rules `B008` and `B904`
+
+### Changed
+
+- Database file relocated from `./optcg.db` to `./data/optcg.db`; images dir relocated from `card_images/` to `data/images/`; static mount renamed `/card_images` → `/images`
+- All table names normalised to snake_case: `settype` → `set_type`, `cardtype` → `card_type`, `cardattribute` → `card_attribute`, `cardcolor` → `card_color`, `cardrarity` → `card_rarity`, `cardblock` → `card_block`, `cardformat` → `card_format`, `cardkeywords` → `card_keyword`, `cardreswords` → `card_resword`
+- `CardKeywords` / `CardReswords` junction models renamed to `CardKeyword` / `CardResword` for consistency
+- `Card` columns `name`, `desc`, `trigger` replaced by FK references `name_fk`, `effect_fk`, `trigger_fk` pointing to the new dedup tables
+- Timestamps changed from `date` (SQLite `CURRENT_DATE` server-default) to `datetime` with millisecond precision set in Python; `onupdate` now triggers correctly on every flush
+- `init_db()` now creates `data/` directory before calling `create_all`
+- All models updated from `Optional[T]` syntax to `T | None` (Python 3.10+ union style)
+- `ingest.py`: removed `CardRarity` direct upsert (rarity now stored on `Naip`); updated card upsert to write `name_fk`, `effect_fk`, `trigger_fk`
+
 ---
 
 ## [0.1.0] - 2026-05-13
@@ -24,10 +47,10 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - `database.py` with SQLite engine, `init_db`, and `get_session`
 - `routers/cards.py`: full CRUD with rich enriched responses, image upload (multipart file + URL fetch), and M2M junction sync
 - `routers/sets.py`: read-only `GET /sets/` and `GET /sets/{id}`
-- `routers/lookups.py`: read-only `GET /lookups/{resource}` for all 12 lookup types
+- `routers/lookups.py`: read-only explicit routes for 11 lookup types (`GET /lookups/cardtypes`, `/colors`, `/tribes`, `/attributes`, `/rarities`, `/blocks`, `/formats`, `/keywords`, `/reswords`, `/artists`, `/sets`)
 - `scripts/ingest.py` data ingestion script
 - `alembic.ini` and `alembic/` migration environment
-- Static file serving for `card_images/` via `GET /card_images/{filename}`
+- Static file serving for `data/images/` via `GET /images/{filename}`
 - CORS middleware allowing all origins
 - `alembic`, `sqlmodel`, `httpx`, `python-multipart`, `beautifulsoup4` runtime dependencies
 
