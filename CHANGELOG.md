@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:27:41 )
-[//]: # (+ Revised: 	2026/05/16 22:53:20.507971 )
+[//]: # (+ Revised: 	2026/05/16 22:57:10.591988 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # Changelog
@@ -67,16 +67,3 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 - Root `main.py` entry point (replaced by `src/optcg_api/main.py`)
 - `src/optcg_api/app.py` (logic moved into `main.py`)
-
----
-
-## [0.0.1] - 2026-05-12
-
-### Added
-
-- FastAPI application skeleton with single `GET /` endpoint
-- `src/optcg_api/` package structure with `app.py` and `__init__.py`
-- setuptools build system with packages discovered under `src/`
-- `opapi` CLI script alias mapped to `optcg_api.main:main`
-- `uv.lock` tracked in version control
-- `CHANGELOG.md`, `CONTRIBUTING.md`, `CONTRIBUTORS`, `README.md`, and `LICENSE` (PBL v2.0)
