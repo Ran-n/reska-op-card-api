@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/05/16 15:46:38.702394
+Revised: 2026/05/16 22:10:55.727647
 """
 
 from datetime import UTC, date, datetime
@@ -170,6 +170,8 @@ class Set(SQLModel, table=True):
     type_fk: int | None = Field(default=None, foreign_key="set_type.id")
     code: str = Field(sa_column=sa.Column(sa.String, nullable=False, unique=True))
     name: str
+    series: str | None = None
+    ord: int | None = None
     desc: str | None = None
     release_ts: date | None = None
 

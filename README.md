@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:26:17 )
-[//]: # (+ Revised: 	2026/05/15 13:47:35.194951 )
+[//]: # (+ Revised: 	2026/05/16 22:53:20.580417 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # optcg_api
@@ -75,7 +75,7 @@ Lookup resources: `cardtypes`, `colors`, `tribes`, `attributes`, `rarities`, `bl
 
 ## Data model
 
-Core tables: `set`, `card`, `naip` (physical print — card + set + artist + rarity; holds per-print overrides for name, effect, trigger, and image; `is_default` flags the canonical print).
+Core tables: `set` (with `series` and `ord` for grouping/ordering within a release series), `card`, `naip` (physical print — card + set + artist + rarity; holds per-print overrides for name, effect, trigger, and image; `is_default` flags the canonical print).
 
 Text dedup tables: `name`, `effect`, `trigger`, `image` — shared string values referenced by FK to avoid redundancy.
 
