@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/05/15 13:07:38.600229
+Revised: 2026/05/17 20:26:56.769242
 """
 
 import shutil
@@ -51,6 +51,11 @@ class NaipItem(BaseModel):
     name: str
     artist_name: str | None = None
     rarity_name: str | None = None
+    rarity_symbol: str | None = None
+    set_code: str | None = None
+    image_fk: int | None = None
+    is_default: bool = False
+    is_errata: bool = False
 
 
 class CardDetail(BaseModel):
@@ -143,14 +148,30 @@ def _enrich(card: Card, session: Session) -> CardDetail:
 
     naip_rows = session.exec(
         text(
-            "SELECT n.id, COALESCE(nm.name, ''), a.name, r.name FROM naip n "
+            "SELECT n.id, COALESCE(nm.name, ''), a.name, r.name, r.symbol, s.code, "
+            "n.image_fk, n.is_default, n.is_errata "
+            "FROM naip n "
             "LEFT JOIN name nm ON nm.id = n.name_fk "
             "LEFT JOIN artist a ON a.id = n.artist_fk "
             "LEFT JOIN rarity r ON r.id = n.rarity_fk "
+            'LEFT JOIN "set" s ON s.id = n.set_fk '
             "WHERE n.card_fk = :cid"
         ).bindparams(cid=card.id)
     ).all()
-    naips = [NaipItem(id=r[0], name=r[1], artist_name=r[2], rarity_name=r[3]) for r in naip_rows]
+    naips = [
+        NaipItem(
+            id=r[0],
+            name=r[1],
+            artist_name=r[2],
+            rarity_name=r[3],
+            rarity_symbol=r[4],
+            set_code=r[5],
+            image_fk=r[6],
+            is_default=bool(r[7]),
+            is_errata=bool(r[8]),
+        )
+        for r in naip_rows
+    ]
 
     color_rows = session.exec(
         text(

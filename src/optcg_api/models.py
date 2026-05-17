@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/05/17 17:06:48.323718
+Revised: 2026/05/17 20:26:56.657297
 """
 
 from datetime import UTC, date, datetime
@@ -214,6 +214,12 @@ class Trigger(SQLModel, table=True):
 
 class Card(SQLModel, table=True):
     __tablename__ = "card"
+    __table_args__ = (
+        UniqueConstraint("set_fk", "number"),
+        Index("ix_card_set_fk", "set_fk"),
+        Index("ix_card_cardtype_fk", "cardtype_fk"),
+        Index("ix_card_name_fk", "name_fk"),
+    )
 
     id: int | None = Field(default=None, primary_key=True)
     created_ts: datetime | None = Field(default=None, sa_column=_created_col())
@@ -237,6 +243,16 @@ class Naip(SQLModel, table=True):
     __table_args__ = (
         # at most one default print per card
         Index("ix_naip_one_default_per_card", "card_fk", unique=True, sqlite_where=sa.text("is_default = 1")),
+        # deduplicate physical prints (NULLs excluded — NULL != NULL in SQLite UNIQUE)
+        Index(
+            "ix_naip_unique_print",
+            "card_fk",
+            "set_fk",
+            "artist_fk",
+            "rarity_fk",
+            unique=True,
+            sqlite_where=sa.text("artist_fk IS NOT NULL AND rarity_fk IS NOT NULL"),
+        ),
     )
 
     id: int | None = Field(default=None, primary_key=True)

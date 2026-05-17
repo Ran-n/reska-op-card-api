@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:27:41 )
-[//]: # (+ Revised: 	2026/05/16 22:57:10.591988 )
+[//]: # (+ Revised: 	2026/05/17 20:29:09.003621 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # Changelog
@@ -30,6 +30,12 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - `_DateTimeMs` custom SQLAlchemy type — stores `datetime` as `YYYY-MM-DD HH:MM:SS.mmm` (millisecond precision) in SQLite
 - `ingest.py`: name/effect/trigger dedup caches; `Naip` creation with rarity FK; Python 3.12 generic function syntax (`_get_or_create[T]`)
 - `ruff` exclusion for `alembic/versions/`; suppressed rules `B008` and `B904`
+- `Card` model: `UniqueConstraint("set_fk", "number")` and indexes on `set_fk`, `cardtype_fk`, `name_fk`; migration `d5e6f7a8b9c0`
+- `Naip` model: partial unique index `ix_naip_unique_print` on `(card_fk, set_fk, artist_fk, rarity_fk)` where both FKs are non-NULL to deduplicate physical prints; same migration
+- `NaipItem` response fields: `rarity_symbol`, `set_code`, `image_fk`, `is_default`, `is_errata`
+- `GET /lookups/settypes` endpoint
+- Typed Pydantic response models for all lookup endpoints (`LookupResponse`, `LookupWithSymbolResponse`, `SetLookupResponse`)
+- `SetResponse` Pydantic model for `GET /sets/` and `GET /sets/{id}`, exposing `series`, `ord`, `desc`, `release_ts`, `type_fk`
 
 ### Changed
 
@@ -41,6 +47,8 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - `init_db()` now creates `data/` directory before calling `create_all`
 - All models updated from `Optional[T]` syntax to `T | None` (Python 3.10+ union style)
 - `ingest.py`: removed `CardRarity` direct upsert (rarity now stored on `Naip`); updated card upsert to write `name_fk`, `effect_fk`, `trigger_fk`; removed `Naip` auto-creation during ingest (naip records are managed separately)
+- `GET /cards/{id}` enrichment query now joins `set` to populate `NaipItem.set_code` and returns all new `NaipItem` fields
+- `routers/lookups.py`: removed generic `LOOKUP_MAP` dict; each endpoint now has an explicit `response_model`
 
 ---
 
