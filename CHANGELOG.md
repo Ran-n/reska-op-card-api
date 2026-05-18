@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:27:41 )
-[//]: # (+ Revised: 	2026/05/17 20:29:09.003621 )
+[//]: # (+ Revised: 	2026/05/18 09:28:26.666652 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # Changelog
@@ -24,6 +24,7 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - `NaipColor`, `NaipTribe`, `NaipAttribute`, `NaipKeyword`, `NaipResword`, `NaipBlock`, `NaipFormat` junction tables mirroring their `card_*` counterparts; same migration
 - `Set.series` and `Set.ord` nullable columns for grouping sets by release series and ordering within it; migration `b2c3d4e5f6a8`
 - `Naip.is_errata` boolean column (default `False`) to flag errata prints; migration `a1b2c3d4e5f7`
+- `Naip.sort_order` nullable integer column for explicit display ordering within a set; migration `g1h2i3j4k5l6`
 - ER and MR diagrams updated to reflect `is_errata` column on `Naip`
 - `Name`, `Effect`, `Trigger`, `Image` dedup tables — shared string values referenced by FK from `Card` and `Naip` to avoid redundancy
 - `CardEffectHistory`, `CardTriggerHistory` audit tables with `valid_from` / `valid_to` validity windows
@@ -44,7 +45,7 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - `CardKeywords` / `CardReswords` junction models renamed to `CardKeyword` / `CardResword` for consistency
 - `Card` columns `name`, `desc`, `trigger` replaced by FK references `name_fk`, `effect_fk`, `trigger_fk` pointing to the new dedup tables
 - Timestamps changed from `date` (SQLite `CURRENT_DATE` server-default) to `datetime` with millisecond precision set in Python; `onupdate` now triggers correctly on every flush
-- `init_db()` now creates `data/` directory before calling `create_all`
+- `init_db()` now creates `data/` directory before calling `create_all`; stamps Alembic head after schema creation so fresh databases start in sync with migration history
 - All models updated from `Optional[T]` syntax to `T | None` (Python 3.10+ union style)
 - `ingest.py`: removed `CardRarity` direct upsert (rarity now stored on `Naip`); updated card upsert to write `name_fk`, `effect_fk`, `trigger_fk`; removed `Naip` auto-creation during ingest (naip records are managed separately)
 - `GET /cards/{id}` enrichment query now joins `set` to populate `NaipItem.set_code` and returns all new `NaipItem` fields

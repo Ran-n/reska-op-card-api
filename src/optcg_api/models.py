@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/05/17 20:26:56.657297
+Revised: 2026/05/18 09:30:43.993928
 """
 
 from datetime import UTC, date, datetime
@@ -268,6 +268,7 @@ class Naip(SQLModel, table=True):
     trigger_fk: int | None = Field(default=None, foreign_key="trigger.id")
     is_default: bool = Field(default=False)
     is_errata: bool = Field(default=False)
+    sort_order: int | None = Field(default=None)
     cardtype_fk: int | None = Field(default=None, foreign_key="card_type.id")
     power: int | None = None
     life: int | None = None
