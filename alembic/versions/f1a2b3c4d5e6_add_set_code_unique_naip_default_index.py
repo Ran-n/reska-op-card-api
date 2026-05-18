@@ -40,19 +40,19 @@ def upgrade() -> None:
     ))
     conn.execute(sa.text('DROP TABLE "set_old"'))
 
-    # Deduplicate: keep only the lowest-id naip with is_default=1 per card_fk
-    conn.execute(sa.text(
-        "UPDATE naip SET is_default = 0 "
-        "WHERE is_default = 1 AND id NOT IN ("
-        "  SELECT MIN(id) FROM naip WHERE is_default = 1 GROUP BY card_fk"
-        ")"
-    ))
-
-    # Partial unique index: at most one is_default=1 naip per card_fk
-    conn.execute(sa.text(
-        "CREATE UNIQUE INDEX ix_naip_one_default_per_card "
-        "ON naip (card_fk) WHERE is_default = 1"
-    ))
+    # is_default is added in a later migration (c3d4e5f6a7b9); skip if not present yet
+    naip_cols = {row[1] for row in conn.execute(sa.text("PRAGMA table_info(naip)"))}
+    if "is_default" in naip_cols:
+        conn.execute(sa.text(
+            "UPDATE naip SET is_default = 0 "
+            "WHERE is_default = 1 AND id NOT IN ("
+            "  SELECT MIN(id) FROM naip WHERE is_default = 1 GROUP BY card_fk"
+            ")"
+        ))
+        conn.execute(sa.text(
+            "CREATE UNIQUE INDEX IF NOT EXISTS ix_naip_one_default_per_card "
+            "ON naip (card_fk) WHERE is_default = 1"
+        ))
 
     conn.execute(sa.text("PRAGMA foreign_keys = ON"))
 

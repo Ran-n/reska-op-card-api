@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:27:41 )
-[//]: # (+ Revised: 	2026/05/18 13:45:51.002894 )
+[//]: # (+ Revised: 	2026/05/18 14:15:53.586486 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # Changelog
@@ -17,6 +17,11 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ### Fixed
 
 - `.gitignore`: added `data/` rule so local card images and database files are never tracked
+- `init_db()` now runs `alembic upgrade head` instead of `SQLModel.metadata.create_all` + `stamp`; fresh databases are built entirely through migrations, keeping schema and migration history in sync
+- Migration `h2i3j4k5l6m7`: expanded to full table-rebuild strategy — all 35 tables recreated with `server_default` timestamps and `AFTER UPDATE` triggers; `PRAGMA foreign_keys` bracketed around the rebuild; downgrade drops triggers cleanly
+- Migration `e1a2b3c4d5e6`: table renames now guarded with `_table_exists` check so re-running is idempotent
+- Migration `a1b2c3d4e5f7`: adds `is_default` column if missing before adding `is_errata`, preventing column-not-found errors on databases upgraded out of order
+- Migration `f1a2b3c4d5e6`: `is_default` dedup and unique-index steps skipped when column is absent; index creation uses `IF NOT EXISTS`
 
 ### Added
 
@@ -45,7 +50,7 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - `CardKeywords` / `CardReswords` junction models renamed to `CardKeyword` / `CardResword` for consistency
 - `Card` columns `name`, `desc`, `trigger` replaced by FK references `name_fk`, `effect_fk`, `trigger_fk` pointing to the new dedup tables
 - Timestamps moved from Python-side `_DateTimeMs` / `_now_ms` to DB-side `server_default` + SQLite triggers; `_ts_col()` replaces the former `_created_col()` / `_updated_col()` helpers; Python `UTC` / `TypeDecorator` imports removed from `models.py`
-- `init_db()` now creates `data/` directory before calling `create_all`; stamps Alembic head after schema creation so fresh databases start in sync with migration history
+- `init_db()` now creates `data/` directory before running migrations
 - All models updated from `Optional[T]` syntax to `T | None` (Python 3.10+ union style)
 - `ingest.py`: removed `CardRarity` direct upsert (rarity now stored on `Naip`); updated card upsert to write `name_fk`, `effect_fk`, `trigger_fk`; removed `Naip` auto-creation during ingest (naip records are managed separately)
 - `GET /cards/{id}` enrichment query now joins `set` to populate `NaipItem.set_code` and returns all new `NaipItem` fields

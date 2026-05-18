@@ -8,6 +8,7 @@ Create Date: 2026-05-15 00:00:00.000000
 
 from collections.abc import Sequence
 
+import sqlalchemy as sa
 from alembic import op
 
 revision: str = "e1a2b3c4d5e6"
@@ -29,9 +30,15 @@ _RENAMES = [
 ]
 
 
+def _table_exists(conn: sa.engine.Connection, name: str) -> bool:
+    return sa.inspect(conn).has_table(name)
+
+
 def upgrade() -> None:
+    conn = op.get_bind()
     for old, new in _RENAMES:
-        op.rename_table(old, new)
+        if _table_exists(conn, old):
+            op.rename_table(old, new)
 
 
 def downgrade() -> None:

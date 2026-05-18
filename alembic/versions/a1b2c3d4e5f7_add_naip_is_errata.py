@@ -18,6 +18,9 @@ depends_on: str | Sequence[str] | None = None
 
 def upgrade() -> None:
     conn = op.get_bind()
+    existing = {r[1] for r in conn.execute(sa.text("PRAGMA table_info(naip)"))}
+    if "is_default" not in existing:
+        conn.execute(sa.text("ALTER TABLE naip ADD COLUMN is_default INTEGER NOT NULL DEFAULT 0"))
     conn.execute(sa.text("ALTER TABLE naip ADD COLUMN is_errata INTEGER NOT NULL DEFAULT 0"))
 
 
