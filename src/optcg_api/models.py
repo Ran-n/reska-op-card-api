@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/05/21 13:17:44.808938
+Revised: 2026/05/21 13:54:17.299727
 """
 
 from datetime import date, datetime
@@ -134,6 +134,44 @@ class Resword(SQLModel, table=True):
     desc: str | None = None
 
 
+class Language(SQLModel, table=True):
+    __tablename__ = "language"
+
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_ts_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_ts_col())
+    code: str = Field(sa_column=sa.Column(sa.String, nullable=False, unique=True))
+    name: str
+    desc: str | None = None
+    image_fk: int | None = Field(default=None, foreign_key="image.id")
+
+
+class Region(SQLModel, table=True):
+    __tablename__ = "region"
+
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_ts_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_ts_col())
+    code: str = Field(sa_column=sa.Column(sa.String, nullable=False, unique=True))
+    name: str
+    desc: str | None = None
+
+
+class RegionLanguage(SQLModel, table=True):
+    __tablename__ = "region_language"
+    __table_args__ = (
+        UniqueConstraint("region_fk", "language_fk"),
+        Index("ix_region_language_region_fk", "region_fk"),
+        Index("ix_region_language_language_fk", "language_fk"),
+    )
+
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_ts_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_ts_col())
+    region_fk: int = Field(foreign_key="region.id")
+    language_fk: int = Field(foreign_key="language.id")
+
+
 # ── Core tables ──────────────────────────────────────────────────────────────
 
 
@@ -250,6 +288,7 @@ class Naip(SQLModel, table=True):
     serial_max: int | None = Field(default=None)
     cardtype_fk: int | None = Field(default=None, foreign_key="card_type.id")
     block_fk: int | None = Field(default=None, foreign_key="block.id")
+    language_fk: int | None = Field(default=None, foreign_key="language.id")
     power: int | None = None
     life: int | None = None
     counter: int | None = None

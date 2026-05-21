@@ -27,7 +27,11 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - `BannedPair` table — two-card combo ban with `ck_banned_pair_ordered` constraint (`card_a_fk < card_b_fk`) and NULL-safe partial unique index for global pair bans; `trg_banned_pair_update` trigger; migrations `a3b4c5d6e7f8`, `b4c5d6e7f8a9`
 - `trg_block_update` SQLite trigger to auto-bump `updated_ts` on `block` row changes; migration `a3b4c5d6e7f8`
 - `trg_naip_serial_check_max_insert` / `trg_naip_serial_check_max_update` BEFORE triggers enforce `serial_number ≤ serial_max` on `naip_serial` rows (SQLite `CHECK` cannot reference other tables); migration `b4c5d6e7f8a9`
-- BACKLOG: region & language system spec — `language`, `region`, `region_language` tables; BCP-47 language codes; UN M.49 region codes; `naip.language_fk`; seed data for 5 languages and 15 regions
+- `Language` table — BCP-47 language codes (`ja`, `en`, `fr`, `zh-Hans`, `ko`), optional `image_fk`; `trg_language_update` trigger; migration `b5c6d7e8f9a0`
+- `Region` table — UN M.49 region codes for 15 tournament regions; `trg_region_update` trigger; migration `b5c6d7e8f9a0`
+- `RegionLanguage` junction table — maps permitted languages per region; unique on `(region_fk, language_fk)`; `trg_region_language_update` trigger; migration `b5c6d7e8f9a0`
+- `Naip.language_fk` nullable FK → `language.id` — NULL means language unknown; migration `b5c6d7e8f9a0`
+- Seed data: 5 languages and 15 regions with their permitted-language mappings per official One Piece TCG rules; migration `b5c6d7e8f9a0`
 
 ### Fixed
 
