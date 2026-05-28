@@ -15,9 +15,9 @@ from sqlmodel import Session, select, text
 
 from optcg_api.database import get_session
 from optcg_api.models import (
+    Block,
     Card,
     CardAttribute,
-    CardBlock,
     CardColor,
     CardFormat,
     CardKeyword,
@@ -195,11 +195,8 @@ def _enrich(card: Card, session: Session) -> CardDetail:
             "JOIN card_rarity cr ON cr.rarity_fk = r.id WHERE cr.card_fk = :cid"
         ).bindparams(cid=card.id)
     ).all()
-    block_rows = session.exec(
-        text(
-            "SELECT b.id, b.name FROM block b JOIN card_block cb ON cb.block_fk = b.id WHERE cb.card_fk = :cid"
-        ).bindparams(cid=card.id)
-    ).all()
+    block_obj = session.get(Block, card.block_fk) if card.block_fk else None
+    block_rows = [(block_obj.id, block_obj.name)] if block_obj else []
     format_rows = session.exec(
         text(
             "SELECT f.id, f.name FROM format f JOIN card_format cf ON cf.format_fk = f.id WHERE cf.card_fk = :cid"
@@ -244,24 +241,25 @@ def _enrich(card: Card, session: Session) -> CardDetail:
     )
 
 
-def _sync_junctions(card_id: int, data: CardWrite, session: Session):
+def _sync_junctions(card: Card, data: CardWrite, session: Session):
     pairs = [
         (CardColor, "color_fk", data.colors),
         (CardTribe, "tribe_fk", data.tribes),
         (CardAttribute, "attribute_fk", data.attrs),
         (CardRarity, "rarity_fk", data.rarities),
-        (CardBlock, "block_fk", data.blocks),
         (CardFormat, "format_fk", data.formats),
         (CardKeyword, "keyword_fk", data.keywords),
         (CardResword, "resword_fk", data.reswords),
     ]
     for model, fk_field, ids in pairs:
-        existing = session.exec(select(model).where(model.card_fk == card_id)).all()
+        existing = session.exec(select(model).where(model.card_fk == card.id)).all()
         for row in existing:
             session.delete(row)
         session.flush()
         for fk_id in ids:
-            session.add(model(**{"card_fk": card_id, fk_field: fk_id}))
+            session.add(model(**{"card_fk": card.id, fk_field: fk_id}))
+    card.block_fk = data.blocks[0] if data.blocks else None
+    session.add(card)
 
 
 # ── Endpoints ────────────────────────────────────────────────────────────────
@@ -365,7 +363,7 @@ def create_card(data: CardWrite, session: Session = Depends(get_session)):
     )
     session.add(card)
     session.flush()
-    _sync_junctions(card.id, data, session)
+    _sync_junctions(card, data, session)
     session.commit()
     session.refresh(card)
     return _enrich(card, session)
@@ -388,7 +386,7 @@ def update_card(card_id: int, data: CardWrite, session: Session = Depends(get_se
     card.cost = data.cost
     session.add(card)
     session.flush()
-    _sync_junctions(card_id, data, session)
+    _sync_junctions(card, data, session)
     session.commit()
     session.refresh(card)
     return _enrich(card, session)
@@ -408,7 +406,7 @@ def delete_card(card_id: int, session: Session = Depends(get_session)):
                     old.unlink()
                 session.delete(img)
         session.delete(naip)
-    for model in (CardColor, CardTribe, CardAttribute, CardRarity, CardBlock, CardFormat, CardKeyword, CardResword):
+    for model in (CardColor, CardTribe, CardAttribute, CardRarity, CardFormat, CardKeyword, CardResword):
         for row in session.exec(select(model).where(model.card_fk == card_id)).all():
             session.delete(row)
     session.delete(card)

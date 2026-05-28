@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/05/18 13:45:51.080616
+Revised: 2026/05/27 14:14:21.479395
 
 Populate the optcg.db database by scraping en.onepiece-cardgame.com/cardlist/.
 
@@ -67,13 +67,16 @@ _SET_TYPE_MAP = {
     "Other Product Card": "Other",
 }
 
-# Maps card category text -> CardType symbol
+# Maps card category text (from site) -> CardType symbol (must exist in DB seed)
 _CARD_TYPE_MAP = {
-    "Leader": ("LEADER", "Leader"),
-    "Character": ("CHARACTER", "Character"),
-    "Event": ("EVENT", "Event"),
-    "Stage": ("STAGE", "Stage"),
+    "LEADER": "LEADER",
+    "CHARACTER": "CHARACTER",
+    "EVENT": "EVENT",
+    "STAGE": "STAGE",
 }
+
+# Rarity symbols that are card types, not rarities — skip rarity assignment for these
+_RARITY_SKIP = {"L", "D"}
 
 _SET_ID_RE = re.compile(r"\[([A-Z0-9\-]+)\]")
 _CARD_NUM_RE = re.compile(r"-(\d+)")
@@ -264,20 +267,11 @@ def _parse_card_dl(dl: Tag, set_code: str) -> dict | None:
 
 
 def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) -> tuple[int, int]:
-    # Pre-populate SetType rows
-    set_type_cache: dict[str, SetType] = {}
-    card_type_cache: dict[str, CardType] = {}
+    # Load seeded lookup tables — all must exist before ingest runs
+    card_type_cache: dict[str, CardType] = {ct.symbol: ct for ct in session.exec(select(CardType)).all()}
+    rarity_cache: dict[str, Rarity] = {r.symbol: r for r in session.exec(select(Rarity)).all()}
 
-    # Ensure all CardType rows exist up front
-    for symbol, name in _CARD_TYPE_MAP.values():
-        existing = session.exec(select(CardType).where(CardType.symbol == symbol)).first()
-        if existing:
-            ct = existing
-        else:
-            ct = CardType(symbol=symbol, name=name)
-            session.add(ct)
-            session.flush()
-        card_type_cache[symbol] = ct
+    set_type_cache: dict[str, SetType] = {}
 
     # Upsert sets
     set_pk_by_code: dict[str, int] = {}
@@ -300,7 +294,6 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
 
     # Upsert cards + junction rows
     color_cache: dict[str, Color] = {}
-    rarity_cache: dict[str, Rarity] = {}
     attribute_cache: dict[str, Attribute] = {}
     tribe_cache: dict[str, Tribe] = {}
     name_cache: dict[str, Name] = {}
@@ -333,9 +326,11 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
             continue
 
         number = _card_number(cd["card_id"])
-        cat = cd.get("category") or ""
-        symbol, _ = _CARD_TYPE_MAP.get(cat, ("CHARACTER", "Character"))
-        ct = card_type_cache.get(symbol) or _get_or_create(session, CardType, symbol=symbol)
+        cat = (cd.get("category") or "").upper()
+        symbol = _CARD_TYPE_MAP.get(cat, "CHARACTER")
+        ct = card_type_cache.get(symbol)
+        if ct is None:
+            raise RuntimeError(f"Unknown card type symbol {symbol!r} — update the seed migration")
 
         name_fk = _get_name_fk(cd["name"])
         effect_fk = _get_effect_fk(cd.get("desc"))
@@ -383,17 +378,13 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
             if color_pk not in existing_colors:
                 session.add(CardColor(card_fk=card_pk, color_fk=color_pk))
 
-        # Rarity — populate lookup table
+        # Rarity — strict lookup against seeded values
         rarity_text = cd.get("rarity")
-        if rarity_text and rarity_text not in rarity_cache:
-            existing_r = session.exec(select(Rarity).where(Rarity.symbol == rarity_text)).first()
-            if existing_r:
-                rarity_cache[rarity_text] = existing_r
-            else:
-                r = Rarity(symbol=rarity_text, name=rarity_text)
-                session.add(r)
-                session.flush()
-                rarity_cache[rarity_text] = r
+        if rarity_text and rarity_text not in _RARITY_SKIP and rarity_text not in rarity_cache:
+            raise RuntimeError(
+                f"Unknown rarity symbol {rarity_text!r} on card {cd['card_id']!r} — "
+                "add it to the seed migration and re-run alembic upgrade head"
+            )
 
         # Attribute
         attribute_text = cd.get("attribute")

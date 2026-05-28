@@ -61,6 +61,8 @@ class Rarity(SQLModel, table=True):
     symbol: str
     name: str
     desc: str | None = None
+    is_type: bool = Field(default=False)
+    is_base: bool = Field(default=False)
 
 
 class Tribe(SQLModel, table=True):
@@ -177,13 +179,14 @@ class RegionLanguage(SQLModel, table=True):
 
 class Set(SQLModel, table=True):
     __tablename__ = "set"
+    __table_args__ = (UniqueConstraint("code", "language_fk"),)
 
     id: int | None = Field(default=None, primary_key=True)
     created_ts: datetime | None = Field(default=None, sa_column=_ts_col())
     updated_ts: datetime | None = Field(default=None, sa_column=_ts_col())
     type_fk: int | None = Field(default=None, foreign_key="set_type.id")
-    block_fk: int | None = Field(default=None, foreign_key="block.id")
-    code: str = Field(sa_column=sa.Column(sa.String, nullable=False, unique=True))
+    language_fk: int = Field(foreign_key="language.id")
+    code: str = Field(sa_column=sa.Column(sa.String, nullable=False))
     name: str
     series: str | None = None
     ord: int | None = None
