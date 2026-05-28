@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/05/27 14:14:21.479395
+Revised: 2026/05/28 13:21:16.052064
 
 Populate the optcg.db database by scraping en.onepiece-cardgame.com/cardlist/.
 
@@ -37,6 +37,7 @@ from optcg_api.models import (  # noqa: E402, I001
     CardType,
     Color,
     Effect,
+    Language,
     Name,
     Rarity,
     Set,
@@ -271,6 +272,8 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
     card_type_cache: dict[str, CardType] = {ct.symbol: ct for ct in session.exec(select(CardType)).all()}
     rarity_cache: dict[str, Rarity] = {r.symbol: r for r in session.exec(select(Rarity)).all()}
 
+    en_lang = session.exec(select(Language).where(Language.code == "en")).one()
+
     set_type_cache: dict[str, SetType] = {}
 
     # Upsert sets
@@ -281,13 +284,13 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
             set_type_cache[st_name] = _get_or_create(session, SetType, name=st_name)
         st = set_type_cache[st_name]
 
-        existing = session.exec(select(Set).where(Set.code == sd["code"])).first()
+        existing = session.exec(select(Set).where(Set.code == sd["code"], Set.language_fk == en_lang.id)).first()
         if existing:
             existing.name = sd["name"]
             existing.type_fk = st.id
             s = existing
         else:
-            s = Set(code=sd["code"], name=sd["name"], type_fk=st.id)
+            s = Set(code=sd["code"], name=sd["name"], type_fk=st.id, language_fk=en_lang.id)
             session.add(s)
             session.flush()
         set_pk_by_code[sd["code"]] = s.id

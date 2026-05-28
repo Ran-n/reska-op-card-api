@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:27:41 )
-[//]: # (+ Revised: 	2026/05/28 13:13:17.230916 )
+[//]: # (+ Revised: 	2026/05/28 13:22:52.448316 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # Changelog
@@ -54,6 +54,7 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - `init_db()` now runs `alembic upgrade head` instead of `SQLModel.metadata.create_all` + `stamp`; fresh databases are built entirely through migrations, keeping schema and migration history in sync
 - `ingest.py`: `except ValueError, TypeError` corrected to `except (ValueError, TypeError)`
 - `ingest.py`: card types and rarities now loaded from DB seed at startup; unknown symbols raise `RuntimeError` instead of silently creating unsanctioned rows; `L` and `D` rarity symbols skipped as they are card-type pseudo-rarities
+- `ingest.py`: set lookup and upsert now filter and assign `language_fk` using the `en` language row; `Set` unique lookup uses `(code, language_fk)` instead of `code` alone
 
 ### Changed
 
