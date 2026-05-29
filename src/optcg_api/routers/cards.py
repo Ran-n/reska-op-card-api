@@ -21,7 +21,6 @@ from optcg_api.models import (
     CardColor,
     CardFormat,
     CardKeyword,
-    CardRarity,
     CardResword,
     CardTribe,
     Effect,
@@ -117,7 +116,6 @@ class CardWrite(BaseModel):
     colors: list[int] = []
     tribes: list[int] = []
     attrs: list[int] = []
-    rarities: list[int] = []
     blocks: list[int] = []
     formats: list[int] = []
     keywords: list[int] = []
@@ -191,8 +189,8 @@ def _enrich(card: Card, session: Session) -> CardDetail:
     ).all()
     rarity_rows = session.exec(
         text(
-            "SELECT r.id, r.name, r.symbol FROM rarity r "
-            "JOIN card_rarity cr ON cr.rarity_fk = r.id WHERE cr.card_fk = :cid"
+            "SELECT DISTINCT r.id, r.name, r.symbol FROM rarity r "
+            "JOIN naip n ON n.rarity_fk = r.id WHERE n.card_fk = :cid"
         ).bindparams(cid=card.id)
     ).all()
     block_obj = session.get(Block, card.block_fk) if card.block_fk else None
@@ -246,7 +244,6 @@ def _sync_junctions(card: Card, data: CardWrite, session: Session):
         (CardColor, "color_fk", data.colors),
         (CardTribe, "tribe_fk", data.tribes),
         (CardAttribute, "attribute_fk", data.attrs),
-        (CardRarity, "rarity_fk", data.rarities),
         (CardFormat, "format_fk", data.formats),
         (CardKeyword, "keyword_fk", data.keywords),
         (CardResword, "resword_fk", data.reswords),
@@ -406,7 +403,7 @@ def delete_card(card_id: int, session: Session = Depends(get_session)):
                     old.unlink()
                 session.delete(img)
         session.delete(naip)
-    for model in (CardColor, CardTribe, CardAttribute, CardRarity, CardFormat, CardKeyword, CardResword):
+    for model in (CardColor, CardTribe, CardAttribute, CardFormat, CardKeyword, CardResword):
         for row in session.exec(select(model).where(model.card_fk == card_id)).all():
             session.delete(row)
     session.delete(card)

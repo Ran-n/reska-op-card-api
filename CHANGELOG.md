@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:27:41 )
-[//]: # (+ Revised: 	2026/05/28 13:22:52.448316 )
+[//]: # (+ Revised: 	2026/05/29 21:33:56.842918 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # Changelog
@@ -42,7 +42,8 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - `CardEffectHistory`, `CardTriggerHistory` audit tables with `valid_from` / `valid_to` validity windows; migration `0001_initial`
 - DB-side timestamp defaults: all tables use `strftime('%Y-%m-%d %H:%M:%f', 'now')` as `server_default` for `created_ts` and `updated_ts`; SQLite `AFTER UPDATE` triggers auto-bump `updated_ts` on every row change; migration `0001_initial`
 - `Card` model: `UniqueConstraint("set_fk", "number")` and indexes on `set_fk`, `cardtype_fk`, `name_fk`; migration `0001_initial`
-- `Naip` model: partial unique index `ix_naip_unique_print` on `(card_fk, set_fk, artist_fk, rarity_fk)` where both FKs are non-NULL to deduplicate physical prints; migration `0001_initial`
+- `Naip.is_foil` boolean column (default `False`) to distinguish foil from non-foil prints; migration `0002_naip_is_foil`
+- `Naip` model: partial unique index `ix_naip_unique_print` on `(card_fk, set_fk, artist_fk, rarity_fk, is_foil)` where both FKs are non-NULL to deduplicate physical prints; migration `0001_initial`
 - `NaipItem` response fields: `rarity_symbol`, `set_code`, `image_fk`, `is_default`, `is_errata`
 - `GET /lookups/settypes` endpoint
 - Typed Pydantic response models for all lookup endpoints (`LookupResponse`, `LookupWithSymbolResponse`, `SetLookupResponse`)
@@ -74,6 +75,8 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Removed
 
+- `FD` (Foil DON!! Rare) rarity seed row — foil status is now tracked via `Naip.is_foil`; migration `0002_naip_is_foil`
+- `CardRarity` junction model and `card_rarity` table — rarities are sourced from `Naip.rarity_fk` directly; `GET /cards/{id}` rarity enrichment now joins via `naip`; migration `0001_initial`
 - `CardBlock` junction model and `card_block` table — replaced by `Card.block_fk` direct FK; migration `0001_initial`
 - `NaipBlock` junction model and `naip_block` table — replaced by `Naip.block_fk` direct FK; migration `0001_initial`
 - `NaipFormat` junction model and `naip_format` table — format legality is card-level only; migration `0001_initial`

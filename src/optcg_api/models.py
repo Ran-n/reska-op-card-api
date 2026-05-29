@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/05/21 13:54:17.299727
+Revised: 2026/05/29 21:32:23.358532
 """
 
 from datetime import date, datetime
@@ -269,6 +269,7 @@ class Naip(SQLModel, table=True):
             "set_fk",
             "artist_fk",
             "rarity_fk",
+            "is_foil",
             unique=True,
             sqlite_where=sa.text("artist_fk IS NOT NULL AND rarity_fk IS NOT NULL"),
         ),
@@ -287,6 +288,7 @@ class Naip(SQLModel, table=True):
     trigger_fk: int | None = Field(default=None, foreign_key="trigger.id")
     is_default: bool = Field(default=False)
     is_errata: bool = Field(default=False)
+    is_foil: bool = Field(default=False)
     sort_order: int | None = Field(default=None)
     serial_max: int | None = Field(default=None)
     cardtype_fk: int | None = Field(default=None, foreign_key="card_type.id")
@@ -386,21 +388,6 @@ class CardColor(SQLModel, table=True):
     updated_ts: datetime | None = Field(default=None, sa_column=_ts_col())
     card_fk: int = Field(foreign_key="card.id")
     color_fk: int = Field(foreign_key="color.id")
-
-
-class CardRarity(SQLModel, table=True):
-    __tablename__ = "card_rarity"
-    __table_args__ = (
-        UniqueConstraint("card_fk", "rarity_fk"),
-        Index("ix_card_rarity_card_fk", "card_fk"),
-        Index("ix_card_rarity_rarity_fk", "rarity_fk"),
-    )
-
-    id: int | None = Field(default=None, primary_key=True)
-    created_ts: datetime | None = Field(default=None, sa_column=_ts_col())
-    updated_ts: datetime | None = Field(default=None, sa_column=_ts_col())
-    card_fk: int = Field(foreign_key="card.id")
-    rarity_fk: int = Field(foreign_key="rarity.id")
 
 
 class CardFormat(SQLModel, table=True):

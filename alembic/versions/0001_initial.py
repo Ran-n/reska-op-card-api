@@ -54,7 +54,6 @@ _TRIGGER_TABLES = [
     "card_tribe",
     "card_attribute",
     "card_color",
-    "card_rarity",
     "card_format",
     "card_keyword",
     "card_resword",
@@ -97,7 +96,6 @@ _RARITIES = [
     ("AUD", "Gold DON!! Rare", False, False),
     ("EMR", "Event Manga Rare", False, False),
     ("PTR", "Pattern Rare", False, False),
-    ("FD", "Foil DON!! Rare", False, False),
     ("NFD", "Non-Foil DON!!", False, True),
 ]
 
@@ -456,6 +454,7 @@ def upgrade() -> None:
             trigger_fk  INTEGER REFERENCES "trigger"(id),
             is_default  INTEGER NOT NULL DEFAULT 0,
             is_errata   INTEGER NOT NULL DEFAULT 0,
+            is_foil     INTEGER NOT NULL DEFAULT 0,
             sort_order  INTEGER,
             serial_max  INTEGER,
             cardtype_fk INTEGER REFERENCES card_type(id),
@@ -471,7 +470,7 @@ def upgrade() -> None:
     conn.execute(sa.text("CREATE UNIQUE INDEX ix_naip_one_default_per_card ON naip (card_fk) WHERE is_default = 1"))
     conn.execute(
         sa.text(
-            "CREATE UNIQUE INDEX ix_naip_unique_print ON naip (card_fk, set_fk, artist_fk, rarity_fk) "
+            "CREATE UNIQUE INDEX ix_naip_unique_print ON naip (card_fk, set_fk, artist_fk, rarity_fk, is_foil) "
             "WHERE artist_fk IS NOT NULL AND rarity_fk IS NOT NULL"
         )
     )
@@ -570,21 +569,6 @@ def upgrade() -> None:
     )
     conn.execute(sa.text("CREATE INDEX ix_card_color_card_fk ON card_color (card_fk)"))
     conn.execute(sa.text("CREATE INDEX ix_card_color_color_fk ON card_color (color_fk)"))
-
-    conn.execute(
-        sa.text(f"""
-        CREATE TABLE card_rarity (
-            id         INTEGER PRIMARY KEY,
-            created_ts {_TS},
-            updated_ts {_TS},
-            card_fk    INTEGER NOT NULL REFERENCES card(id),
-            rarity_fk  INTEGER NOT NULL REFERENCES rarity(id),
-            UNIQUE (card_fk, rarity_fk)
-        )
-    """)
-    )
-    conn.execute(sa.text("CREATE INDEX ix_card_rarity_card_fk ON card_rarity (card_fk)"))
-    conn.execute(sa.text("CREATE INDEX ix_card_rarity_rarity_fk ON card_rarity (rarity_fk)"))
 
     conn.execute(
         sa.text(f"""
@@ -878,8 +862,6 @@ def downgrade() -> None:
         "ix_card_keyword_card_fk",
         "ix_card_format_format_fk",
         "ix_card_format_card_fk",
-        "ix_card_rarity_rarity_fk",
-        "ix_card_rarity_card_fk",
         "ix_card_color_color_fk",
         "ix_card_color_card_fk",
         "ix_card_attribute_attribute_fk",
@@ -909,7 +891,6 @@ def downgrade() -> None:
         "card_resword",
         "card_keyword",
         "card_format",
-        "card_rarity",
         "card_color",
         "card_attribute",
         "card_tribe",
