@@ -16,6 +16,12 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Added
 
+- `_images.py` shared image utility module: `save_image_bytes` (BLAKE3 content-addressed filenames), `upsert_image_row`, `cleanup_orphaned_image`, `replace_naip_image`
+- `routers/naips.py`: full CRUD (`GET /naips/{id}`, `POST /naips/`, `PUT /naips/{id}`, `DELETE /naips/{id}`) with enriched `NaipDetail` response, per-naip junction sync for colors/tribes/attrs/keywords/reswords, and orphaned-image cleanup on delete
+- `POST /naips/{id}/image-url` and `POST /naips/{id}/image` image upload endpoints on the naips router
+- `GET /lookups/languages` and `GET /lookups/regions` endpoints
+- `blake3 >=1.0.8` runtime dependency
+- `CardWrite.one_block_max` validator — rejects `blocks` lists longer than 1
 - `Naip.serial_max` nullable integer column — the total print run size for a serialized naip (e.g. 500 for a 1/500 card); migration `0001_initial`
 - `NaipSerial` table — records each known revealed copy of a serialized naip (`naip_fk`, `serial_number`, `image_fk`); unique on `(naip_fk, serial_number)` with a `CHECK serial_number >= 1` constraint; migration `0001_initial`
 - `trg_naip_serial_update` SQLite trigger to auto-bump `updated_ts` on `naip_serial` row changes; migration `0001_initial`
@@ -59,6 +65,8 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Changed
 
+- Image files now stored with BLAKE3-derived hex filenames (content-addressed) instead of `{card_id}{suffix}`; deduplicates identical art across naips automatically
+- `routers/cards.py` image upload refactored to delegate to `_images` helpers; `urllib.request` replaced by `httpx.AsyncClient`; orphaned images cleaned up on card delete
 - All 28 incremental migrations squashed into single `0001_initial` migration covering the full schema, all triggers, and all seed data; migration history restarted
 - `Set.block_fk` removed; sets are no longer linked to blocks directly
 - Database file relocated from `./optcg.db` to `./data/optcg.db`; images dir relocated from `card_images/` to `data/images/`; static mount renamed `/card_images` → `/images`

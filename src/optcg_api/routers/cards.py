@@ -2,17 +2,23 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/05/17 20:26:56.769242
+Revised: 2026/05/13 13:13:00.000000
 """
 
-import shutil
-import urllib.request
 from pathlib import Path
 
+import httpx
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from sqlmodel import Session, select, text
 
+from optcg_api._images import (
+    VALID_SUFFIXES,
+    cleanup_orphaned_image,
+    replace_naip_image,
+    save_image_bytes,
+    upsert_image_row,
+)
 from optcg_api.database import get_session
 from optcg_api.models import (
     Block,
@@ -24,14 +30,10 @@ from optcg_api.models import (
     CardResword,
     CardTribe,
     Effect,
-    Image,
     Naip,
     Name,
     Trigger,
 )
-
-IMAGES_DIR = Path(__file__).parent.parent.parent.parent / "data" / "images"
-IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 router = APIRouter(prefix="/cards", tags=["cards"])
 
@@ -120,6 +122,13 @@ class CardWrite(BaseModel):
     formats: list[int] = []
     keywords: list[int] = []
     reswords: list[int] = []
+
+    @field_validator("blocks")
+    @classmethod
+    def one_block_max(cls, v: list[int]) -> list[int]:
+        if len(v) > 1:
+            raise ValueError("a card can have at most one block")
+        return v
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -394,19 +403,17 @@ def delete_card(card_id: int, session: Session = Depends(get_session)):
     card = session.get(Card, card_id)
     if not card:
         raise HTTPException(status_code=404, detail="Card not found")
-    for naip in session.exec(select(Naip).where(Naip.card_fk == card_id)).all():
-        if naip.image_fk:
-            img = session.get(Image, naip.image_fk)
-            if img:
-                old = IMAGES_DIR / img.path
-                if old.exists():
-                    old.unlink()
-                session.delete(img)
+    naips = session.exec(select(Naip).where(Naip.card_fk == card_id)).all()
+    old_img_fks = [n.image_fk for n in naips if n.image_fk]
+    for naip in naips:
         session.delete(naip)
     for model in (CardColor, CardTribe, CardAttribute, CardFormat, CardKeyword, CardResword):
         for row in session.exec(select(model).where(model.card_fk == card_id)).all():
             session.delete(row)
     session.delete(card)
+    session.flush()
+    for img_fk in old_img_fks:
+        cleanup_orphaned_image(img_fk, session)
     session.commit()
 
 
@@ -414,20 +421,13 @@ class ImageUrlPayload(BaseModel):
     url: str
 
 
-def _set_card_image(card: Card, filename: str, session: Session) -> None:
-    """Upsert an Image row and link it to the card's default Naip."""
-    existing_img = session.exec(select(Image).where(Image.path == filename)).first()
-    if existing_img:
-        img = existing_img
-    else:
-        img = Image(path=filename)
-        session.add(img)
-        session.flush()
-
+def _set_card_image(card: Card, raw: bytes, suffix: str, session: Session) -> None:
+    """Save image bytes and link to the card's default Naip (creating one if absent)."""
+    filename = save_image_bytes(raw, suffix)
+    img = upsert_image_row(filename, session)
     naip = session.exec(select(Naip).where(Naip.card_fk == card.id, Naip.is_default == True)).first()  # noqa: E712
     if naip:
-        naip.image_fk = img.id
-        session.add(naip)
+        replace_naip_image(naip, img.id, session)
     else:
         session.add(Naip(card_fk=card.id, set_fk=card.set_fk, image_fk=img.id, is_default=True))
 
@@ -439,17 +439,16 @@ async def upload_card_image_from_url(card_id: int, payload: ImageUrlPayload, ses
         raise HTTPException(status_code=404, detail="Card not found")
     url = payload.url.strip()
     suffix = Path(url.split("?")[0]).suffix.lower() or ".jpg"
-    if suffix not in (".jpg", ".jpeg", ".png", ".webp"):
+    if suffix not in VALID_SUFFIXES:
         suffix = ".jpg"
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            raw = resp.read()
-    except Exception as e:
+        async with httpx.AsyncClient(follow_redirects=True, timeout=15) as client:
+            resp = await client.get(url, headers={"User-Agent": "Mozilla/5.0"})
+            resp.raise_for_status()
+            raw = resp.content
+    except httpx.HTTPError as e:
         raise HTTPException(status_code=400, detail=f"Failed to fetch image: {e}")
-    filename = f"{card_id}{suffix}"
-    (IMAGES_DIR / filename).write_bytes(raw)
-    _set_card_image(card, filename, session)
+    _set_card_image(card, raw, suffix, session)
     session.commit()
     session.refresh(card)
     return _enrich(card, session)
@@ -461,13 +460,10 @@ async def upload_card_image(card_id: int, file: UploadFile = File(...), session:
     if not card:
         raise HTTPException(status_code=404, detail="Card not found")
     suffix = Path(file.filename).suffix.lower() if file.filename else ".jpg"
-    if suffix not in (".jpg", ".jpeg", ".png", ".webp"):
+    if suffix not in VALID_SUFFIXES:
         raise HTTPException(status_code=400, detail="Only jpg, png, webp images are accepted")
-    filename = f"{card_id}{suffix}"
-    dest = IMAGES_DIR / filename
-    with dest.open("wb") as f:
-        shutil.copyfileobj(file.file, f)
-    _set_card_image(card, filename, session)
+    raw = await file.read()
+    _set_card_image(card, raw, suffix, session)
     session.commit()
     session.refresh(card)
     return _enrich(card, session)

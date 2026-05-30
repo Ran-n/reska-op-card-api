@@ -18,7 +18,9 @@ from optcg_api.models import (
     Color,
     Format,
     Keyword,
+    Language,
     Rarity,
+    Region,
     Resword,
     Set,
     SetType,
@@ -46,6 +48,20 @@ class SetLookupResponse(BaseModel):
 
 class SetTypeLookupResponse(LookupResponse):
     pass
+
+
+class LanguageLookupResponse(BaseModel):
+    id: int
+    code: str
+    name: str
+    desc: str | None = None
+
+
+class RegionLookupResponse(BaseModel):
+    id: int
+    code: str
+    name: str
+    desc: str | None = None
 
 
 @router.get("/cardtypes", response_model=list[LookupWithSymbolResponse])
@@ -106,3 +122,13 @@ def get_sets(session: Session = Depends(get_session)):
 @router.get("/settypes", response_model=list[SetTypeLookupResponse])
 def get_settypes(session: Session = Depends(get_session)):
     return session.exec(select(SetType).order_by(SetType.name)).all()
+
+
+@router.get("/languages", response_model=list[LanguageLookupResponse])
+def get_languages(session: Session = Depends(get_session)):
+    return session.exec(select(Language).order_by(Language.code)).all()
+
+
+@router.get("/regions", response_model=list[RegionLookupResponse])
+def get_regions(session: Session = Depends(get_session)):
+    return session.exec(select(Region).order_by(Region.code)).all()

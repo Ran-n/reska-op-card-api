@@ -13,7 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from optcg_api.database import init_db
-from optcg_api.routers import cards, lookups, sets
+from optcg_api.routers import cards, lookups, naips, sets
 
 IMAGES_DIR = Path(__file__).parent.parent.parent / "data" / "images"
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)
@@ -35,6 +35,7 @@ app.add_middleware(
 )
 
 app.include_router(cards.router)
+app.include_router(naips.router)
 app.include_router(sets.router)
 app.include_router(lookups.router)
 
