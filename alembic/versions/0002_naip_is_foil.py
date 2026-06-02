@@ -27,15 +27,18 @@ def upgrade() -> None:
     conn = op.get_bind()
     conn.execute(sa.text("PRAGMA foreign_keys = OFF"))
 
-    conn.execute(sa.text("ALTER TABLE naip ADD COLUMN is_foil INTEGER NOT NULL DEFAULT 0"))
+    # 0001_initial was squashed to already include is_foil — skip if present
+    existing_cols = [row[1] for row in conn.execute(sa.text("PRAGMA table_info(naip)")).fetchall()]
+    if "is_foil" not in existing_cols:
+        conn.execute(sa.text("ALTER TABLE naip ADD COLUMN is_foil INTEGER NOT NULL DEFAULT 0"))
 
-    conn.execute(sa.text("DROP INDEX IF EXISTS ix_naip_unique_print"))
-    conn.execute(
-        sa.text(
-            "CREATE UNIQUE INDEX ix_naip_unique_print ON naip (card_fk, set_fk, artist_fk, rarity_fk, is_foil) "
-            "WHERE artist_fk IS NOT NULL AND rarity_fk IS NOT NULL"
+        conn.execute(sa.text("DROP INDEX IF EXISTS ix_naip_unique_print"))
+        conn.execute(
+            sa.text(
+                "CREATE UNIQUE INDEX ix_naip_unique_print ON naip (card_fk, set_fk, artist_fk, rarity_fk, is_foil) "
+                "WHERE artist_fk IS NOT NULL AND rarity_fk IS NOT NULL"
+            )
         )
-    )
 
     conn.execute(sa.text("DELETE FROM rarity WHERE symbol = 'FD'"))
 

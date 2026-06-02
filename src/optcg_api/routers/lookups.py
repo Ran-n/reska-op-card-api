@@ -19,6 +19,7 @@ from optcg_api.models import (
     Format,
     Keyword,
     Language,
+    PrintVariant,
     Rarity,
     Region,
     Resword,
@@ -87,6 +88,15 @@ def get_attributes(session: Session = Depends(get_session)):
 @router.get("/rarities", response_model=list[LookupWithSymbolResponse])
 def get_rarities(session: Session = Depends(get_session)):
     return session.exec(select(Rarity).order_by(Rarity.name)).all()
+
+
+class PrintVariantLookupResponse(LookupWithSymbolResponse):
+    parent_fk: int | None = None
+
+
+@router.get("/print-variants", response_model=list[PrintVariantLookupResponse])
+def get_print_variants(session: Session = Depends(get_session)):
+    return session.exec(select(PrintVariant).order_by(PrintVariant.name)).all()
 
 
 @router.get("/blocks", response_model=list[LookupResponse])

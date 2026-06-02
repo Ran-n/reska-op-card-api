@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:27:41 )
-[//]: # (+ Revised: 	2026/05/29 21:33:56.842918 )
+[//]: # (+ Revised: 	2026/06/02 09:01:28.863745 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # Changelog
@@ -15,6 +15,25 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ## [Unreleased]
 
 ### Added
+
+- `PrintVariant` table with `parent_fk` self-reference encoding a hierarchy of print-level variants (STD, AA, TR, SP, GR, MR, EMR, RMR, FA, AUD, PTR, MTR, AU, AG); `trg_print_variant_update` trigger; migration `0003_print_variant`
+- `Card.rarity_fk` nullable FK → `rarity.id` — the canonical base rarity the card was designed as (C, UC, R, SR, SEC, L, D, P), independent of any specific print; `ix_card_rarity_fk` index; migration `0003_print_variant`
+- `Naip.print_variant_fk` NOT NULL FK → `print_variant.id` — the specific print variant of this physical print (STD for standard prints, AA/TR/SP/etc. for special prints); `ix_naip_print_variant_fk` index; migration `0003_print_variant`
+- `ix_naip_unique_print` partial unique index now covers `(card_fk, set_fk, artist_fk, print_variant_fk, is_foil)` where `artist_fk IS NOT NULL`; migration `0003_print_variant`
+- `CardDetail` response fields: `rarity_fk`, `rarity_name`, `rarity_symbol` (card-level canonical rarity)
+- `NaipItem` response fields: `print_variant_name`, `print_variant_symbol`, `is_foil`
+- `NaipDetail` response fields: `print_variant_fk`, `print_variant_name`, `print_variant_symbol`
+- `CardWrite` and `NaipWrite` accept `rarity_fk` / `print_variant_fk` respectively
+- `ingest.py` now sets `card.rarity_fk` from scraped rarity symbol; print_variant symbols reported by the site are recognised and skipped (no naip rows yet)
+- `GET /lookups/print-variants` endpoint returning all `PrintVariant` rows with `symbol`, `name`, `desc`, `parent_fk`
+
+### Changed
+
+- `Naip.rarity_fk` removed — rarity is now exclusively on `Card.rarity_fk`; print-level variant is `Naip.print_variant_fk`
+- `Rarity` table: `is_type` and `is_base` columns removed — card-type classification lives on `card_type`, print-variant classification lives on `print_variant`; `NFD` (Non-Foil DON!!) row removed (foil distinction is `Naip.is_foil`)
+- `CardDetail.rarities` list removed — replaced by single `rarity_fk`/`rarity_name`/`rarity_symbol` fields on the card itself
+
+### Previous entries
 
 - `_images.py` shared image utility module: `save_image_bytes` (BLAKE3 content-addressed filenames), `upsert_image_row`, `cleanup_orphaned_image`, `replace_naip_image`
 - `routers/naips.py`: full CRUD (`GET /naips/{id}`, `POST /naips/`, `PUT /naips/{id}`, `DELETE /naips/{id}`) with enriched `NaipDetail` response, per-naip junction sync for colors/tribes/attrs/keywords/reswords, and orphaned-image cleanup on delete

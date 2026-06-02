@@ -51,18 +51,20 @@ class NaipItem(BaseModel):
     id: int
     name: str
     artist_name: str | None = None
-    rarity_name: str | None = None
-    rarity_symbol: str | None = None
+    print_variant_name: str | None = None
+    print_variant_symbol: str | None = None
     set_code: str | None = None
     image_fk: int | None = None
     is_default: bool = False
     is_errata: bool = False
+    is_foil: bool = False
 
 
 class CardDetail(BaseModel):
     id: int
     set_fk: int
     cardtype_fk: int
+    rarity_fk: int | None = None
     number: int
     name: str
     effect: str | None = None
@@ -75,10 +77,11 @@ class CardDetail(BaseModel):
     set_name: str | None = None
     cardtype_name: str | None = None
     cardtype_symbol: str | None = None
+    rarity_name: str | None = None
+    rarity_symbol: str | None = None
     colors: list[LookupItem] = []
     tribes: list[LookupItem] = []
     attrs: list[LookupItem] = []
-    rarities: list[LookupItem] = []
     blocks: list[LookupItem] = []
     formats: list[LookupItem] = []
     keywords: list[LookupItem] = []
@@ -107,6 +110,7 @@ class CardListResponse(BaseModel):
 class CardWrite(BaseModel):
     set_fk: int
     cardtype_fk: int
+    rarity_fk: int | None = None
     number: int
     name: str
     effect: str | None = None
@@ -144,10 +148,14 @@ def _resolve_text(session: Session, model, pk: int | None, field: str) -> str | 
 def _enrich(card: Card, session: Session) -> CardDetail:
     row = session.exec(
         text(
-            'SELECT s.code, s.name, ct.name, ct.symbol FROM "set" s JOIN card_type ct ON ct.id = :ct WHERE s.id = :s'
-        ).bindparams(ct=card.cardtype_fk, s=card.set_fk)
+            "SELECT s.code, s.name, ct.name, ct.symbol, r.name, r.symbol "
+            'FROM "set" s '
+            "JOIN card_type ct ON ct.id = :ct "
+            "LEFT JOIN rarity r ON r.id = :rid "
+            "WHERE s.id = :s"
+        ).bindparams(ct=card.cardtype_fk, s=card.set_fk, rid=card.rarity_fk)
     ).first()
-    set_code, set_name, ct_name, ct_sym = row if row else (None, None, None, None)
+    set_code, set_name, ct_name, ct_sym, rarity_name, rarity_sym = row if row else (None, None, None, None, None, None)
 
     card_name = _resolve_text(session, Name, card.name_fk, "name") or ""
     effect = _resolve_text(session, Effect, card.effect_fk, "effect")
@@ -155,12 +163,12 @@ def _enrich(card: Card, session: Session) -> CardDetail:
 
     naip_rows = session.exec(
         text(
-            "SELECT n.id, COALESCE(nm.name, ''), a.name, r.name, r.symbol, s.code, "
-            "n.image_fk, n.is_default, n.is_errata "
+            "SELECT n.id, COALESCE(nm.name, ''), a.name, pv.name, pv.symbol, s.code, "
+            "n.image_fk, n.is_default, n.is_errata, n.is_foil "
             "FROM naip n "
             "LEFT JOIN name nm ON nm.id = n.name_fk "
             "LEFT JOIN artist a ON a.id = n.artist_fk "
-            "LEFT JOIN rarity r ON r.id = n.rarity_fk "
+            "LEFT JOIN print_variant pv ON pv.id = n.print_variant_fk "
             'LEFT JOIN "set" s ON s.id = n.set_fk '
             "WHERE n.card_fk = :cid"
         ).bindparams(cid=card.id)
@@ -170,12 +178,13 @@ def _enrich(card: Card, session: Session) -> CardDetail:
             id=r[0],
             name=r[1],
             artist_name=r[2],
-            rarity_name=r[3],
-            rarity_symbol=r[4],
+            print_variant_name=r[3],
+            print_variant_symbol=r[4],
             set_code=r[5],
             image_fk=r[6],
             is_default=bool(r[7]),
             is_errata=bool(r[8]),
+            is_foil=bool(r[9]),
         )
         for r in naip_rows
     ]
@@ -194,12 +203,6 @@ def _enrich(card: Card, session: Session) -> CardDetail:
         text(
             "SELECT a.id, a.name FROM attribute a "
             "JOIN card_attribute ca ON ca.attribute_fk = a.id WHERE ca.card_fk = :cid"
-        ).bindparams(cid=card.id)
-    ).all()
-    rarity_rows = session.exec(
-        text(
-            "SELECT DISTINCT r.id, r.name, r.symbol FROM rarity r "
-            "JOIN naip n ON n.rarity_fk = r.id WHERE n.card_fk = :cid"
         ).bindparams(cid=card.id)
     ).all()
     block_obj = session.get(Block, card.block_fk) if card.block_fk else None
@@ -224,6 +227,7 @@ def _enrich(card: Card, session: Session) -> CardDetail:
         id=card.id,
         set_fk=card.set_fk,
         cardtype_fk=card.cardtype_fk,
+        rarity_fk=card.rarity_fk,
         number=card.number,
         name=card_name,
         effect=effect,
@@ -236,10 +240,11 @@ def _enrich(card: Card, session: Session) -> CardDetail:
         set_name=set_name,
         cardtype_name=ct_name,
         cardtype_symbol=ct_sym,
+        rarity_name=rarity_name,
+        rarity_symbol=rarity_sym,
         colors=[LookupItem(id=r[0], name=r[1]) for r in color_rows],
         tribes=[LookupItem(id=r[0], name=r[1]) for r in tribe_rows],
         attrs=[LookupItem(id=r[0], name=r[1]) for r in attr_rows],
-        rarities=[LookupItem(id=r[0], name=r[1], symbol=r[2]) for r in rarity_rows],
         blocks=[LookupItem(id=r[0], name=r[1]) for r in block_rows],
         formats=[LookupItem(id=r[0], name=r[1]) for r in format_rows],
         keywords=[LookupItem(id=r[0], name=r[1]) for r in kw_rows],
@@ -358,6 +363,7 @@ def create_card(data: CardWrite, session: Session = Depends(get_session)):
     card = Card(
         set_fk=data.set_fk,
         cardtype_fk=data.cardtype_fk,
+        rarity_fk=data.rarity_fk,
         number=data.number,
         name_fk=name_fk,
         effect_fk=effect_fk,
@@ -382,6 +388,7 @@ def update_card(card_id: int, data: CardWrite, session: Session = Depends(get_se
         raise HTTPException(status_code=404, detail="Card not found")
     card.set_fk = data.set_fk
     card.cardtype_fk = data.cardtype_fk
+    card.rarity_fk = data.rarity_fk
     card.number = data.number
     card.name_fk = _upsert_text_fk(session, Name, "name", data.name)
     card.effect_fk = _upsert_text_fk(session, Effect, "effect", data.effect)

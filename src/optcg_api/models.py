@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/05/29 21:32:23.358532
+Revised: 2026/06/01 10:11:52.076868
 """
 
 from datetime import date, datetime
@@ -61,8 +61,18 @@ class Rarity(SQLModel, table=True):
     symbol: str
     name: str
     desc: str | None = None
-    is_type: bool = Field(default=False)
-    is_base: bool = Field(default=False)
+
+
+class PrintVariant(SQLModel, table=True):
+    __tablename__ = "print_variant"
+
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_ts_col())
+    updated_ts: datetime | None = Field(default=None, sa_column=_ts_col())
+    symbol: str
+    name: str
+    desc: str | None = None
+    parent_fk: int | None = Field(default=None, foreign_key="print_variant.id")
 
 
 class Tribe(SQLModel, table=True):
@@ -237,6 +247,7 @@ class Card(SQLModel, table=True):
         Index("ix_card_set_fk", "set_fk"),
         Index("ix_card_cardtype_fk", "cardtype_fk"),
         Index("ix_card_name_fk", "name_fk"),
+        Index("ix_card_rarity_fk", "rarity_fk"),
     )
 
     id: int | None = Field(default=None, primary_key=True)
@@ -245,6 +256,7 @@ class Card(SQLModel, table=True):
     set_fk: int = Field(foreign_key="set.id")
     cardtype_fk: int = Field(foreign_key="card_type.id")
     name_fk: int = Field(foreign_key="name.id")
+    rarity_fk: int | None = Field(default=None, foreign_key="rarity.id")
     effect_fk: int | None = Field(default=None, foreign_key="effect.id")
     trigger_fk: int | None = Field(default=None, foreign_key="trigger.id")
     block_fk: int | None = Field(default=None, foreign_key="block.id")
@@ -256,23 +268,24 @@ class Card(SQLModel, table=True):
 
 
 class Naip(SQLModel, table=True):
-    """A specific physical print of a card (card + set + artist + rarity)."""
+    """A specific physical print of a card (card + set + artist + print_variant)."""
 
     __tablename__ = "naip"
     __table_args__ = (
         # at most one default print per card
         Index("ix_naip_one_default_per_card", "card_fk", unique=True, sqlite_where=sa.text("is_default = 1")),
-        # deduplicate physical prints (NULLs excluded — NULL != NULL in SQLite UNIQUE)
+        # deduplicate physical prints (artist_fk NULL excluded — NULL != NULL in SQLite UNIQUE)
         Index(
             "ix_naip_unique_print",
             "card_fk",
             "set_fk",
             "artist_fk",
-            "rarity_fk",
+            "print_variant_fk",
             "is_foil",
             unique=True,
-            sqlite_where=sa.text("artist_fk IS NOT NULL AND rarity_fk IS NOT NULL"),
+            sqlite_where=sa.text("artist_fk IS NOT NULL"),
         ),
+        Index("ix_naip_print_variant_fk", "print_variant_fk"),
     )
 
     id: int | None = Field(default=None, primary_key=True)
@@ -281,7 +294,7 @@ class Naip(SQLModel, table=True):
     card_fk: int = Field(foreign_key="card.id")
     set_fk: int = Field(foreign_key="set.id")
     artist_fk: int | None = Field(default=None, foreign_key="artist.id")
-    rarity_fk: int | None = Field(default=None, foreign_key="rarity.id")
+    print_variant_fk: int = Field(foreign_key="print_variant.id")
     name_fk: int | None = Field(default=None, foreign_key="name.id")
     image_fk: int | None = Field(default=None, foreign_key="image.id")
     effect_fk: int | None = Field(default=None, foreign_key="effect.id")

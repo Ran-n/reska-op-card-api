@@ -39,6 +39,7 @@ from optcg_api.models import (  # noqa: E402, I001
     Effect,
     Language,
     Name,
+    PrintVariant,
     Rarity,
     Set,
     SetType,
@@ -76,8 +77,9 @@ _CARD_TYPE_MAP = {
     "STAGE": "STAGE",
 }
 
-# Rarity symbols that are card types, not rarities — skip rarity assignment for these
-_RARITY_SKIP = {"L", "D"}
+# Rarity symbols that the site reports but belong to print_variant, not rarity.
+# These cannot be assigned to card.rarity_fk until naip creation is implemented.
+_PRINT_VARIANT_SYMBOLS: set[str] = set()
 
 _SET_ID_RE = re.compile(r"\[([A-Z0-9\-]+)\]")
 _CARD_NUM_RE = re.compile(r"-(\d+)")
@@ -271,6 +273,8 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
     # Load seeded lookup tables — all must exist before ingest runs
     card_type_cache: dict[str, CardType] = {ct.symbol: ct for ct in session.exec(select(CardType)).all()}
     rarity_cache: dict[str, Rarity] = {r.symbol: r for r in session.exec(select(Rarity)).all()}
+    print_variant_cache: dict[str, PrintVariant] = {pv.symbol: pv for pv in session.exec(select(PrintVariant)).all()}
+    _PRINT_VARIANT_SYMBOLS.update(print_variant_cache.keys())
 
     en_lang = session.exec(select(Language).where(Language.code == "en")).one()
 
@@ -339,6 +343,18 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
         effect_fk = _get_effect_fk(cd.get("desc"))
         trigger_fk = _get_trigger_fk(cd.get("trigger"))
 
+        # Rarity — strict lookup; print_variant symbols are skipped (no naip yet)
+        rarity_text = cd.get("rarity")
+        rarity_fk: int | None = None
+        if rarity_text:
+            if rarity_text in rarity_cache:
+                rarity_fk = rarity_cache[rarity_text].id
+            elif rarity_text not in _PRINT_VARIANT_SYMBOLS:
+                raise RuntimeError(
+                    f"Unknown rarity symbol {rarity_text!r} on card {cd['card_id']!r} — "
+                    "add it to the seed migration and re-run alembic upgrade head"
+                )
+
         existing = session.exec(select(Card).where(Card.set_fk == set_pk, Card.number == number)).first()
         if existing:
             existing.name_fk = name_fk
@@ -349,11 +365,14 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
             existing.counter = cd.get("counter")
             existing.cost = cd.get("cost")
             existing.cardtype_fk = ct.id
+            if rarity_fk is not None:
+                existing.rarity_fk = rarity_fk
             card = existing
         else:
             card = Card(
                 set_fk=set_pk,
                 cardtype_fk=ct.id,
+                rarity_fk=rarity_fk,
                 number=number,
                 name_fk=name_fk,
                 effect_fk=effect_fk,
@@ -380,14 +399,6 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
             color_pk = color_cache[color_name].id
             if color_pk not in existing_colors:
                 session.add(CardColor(card_fk=card_pk, color_fk=color_pk))
-
-        # Rarity — strict lookup against seeded values
-        rarity_text = cd.get("rarity")
-        if rarity_text and rarity_text not in _RARITY_SKIP and rarity_text not in rarity_cache:
-            raise RuntimeError(
-                f"Unknown rarity symbol {rarity_text!r} on card {cd['card_id']!r} — "
-                "add it to the seed migration and re-run alembic upgrade head"
-            )
 
         # Attribute
         attribute_text = cd.get("attribute")

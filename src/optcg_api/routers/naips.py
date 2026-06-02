@@ -50,7 +50,7 @@ class NaipDetail(BaseModel):
     card_fk: int
     set_fk: int
     artist_fk: int | None = None
-    rarity_fk: int | None = None
+    print_variant_fk: int | None = None
     language_fk: int | None = None
     image_fk: int | None = None
     cardtype_fk: int | None = None
@@ -68,8 +68,8 @@ class NaipDetail(BaseModel):
     effect: str | None = None
     trigger: str | None = None
     artist_name: str | None = None
-    rarity_name: str | None = None
-    rarity_symbol: str | None = None
+    print_variant_name: str | None = None
+    print_variant_symbol: str | None = None
     set_code: str | None = None
     cardtype_name: str | None = None
     cardtype_symbol: str | None = None
@@ -85,7 +85,7 @@ class NaipWrite(BaseModel):
     card_fk: int
     set_fk: int
     artist_fk: int | None = None
-    rarity_fk: int | None = None
+    print_variant_fk: int | None = None
     language_fk: int | None = None
     cardtype_fk: int | None = None
     block_fk: int | None = None
@@ -160,17 +160,17 @@ def _sync_naip_junctions(naip: Naip, data: NaipWrite, session: Session) -> None:
 def _enrich_naip(naip: Naip, session: Session) -> NaipDetail:
     row = session.exec(
         text(
-            "SELECT a.name, r.name, r.symbol, s.code, ct.name, ct.symbol, l.code "
+            "SELECT a.name, pv.name, pv.symbol, s.code, ct.name, ct.symbol, l.code "
             "FROM naip n "
             "LEFT JOIN artist a ON a.id = n.artist_fk "
-            "LEFT JOIN rarity r ON r.id = n.rarity_fk "
+            "LEFT JOIN print_variant pv ON pv.id = n.print_variant_fk "
             'LEFT JOIN "set" s ON s.id = n.set_fk '
             "LEFT JOIN card_type ct ON ct.id = n.cardtype_fk "
             "LEFT JOIN language l ON l.id = n.language_fk "
             "WHERE n.id = :nid"
         ).bindparams(nid=naip.id)
     ).first()
-    artist_name, rarity_name, rarity_symbol, set_code, ct_name, ct_sym, lang_code = (
+    artist_name, pv_name, pv_symbol, set_code, ct_name, ct_sym, lang_code = (
         row if row else (None, None, None, None, None, None, None)
     )
 
@@ -210,7 +210,7 @@ def _enrich_naip(naip: Naip, session: Session) -> NaipDetail:
         card_fk=naip.card_fk,
         set_fk=naip.set_fk,
         artist_fk=naip.artist_fk,
-        rarity_fk=naip.rarity_fk,
+        print_variant_fk=naip.print_variant_fk,
         language_fk=naip.language_fk,
         image_fk=naip.image_fk,
         cardtype_fk=naip.cardtype_fk,
@@ -228,8 +228,8 @@ def _enrich_naip(naip: Naip, session: Session) -> NaipDetail:
         effect=effect,
         trigger=trigger,
         artist_name=artist_name,
-        rarity_name=rarity_name,
-        rarity_symbol=rarity_symbol,
+        print_variant_name=pv_name,
+        print_variant_symbol=pv_symbol,
         set_code=set_code,
         cardtype_name=ct_name,
         cardtype_symbol=ct_sym,
@@ -246,7 +246,7 @@ def _apply_write(naip: Naip, data: NaipWrite, session: Session) -> None:
     naip.card_fk = data.card_fk
     naip.set_fk = data.set_fk
     naip.artist_fk = data.artist_fk
-    naip.rarity_fk = data.rarity_fk
+    naip.print_variant_fk = data.print_variant_fk
     naip.language_fk = data.language_fk
     naip.cardtype_fk = data.cardtype_fk
     naip.block_fk = data.block_fk
