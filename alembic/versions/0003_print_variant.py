@@ -28,10 +28,12 @@ _TS_EXPR = "strftime('%Y-%m-%d %H:%M:%f', 'now')"
 
 
 def _trigger(table: str) -> str:
+    q = f'"{table}"'
     return (
-        f"CREATE TRIGGER trg_{table}_update AFTER UPDATE ON {table} "
+        f"CREATE TRIGGER trg_{table}_update AFTER UPDATE ON {q} "
+        f"FOR EACH ROW "
         f"WHEN NEW.updated_ts IS OLD.updated_ts "
-        f"BEGIN UPDATE {table} SET updated_ts = {_TS_EXPR} WHERE id = NEW.id; END"
+        f"BEGIN UPDATE {q} SET updated_ts = {_TS_EXPR} WHERE id = NEW.id; END"
     )
 
 

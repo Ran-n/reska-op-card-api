@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/29 00:00:00.000000
-Revised: 2026/05/29 00:00:00.000000
+Revised: 2026/06/02 20:36:43.542448
 
 add naip.is_foil; remove FD (Foil DON!! Rare) rarity
 
@@ -21,6 +21,9 @@ revision: str = "0002_naip_is_foil"
 down_revision: str | Sequence[str] | None = "0001_initial"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
+
+_TS = "TEXT DEFAULT (strftime('%Y-%m-%d %H:%M:%f', 'now'))"
+_TS_EXPR = "strftime('%Y-%m-%d %H:%M:%f', 'now')"
 
 
 def upgrade() -> None:
@@ -52,26 +55,62 @@ def downgrade() -> None:
     # Restore FD rarity
     conn.execute(sa.text("INSERT INTO rarity (symbol, name, is_type, is_base) VALUES ('FD', 'Foil DON!! Rare', 0, 0)"))
 
-    # Restore old index (without is_foil)
+    # Rebuild naip without is_foil; must drop trigger + partial indexes before rename
+    conn.execute(sa.text("DROP TRIGGER IF EXISTS trg_naip_update"))
     conn.execute(sa.text("DROP INDEX IF EXISTS ix_naip_unique_print"))
+    conn.execute(sa.text("DROP INDEX IF EXISTS ix_naip_one_default_per_card"))
+    conn.execute(sa.text("ALTER TABLE naip RENAME TO naip_old"))
+    conn.execute(
+        sa.text(f"""
+        CREATE TABLE naip (
+            id          INTEGER PRIMARY KEY,
+            created_ts  {_TS},
+            updated_ts  {_TS},
+            card_fk     INTEGER NOT NULL REFERENCES card(id),
+            set_fk      INTEGER NOT NULL REFERENCES "set"(id),
+            artist_fk   INTEGER REFERENCES artist(id),
+            rarity_fk   INTEGER REFERENCES rarity(id),
+            name_fk     INTEGER REFERENCES "name"(id),
+            image_fk    INTEGER REFERENCES image(id),
+            effect_fk   INTEGER REFERENCES effect(id),
+            trigger_fk  INTEGER REFERENCES "trigger"(id),
+            is_default  INTEGER NOT NULL DEFAULT 0,
+            is_errata   INTEGER NOT NULL DEFAULT 0,
+            sort_order  INTEGER,
+            serial_max  INTEGER,
+            cardtype_fk INTEGER REFERENCES card_type(id),
+            block_fk    INTEGER REFERENCES block(id),
+            language_fk INTEGER REFERENCES language(id),
+            power       INTEGER,
+            life        INTEGER,
+            counter     INTEGER,
+            cost        INTEGER
+        )
+    """)
+    )
+    conn.execute(
+        sa.text(
+            "INSERT INTO naip "
+            "SELECT id, created_ts, updated_ts, card_fk, set_fk, artist_fk, rarity_fk, "
+            "name_fk, image_fk, effect_fk, trigger_fk, is_default, is_errata, "
+            "sort_order, serial_max, cardtype_fk, block_fk, language_fk, "
+            "power, life, counter, cost "
+            "FROM naip_old"
+        )
+    )
+    conn.execute(sa.text("CREATE UNIQUE INDEX ix_naip_one_default_per_card ON naip (card_fk) WHERE is_default = 1"))
     conn.execute(
         sa.text(
             "CREATE UNIQUE INDEX ix_naip_unique_print ON naip (card_fk, set_fk, artist_fk, rarity_fk) "
             "WHERE artist_fk IS NOT NULL AND rarity_fk IS NOT NULL"
         )
     )
-
-    # SQLite can't drop columns — rebuild naip without is_foil
-    conn.execute(sa.text("ALTER TABLE naip RENAME TO naip_old"))
     conn.execute(
-        sa.text("""
-        CREATE TABLE naip AS SELECT
-            id, created_ts, updated_ts, card_fk, set_fk, artist_fk, rarity_fk,
-            name_fk, image_fk, effect_fk, trigger_fk, is_default, is_errata,
-            sort_order, serial_max, cardtype_fk, block_fk, language_fk,
-            power, life, counter, cost
-        FROM naip_old
-    """)
+        sa.text(
+            f"CREATE TRIGGER trg_naip_update AFTER UPDATE ON naip FOR EACH ROW "
+            f"WHEN NEW.updated_ts IS OLD.updated_ts "
+            f"BEGIN UPDATE naip SET updated_ts = {_TS_EXPR} WHERE id = NEW.id; END"
+        )
     )
     conn.execute(sa.text("DROP TABLE naip_old"))
 

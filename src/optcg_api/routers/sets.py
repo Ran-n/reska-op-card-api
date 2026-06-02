@@ -21,6 +21,7 @@ class SetResponse(BaseModel):
     id: int
     code: str
     name: str
+    language_fk: int
     parent_fk: int | None = None
     desc: str | None = None
     release_ts: date | None = None

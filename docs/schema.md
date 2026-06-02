@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/06/02 18:44:20.175705 )
-[//]: # (+ Revised: 	2026/06/02 18:44:20.175705 )
+[//]: # (+ Revised: 	2026/06/02 20:43:22.148066 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # Database Schema Reference
@@ -259,8 +259,7 @@ A released product (booster set, starter deck, promo set, etc.) in a specific la
 | `language_fk` | FK to `language.id`. The language of this release. |
 | `code` | Official set code (e.g. `OP-01`). Combined with `language_fk`, this is unique. |
 | `name` | Full set name. |
-| `series` | The named series this set belongs to (e.g. "ONE PIECE CARD GAME"). |
-| `ord` | Release order within the series — used for sorting. |
+| `parent_fk` | FK to `set.id`. Points to the canonical (usually English) counterpart of this set, or the base product for a promo/special set. NULL for root sets. Used for grouping and sorting across languages. |
 | `desc` | Optional description. |
 | `release_ts` | Official release date. |
 

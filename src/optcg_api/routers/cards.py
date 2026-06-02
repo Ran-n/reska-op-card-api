@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/05/13 13:13:00.000000
+Revised: 2026/06/02 20:28:44.007569
 """
 
 from pathlib import Path
@@ -21,17 +21,28 @@ from optcg_api._images import (
 )
 from optcg_api.database import get_session
 from optcg_api.models import (
+    BannedPair,
     Block,
     Card,
     CardAttribute,
+    CardBan,
     CardColor,
+    CardEffectHistory,
     CardFormat,
     CardKeyword,
     CardResword,
     CardTribe,
+    CardTriggerHistory,
     Effect,
     Naip,
+    NaipAttribute,
+    NaipColor,
+    NaipKeyword,
+    NaipResword,
+    NaipSerial,
+    NaipTribe,
     Name,
+    PrintVariant,
     Trigger,
 )
 
@@ -413,10 +424,31 @@ def delete_card(card_id: int, session: Session = Depends(get_session)):
     naips = session.exec(select(Naip).where(Naip.card_fk == card_id)).all()
     old_img_fks = [n.image_fk for n in naips if n.image_fk]
     for naip in naips:
+        for naip_junc in (NaipColor, NaipTribe, NaipAttribute, NaipKeyword, NaipResword):
+            for row in session.exec(select(naip_junc).where(naip_junc.naip_fk == naip.id)).all():
+                session.delete(row)
+        for serial in session.exec(select(NaipSerial).where(NaipSerial.naip_fk == naip.id)).all():
+            if serial.image_fk:
+                old_img_fks.append(serial.image_fk)
+            session.delete(serial)
         session.delete(naip)
-    for model in (CardColor, CardTribe, CardAttribute, CardFormat, CardKeyword, CardResword):
+    for model in (
+        CardColor,
+        CardTribe,
+        CardAttribute,
+        CardFormat,
+        CardKeyword,
+        CardResword,
+        CardBan,
+        CardEffectHistory,
+        CardTriggerHistory,
+    ):
         for row in session.exec(select(model).where(model.card_fk == card_id)).all():
             session.delete(row)
+    for row in session.exec(
+        select(BannedPair).where((BannedPair.card_a_fk == card_id) | (BannedPair.card_b_fk == card_id))
+    ).all():
+        session.delete(row)
     session.delete(card)
     session.flush()
     for img_fk in old_img_fks:
@@ -436,7 +468,12 @@ def _set_card_image(card: Card, raw: bytes, suffix: str, session: Session) -> No
     if naip:
         replace_naip_image(naip, img.id, session)
     else:
-        session.add(Naip(card_fk=card.id, set_fk=card.set_fk, image_fk=img.id, is_default=True))
+        std = session.exec(select(PrintVariant).where(PrintVariant.symbol == "STD")).first()
+        if std is None:
+            raise HTTPException(status_code=500, detail="STD print_variant seed row missing")
+        session.add(
+            Naip(card_fk=card.id, set_fk=card.set_fk, image_fk=img.id, is_default=True, print_variant_fk=std.id)
+        )
 
 
 @router.post("/{card_id}/image-url", response_model=CardDetail)

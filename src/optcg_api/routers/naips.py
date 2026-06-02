@@ -50,7 +50,7 @@ class NaipDetail(BaseModel):
     card_fk: int
     set_fk: int
     artist_fk: int | None = None
-    print_variant_fk: int | None = None
+    print_variant_fk: int
     language_fk: int | None = None
     image_fk: int | None = None
     cardtype_fk: int | None = None
@@ -85,7 +85,7 @@ class NaipWrite(BaseModel):
     card_fk: int
     set_fk: int
     artist_fk: int | None = None
-    print_variant_fk: int | None = None
+    print_variant_fk: int
     language_fk: int | None = None
     cardtype_fk: int | None = None
     block_fk: int | None = None
