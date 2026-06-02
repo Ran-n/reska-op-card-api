@@ -21,8 +21,7 @@ class SetResponse(BaseModel):
     id: int
     code: str
     name: str
-    series: str | None = None
-    ord: int | None = None
+    parent_fk: int | None = None
     desc: str | None = None
     release_ts: date | None = None
     type_fk: int | None = None

@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:27:41 )
-[//]: # (+ Revised: 	2026/06/02 09:01:28.863745 )
+[//]: # (+ Revised: 	2026/06/02 18:44:38.335723 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # Changelog
@@ -26,12 +26,16 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - `CardWrite` and `NaipWrite` accept `rarity_fk` / `print_variant_fk` respectively
 - `ingest.py` now sets `card.rarity_fk` from scraped rarity symbol; print_variant symbols reported by the site are recognised and skipped (no naip rows yet)
 - `GET /lookups/print-variants` endpoint returning all `PrintVariant` rows with `symbol`, `name`, `desc`, `parent_fk`
+- `Set.parent_fk` nullable FK → `set.id` self-referential — links a set to its parent (e.g. starter deck → booster set of the same series); `ix_set_parent_fk` index; migration `0004_set_parent_fk`
+- `docs/schema.md` — tabular database schema reference covering all tables, columns, constraints, and triggers
 
 ### Changed
 
 - `Naip.rarity_fk` removed — rarity is now exclusively on `Card.rarity_fk`; print-level variant is `Naip.print_variant_fk`
 - `Rarity` table: `is_type` and `is_base` columns removed — card-type classification lives on `card_type`, print-variant classification lives on `print_variant`; `NFD` (Non-Foil DON!!) row removed (foil distinction is `Naip.is_foil`)
 - `CardDetail.rarities` list removed — replaced by single `rarity_fk`/`rarity_name`/`rarity_symbol` fields on the card itself
+- `Set.series` (str) and `Set.ord` (int) replaced by `Set.parent_fk` self-referential FK; `SetResponse` updated accordingly; migration `0004_set_parent_fk`
+- `doc/` directory renamed to `docs/`
 
 ### Previous entries
 
