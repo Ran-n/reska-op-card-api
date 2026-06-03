@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:26:17 )
-[//]: # (+ Revised: 	2026/06/03 16:32:32.739705 )
+[//]: # (+ Revised: 	2026/06/03 16:48:45.793043 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # optcg_api
@@ -33,7 +33,7 @@ Apply database migrations:
 uv run alembic upgrade head
 ```
 
-The database and images are stored under `data/` (`data/optcg.db`, `data/images/`).
+The database and images are stored under `data/` (`data/optcg.db`, `data/images/cards/`, `data/images/langs/`).
 
 ## Run
 

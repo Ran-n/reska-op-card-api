@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/30 00:00:00.000000
-Revised: 2026/05/30 22:09:52.420655
+Revised: 2026/06/03 16:48:45.371422
 
 Shared image-file utilities for routers that manage Naip/NaipSerial images.
 """
@@ -15,19 +15,20 @@ from sqlmodel import Session, select
 from optcg_api.models import Image, Naip, NaipSerial
 
 IMAGES_DIR = Path(__file__).parent.parent.parent / "data" / "images"
-IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+CARDS_DIR = IMAGES_DIR / "cards"
+CARDS_DIR.mkdir(parents=True, exist_ok=True)
 
 VALID_SUFFIXES = frozenset({".jpg", ".jpeg", ".png", ".webp"})
 
 
 def save_image_bytes(raw: bytes, suffix: str) -> str:
-    """Write raw bytes to IMAGES_DIR with a BLAKE3-hash filename; skip if already present."""
+    """Write raw bytes to CARDS_DIR with a BLAKE3-hash filename; skip if already present."""
     h = _blake3.blake3(raw).hexdigest()
     filename = f"{h}{suffix}"
-    dest = IMAGES_DIR / filename
+    dest = CARDS_DIR / filename
     if not dest.exists():
         dest.write_bytes(raw)
-    return filename
+    return f"cards/{filename}"
 
 
 def upsert_image_row(filename: str, session: Session) -> Image:

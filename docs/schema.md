@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/06/02 18:44:20.175705 )
-[//]: # (+ Revised: 	2026/06/02 20:43:22.148066 )
+[//]: # (+ Revised: 	2026/06/03 16:48:45.650664 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # Database Schema Reference
@@ -231,7 +231,7 @@ A deduplicated table of image file paths. One row per unique path. Referenced by
 
 | Column | Meaning |
 |---|---|
-| `path` | Relative file path to the image asset, globally unique. |
+| `path` | Relative file path within `data/images/`, globally unique. Card art paths are prefixed `cards/`; language flag paths are prefixed `langs/`. |
 
 ### `effect`
 

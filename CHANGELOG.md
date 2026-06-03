@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:27:41 )
-[//]: # (+ Revised: 	2026/06/02 18:44:38.335723 )
+[//]: # (+ Revised: 	2026/06/03 16:48:45.509838 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # Changelog
@@ -16,6 +16,7 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Added
 
+- `Language.image_fk` seeded from `data/languages/<code>.svg` on `alembic upgrade head`; flag images copied to `data/images/langs/`; migration `0005_language_images`
 - `PrintVariant` table with `parent_fk` self-reference encoding a hierarchy of print-level variants (STD, AA, TR, SP, GR, MR, EMR, RMR, FA, AUD, PTR, MTR, AU, AG); `trg_print_variant_update` trigger; migration `0003_print_variant`
 - `Card.rarity_fk` nullable FK → `rarity.id` — the canonical base rarity the card was designed as (C, UC, R, SR, SEC, L, D, P), independent of any specific print; `ix_card_rarity_fk` index; migration `0003_print_variant`
 - `Naip.print_variant_fk` NOT NULL FK → `print_variant.id` — the specific print variant of this physical print (STD for standard prints, AA/TR/SP/etc. for special prints); `ix_naip_print_variant_fk` index; migration `0003_print_variant`
@@ -31,6 +32,7 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Changed
 
+- `data/images/` reorganised into `cards/` and `langs/` subdirectories; all `image.path` values now prefixed with `cards/` (card art) or `langs/` (language flags); migration `0005_language_images`
 - `Naip.rarity_fk` removed — rarity is now exclusively on `Card.rarity_fk`; print-level variant is `Naip.print_variant_fk`
 - `Rarity` table: `is_type` and `is_base` columns removed — card-type classification lives on `card_type`, print-variant classification lives on `print_variant`; `NFD` (Non-Foil DON!!) row removed (foil distinction is `Naip.is_foil`)
 - `CardDetail.rarities` list removed — replaced by single `rarity_fk`/`rarity_name`/`rarity_symbol` fields on the card itself
