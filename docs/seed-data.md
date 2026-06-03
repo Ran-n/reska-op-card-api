@@ -16,35 +16,45 @@ All rows listed here are inserted by Alembic migrations. Do not remove them from
 
 ---
 
-## `rarity` — migration `0001_initial`
+## `rarity` — migration `0001_initial`, updated by `0003_print_variant`
 
-The `rarity` table has two boolean classifier columns:
+Abstract rarity tiers as designed on the card. Print-level finishes (Alt Art, Treasure Rare, etc.) live in `print_variant`, not here.
 
-- `is_type` (added `e8f9a0b1c2d3`) — row represents a card type that also appears in the `card_type` table (L = Leader, D = DON!!); these overlap in name with card types rather than describing a distinct rarity tier.
-- `is_base` (added `a1b2c3d4e5f8`) — row is a base rarity that describes a card's pull weight. Rows where `is_base = FALSE` are print-level finishes (TR, AA, PTR, etc.) that apply to a specific naip rather than the card itself.
+| symbol | name |
+|--------|------|
+| C | Common |
+| UC | Uncommon |
+| R | Rare |
+| SR | Super Rare |
+| SEC | Secret Rare |
+| L | Leader |
+| P | Promo |
+| D | DON!! |
 
-| symbol | name | is_type | is_base |
-|--------|------|---------|---------|
-| C | Common | false | **true** |
-| UC | Uncommon | false | **true** |
-| R | Rare | false | **true** |
-| SR | Super Rare | false | **true** |
-| SEC | Secret Rare | false | **true** |
-| L | Leader | **true** | **true** |
-| P | Promo | false | **true** |
-| D | DON!! | **true** | **true** |
-| NFD | Non-Foil DON!! | false | **true** |
-| TR | Treasure Rare | false | false |
-| AA | Alternate Art | false | false |
-| SP | Special Rare | false | false |
-| MR | Manga Rare | false | false |
-| FA | Full Art | false | false |
-| AU | Gold Rare | false | false |
-| AG | Silver Rare | false | false |
-| AUD | Gold DON!! Rare | false | false |
-| EMR | Event Manga Rare | false | false |
-| PTR | Pattern Rare | false | false |
-| FD | Foil DON!! Rare | false | false |
+Migration `0003_print_variant` stripped the `is_type` and `is_base` columns and removed all print-level rows (TR, AA, SP, MR, FA, AU, AG, AUD, EMR, PTR) and NFD from this table.
+
+---
+
+## `print_variant` — migration `0003_print_variant`
+
+Physical presentation variants of a print. Variants form a hierarchy via `parent_fk`; traversing upward gives all inherited types.
+
+| symbol | name | parent |
+|--------|------|--------|
+| STD | Standard | — |
+| AA | Alternate Art | — |
+| TR | Treasure Rare | AA |
+| SP | Special Rare | AA |
+| MR | Manga Rare | AA |
+| FA | Full Art | AA |
+| AUD | Gold DON!! Rare | AA |
+| PTR | Pattern Rare | AA |
+| MTR | Metallic Rare | AA |
+| GR | Ghost Rare | SP |
+| EMR | Event Manga Rare | MR |
+| RMR | Red Manga Rare | MR |
+| AU | Gold Rare | MTR |
+| AG | Silver Rare | MTR |
 
 ---
 
