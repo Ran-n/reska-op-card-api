@@ -50,12 +50,15 @@ _NEW_INDEXES = [
 
 def upgrade() -> None:
     conn = op.get_bind()
-    existing = {row[1] for row in conn.execute(sa.text("SELECT type, name FROM sqlite_master WHERE type='index'"))}
+    existing = {row[0] for row in conn.execute(sa.text("SELECT name FROM sqlite_master WHERE type='index'"))}
     for name, table, col in _NEW_INDEXES:
         if name not in existing:
             conn.execute(sa.text(f"CREATE INDEX {name} ON {table} ({col})"))
 
 
 def downgrade() -> None:
+    conn = op.get_bind()
+    existing = {row[0] for row in conn.execute(sa.text("SELECT name FROM sqlite_master WHERE type='index'"))}
     for name, _table, _col in _NEW_INDEXES:
-        op.drop_index(name)
+        if name in existing:
+            conn.execute(sa.text(f"DROP INDEX {name}"))

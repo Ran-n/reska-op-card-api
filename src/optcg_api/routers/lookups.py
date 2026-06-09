@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/05/17 20:26:56.997290
+Revised: 2026/06/09 08:02:18.392376
 """
 
 from fastapi import APIRouter, Depends
@@ -17,6 +17,7 @@ from optcg_api.models import (
     CardType,
     Color,
     Format,
+    Image,
     Keyword,
     Language,
     PrintVariant,
@@ -56,6 +57,7 @@ class LanguageLookupResponse(BaseModel):
     code: str
     name: str
     desc: str | None = None
+    flag_path: str | None = None
 
 
 class RegionLookupResponse(BaseModel):
@@ -136,7 +138,22 @@ def get_settypes(session: Session = Depends(get_session)):
 
 @router.get("/languages", response_model=list[LanguageLookupResponse])
 def get_languages(session: Session = Depends(get_session)):
-    return session.exec(select(Language).order_by(Language.code)).all()
+    from sqlalchemy.orm import aliased
+
+    FlagImage = aliased(Image)
+    rows = session.exec(
+        select(Language, FlagImage.path).outerjoin(FlagImage, Language.image_fk == FlagImage.id).order_by(Language.code)
+    ).all()
+    return [
+        LanguageLookupResponse(
+            id=lang.id,
+            code=lang.code,
+            name=lang.name,
+            desc=lang.desc,
+            flag_path=flag_path,
+        )
+        for lang, flag_path in rows
+    ]
 
 
 @router.get("/regions", response_model=list[RegionLookupResponse])

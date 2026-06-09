@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/30 00:00:00.000000
-Revised: 2026/06/03 16:48:45.371422
+Revised: 2026/06/09 08:09:39.985716
 
 Shared image-file utilities for routers that manage Naip/NaipSerial images.
 """
@@ -12,7 +12,7 @@ from pathlib import Path
 import blake3 as _blake3
 from sqlmodel import Session, select
 
-from optcg_api.models import Image, Naip, NaipSerial
+from optcg_api.models import Block, Image, Language, Naip, NaipSerial
 
 IMAGES_DIR = Path(__file__).parent.parent.parent / "data" / "images"
 CARDS_DIR = IMAGES_DIR / "cards"
@@ -49,6 +49,8 @@ def cleanup_orphaned_image(img_id: int | None, session: Session) -> None:
     still_used = (
         session.exec(select(Naip).where(Naip.image_fk == img_id)).first()
         or session.exec(select(NaipSerial).where(NaipSerial.image_fk == img_id)).first()
+        or session.exec(select(Block).where(Block.image_fk == img_id)).first()
+        or session.exec(select(Language).where(Language.image_fk == img_id)).first()
     )
     if still_used:
         return

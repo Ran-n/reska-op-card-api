@@ -52,6 +52,9 @@ def downgrade() -> None:
     conn = op.get_bind()
     conn.execute(sa.text("PRAGMA foreign_keys = OFF"))
 
+    # Clean up named index left by 0003 downgrade (0001 schema used an inline UNIQUE clause)
+    conn.execute(sa.text("DROP INDEX IF EXISTS ix_card_set_number"))
+
     # Restore FD rarity
     conn.execute(sa.text("INSERT INTO rarity (symbol, name, is_type, is_base) VALUES ('FD', 'Foil DON!! Rare', 0, 0)"))
 
