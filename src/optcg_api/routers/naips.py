@@ -2,22 +2,22 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/30 00:00:00.000000
-Revised: 2026/06/08 12:41:32.458545
+Revised: 2026/05/30 00:00:00.000000
 """
 
 from pathlib import Path
 
 import httpx
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select, text
 
 from optcg_api._images import (
     VALID_SUFFIXES,
     cleanup_orphaned_image,
     replace_naip_image,
-    save_image_bytes,
-    upsert_image_row,
+    save_image,
 )
 from optcg_api.database import get_session
 from optcg_api.models import (
@@ -32,17 +32,12 @@ from optcg_api.models import (
     Name,
     Trigger,
 )
+from optcg_api.routers._common import ImageUrlPayload, LookupItem, _resolve_text, _upsert_text_fk
 
 router = APIRouter(prefix="/naips", tags=["naips"])
 
 
 # ── Response / write models ──────────────────────────────────────────────────
-
-
-class LookupItem(BaseModel):
-    id: int
-    name: str
-    symbol: str | None = None
 
 
 class NaipDetail(BaseModel):
@@ -95,10 +90,10 @@ class NaipWrite(BaseModel):
     is_foil: bool = False
     sort_order: int | None = None
     serial_max: int | None = None
-    power: int | None = None
-    life: int | None = None
-    counter: int | None = None
-    cost: int | None = None
+    power: int | None = Field(default=None, ge=0)
+    life: int | None = Field(default=None, ge=0)
+    counter: int | None = Field(default=None, ge=0)
+    cost: int | None = Field(default=None, ge=0)
     name: str | None = None
     effect: str | None = None
     trigger: str | None = None
@@ -109,30 +104,7 @@ class NaipWrite(BaseModel):
     reswords: list[int] = []
 
 
-class ImageUrlPayload(BaseModel):
-    url: str
-
-
 # ── Helpers ──────────────────────────────────────────────────────────────────
-
-
-def _resolve_text(session: Session, model, pk: int | None, field: str) -> str | None:
-    if pk is None:
-        return None
-    obj = session.get(model, pk)
-    return getattr(obj, field, None) if obj else None
-
-
-def _upsert_text_fk(session: Session, model, field: str, value: str | None) -> int | None:
-    if not value:
-        return None
-    existing = session.exec(select(model).where(getattr(model, field) == value)).first()
-    if existing:
-        return existing.id
-    obj = model(**{field: value})
-    session.add(obj)
-    session.flush()
-    return obj.id
 
 
 def _clear_existing_default(card_fk: int, exclude_id: int | None, session: Session) -> None:
@@ -287,7 +259,11 @@ def create_naip(data: NaipWrite, session: Session = Depends(get_session)):
     _apply_write(naip, data, session)
     session.flush()
     _sync_naip_junctions(naip, data, session)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(status_code=409, detail="A default naip already exists for this card")
     session.refresh(naip)
     return _enrich_naip(naip, session)
 
@@ -300,7 +276,11 @@ def update_naip(naip_id: int, data: NaipWrite, session: Session = Depends(get_se
     _apply_write(naip, data, session)
     session.flush()
     _sync_naip_junctions(naip, data, session)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(status_code=409, detail="A default naip already exists for this card")
     session.refresh(naip)
     return _enrich_naip(naip, session)
 
@@ -314,13 +294,15 @@ def delete_naip(naip_id: int, session: Session = Depends(get_session)):
     for model in (NaipColor, NaipTribe, NaipAttribute, NaipKeyword, NaipResword):
         for row in session.exec(select(model).where(model.naip_fk == naip_id)).all():
             session.delete(row)
+    serial_img_fks = []
     for serial in session.exec(select(NaipSerial).where(NaipSerial.naip_fk == naip_id)).all():
-        serial_img_fk = serial.image_fk
+        if serial.image_fk:
+            serial_img_fks.append(serial.image_fk)
         session.delete(serial)
-        session.flush()
-        cleanup_orphaned_image(serial_img_fk, session)
     session.delete(naip)
     session.flush()
+    for fk in serial_img_fks:
+        cleanup_orphaned_image(fk, session)
     cleanup_orphaned_image(old_img_fk, session)
     session.commit()
 
@@ -341,8 +323,7 @@ async def upload_naip_image_from_url(naip_id: int, payload: ImageUrlPayload, ses
             raw = resp.content
     except httpx.HTTPError as e:
         raise HTTPException(status_code=400, detail=f"Failed to fetch image: {e}")
-    filename = save_image_bytes(raw, suffix)
-    img = upsert_image_row(filename, session)
+    img = save_image(raw, suffix, session)
     replace_naip_image(naip, img.id, session)
     session.commit()
     session.refresh(naip)
@@ -358,8 +339,7 @@ async def upload_naip_image(naip_id: int, file: UploadFile = File(...), session:
     if suffix not in VALID_SUFFIXES:
         raise HTTPException(status_code=400, detail="Only jpg, png, webp images are accepted")
     raw = await file.read()
-    filename = save_image_bytes(raw, suffix)
-    img = upsert_image_row(filename, session)
+    img = save_image(raw, suffix, session)
     replace_naip_image(naip, img.id, session)
     session.commit()
     session.refresh(naip)

@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:27:41 )
-[//]: # (+ Revised: 	2026/06/08 13:05:06.568690 )
+[//]: # (+ Revised: 	2026/06/12 17:19:23.164379 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # Changelog
@@ -16,6 +16,8 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Added
 
+- `routers/_common.py` shared module: `LookupItem`, `ImageUrlPayload`, `_resolve_text`, `_upsert_text_fk` — eliminates identical copy-paste between `cards.py` and `naips.py`
+- `CardWrite.number` validates `ge=1`; `CardWrite` and `NaipWrite` stats (`power`, `life`, `counter`, `cost`) validate `ge=0` — rejects negative card numbers and stats at the API boundary
 - FK indexes on `set` (`type_fk`, `language_fk`), `card` (`effect_fk`, `trigger_fk`, `block_fk`), `naip` (`card_fk`, `set_fk`, `artist_fk`, `language_fk`, `cardtype_fk`, `block_fk`), `print_variant` (`parent_fk`), `card_effect_history` (`card_fk`, `effect_fk`), and `card_trigger_history` (`card_fk`, `trigger_fk`); migration `0006_add_missing_indexes`
 - `CardDetail.naips[].image_path` and `NaipDetail.image_path` — resolved `image.path` for the print's `image_fk`
 - `CardListItem` response fields: `colors` (comma-joined `color.name` list), `rarity_symbol`, `image_path` (from the card's default `naip`)
@@ -35,6 +37,9 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Changed
 
+- `_images.py`: `save_image_bytes` + `upsert_image_row` merged into `save_image(raw, suffix, session) → Image`; DB row is checked before writing the file, avoiding wasted I/O on duplicate uploads
+- `routers/cards.py`: `list_cards` uses a dedicated `filter_params` dict for the COUNT query, eliminating a potential param-name collision with `limit`/`offset`
+- `routers/naips.py`: `delete_naip` collects all serial image FKs upfront and performs a single `session.flush()` before orphan cleanup (was one flush per serial)
 - `data/images/` reorganised into `cards/` and `langs/` subdirectories; all `image.path` values now prefixed with `cards/` (card art) or `langs/` (language flags); migration `0005_language_images`
 - `Naip.rarity_fk` removed — rarity is now exclusively on `Card.rarity_fk`; print-level variant is `Naip.print_variant_fk`
 - `Rarity` table: `is_type` and `is_base` columns removed — card-type classification lives on `card_type`, print-variant classification lives on `print_variant`; `NFD` (Non-Foil DON!!) row removed (foil distinction is `Naip.is_foil`)
@@ -85,9 +90,13 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Fixed
 
+- `ingest.py`: `except ValueError, TypeError:` (Python 2 syntax, `SyntaxError` in Python 3) corrected to `except (ValueError, TypeError):`
+- `ingest.py`: `_card_number()` returning `None` (regex miss on non-standard card IDs) now logs a warning and skips the card instead of writing `None` to the non-nullable `Card.number` and hitting a DB constraint error
+- `ingest.py`: `_persist()` now uses `.first()` instead of `.one()` for the `en` language lookup, with a descriptive `RuntimeError` if the seed row is absent
+- `_images.py`: `cleanup_orphaned_image` and `replace_naip_image` use `is None` guards instead of falsy `not` checks, correctly handling any integer FK value
+- `routers/naips.py`: `create_naip` and `update_naip` catch `IntegrityError` on commit and return 409 instead of 500 when the `ix_naip_one_default_per_card` unique index is violated under concurrent writes
 - `.gitignore`: added `data/` rule so local card images and database files are never tracked
 - `init_db()` now runs `alembic upgrade head` instead of `SQLModel.metadata.create_all` + `stamp`; fresh databases are built entirely through migrations, keeping schema and migration history in sync
-- `ingest.py`: `except ValueError, TypeError` corrected to `except (ValueError, TypeError)`
 - `ingest.py`: card types and rarities now loaded from DB seed at startup; unknown symbols raise `RuntimeError` instead of silently creating unsanctioned rows; `L` and `D` rarity symbols skipped as they are card-type pseudo-rarities
 - `ingest.py`: set lookup and upsert now filter and assign `language_fk` using the `en` language row; `Set` unique lookup uses `(code, language_fk)` instead of `code` alone
 

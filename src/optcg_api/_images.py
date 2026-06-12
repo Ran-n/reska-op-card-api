@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/30 00:00:00.000000
-Revised: 2026/06/09 08:09:39.985716
+Revised: 2026/06/12 13:37:30.155951
 
 Shared image-file utilities for routers that manage Naip/NaipSerial images.
 """
@@ -21,22 +21,17 @@ CARDS_DIR.mkdir(parents=True, exist_ok=True)
 VALID_SUFFIXES = frozenset({".jpg", ".jpeg", ".png", ".webp"})
 
 
-def save_image_bytes(raw: bytes, suffix: str) -> str:
-    """Write raw bytes to CARDS_DIR with a BLAKE3-hash filename; skip if already present."""
+def save_image(raw: bytes, suffix: str, session: Session) -> Image:
+    """Persist raw bytes to CARDS_DIR and return the Image row; skips file I/O if row already exists."""
     h = _blake3.blake3(raw).hexdigest()
-    filename = f"{h}{suffix}"
-    dest = CARDS_DIR / filename
-    if not dest.exists():
-        dest.write_bytes(raw)
-    return f"cards/{filename}"
-
-
-def upsert_image_row(filename: str, session: Session) -> Image:
-    """Return existing Image row for filename, or create one."""
-    existing = session.exec(select(Image).where(Image.path == filename)).first()
+    path = f"cards/{h}{suffix}"
+    existing = session.exec(select(Image).where(Image.path == path)).first()
     if existing:
         return existing
-    img = Image(path=filename)
+    dest = CARDS_DIR / f"{h}{suffix}"
+    if not dest.exists():
+        dest.write_bytes(raw)
+    img = Image(path=path)
     session.add(img)
     session.flush()
     return img
@@ -44,7 +39,7 @@ def upsert_image_row(filename: str, session: Session) -> Image:
 
 def cleanup_orphaned_image(img_id: int | None, session: Session) -> None:
     """Delete the Image row and its file if nothing references it anymore."""
-    if not img_id:
+    if img_id is None:
         return
     still_used = (
         session.exec(select(Naip).where(Naip.image_fk == img_id)).first()
@@ -66,5 +61,5 @@ def replace_naip_image(naip: Naip, new_img_id: int, session: Session) -> None:
     naip.image_fk = new_img_id
     session.add(naip)
     session.flush()
-    if old_fk and old_fk != new_img_id:
+    if old_fk is not None and old_fk != new_img_id:
         cleanup_orphaned_image(old_fk, session)

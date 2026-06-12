@@ -2,22 +2,22 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/06/08 13:00:46.726038
+Revised: 2026/05/13 13:13:00.000000
 """
 
 from pathlib import Path
 
 import httpx
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select, text
 
 from optcg_api._images import (
     VALID_SUFFIXES,
     cleanup_orphaned_image,
     replace_naip_image,
-    save_image_bytes,
-    upsert_image_row,
+    save_image,
 )
 from optcg_api.database import get_session
 from optcg_api.models import (
@@ -45,17 +45,12 @@ from optcg_api.models import (
     PrintVariant,
     Trigger,
 )
+from optcg_api.routers._common import ImageUrlPayload, LookupItem, _resolve_text, _upsert_text_fk
 
 router = APIRouter(prefix="/cards", tags=["cards"])
 
 
 # ── Rich response models ─────────────────────────────────────────────────────
-
-
-class LookupItem(BaseModel):
-    id: int
-    name: str
-    symbol: str | None = None
 
 
 class NaipItem(BaseModel):
@@ -126,14 +121,14 @@ class CardWrite(BaseModel):
     set_fk: int
     cardtype_fk: int
     rarity_fk: int | None = None
-    number: int
+    number: int = Field(ge=1)
     name: str
     effect: str | None = None
     trigger: str | None = None
-    power: int | None = None
-    life: int | None = None
-    counter: int | None = None
-    cost: int | None = None
+    power: int | None = Field(default=None, ge=0)
+    life: int | None = Field(default=None, ge=0)
+    counter: int | None = Field(default=None, ge=0)
+    cost: int | None = Field(default=None, ge=0)
     colors: list[int] = []
     tribes: list[int] = []
     attrs: list[int] = []
@@ -151,13 +146,6 @@ class CardWrite(BaseModel):
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
-
-
-def _resolve_text(session: Session, model, pk: int | None, field: str) -> str | None:
-    if pk is None:
-        return None
-    obj = session.get(model, pk)
-    return getattr(obj, field, None) if obj else None
 
 
 def _enrich(card: Card, session: Session) -> CardDetail:
@@ -303,16 +291,16 @@ def list_cards(
     session: Session = Depends(get_session),
 ):
     conditions = []
-    params: dict = {"offset": offset, "limit": limit}
+    filter_params: dict = {}
     if name:
         conditions.append("nm.name LIKE :name")
-        params["name"] = f"%{name}%"
+        filter_params["name"] = f"%{name}%"
     if set_id is not None:
         conditions.append("c.set_fk = :set_id")
-        params["set_id"] = set_id
+        filter_params["set_id"] = set_id
     if cardtype_id is not None:
         conditions.append("c.cardtype_fk = :cardtype_id")
-        params["cardtype_id"] = cardtype_id
+        filter_params["cardtype_id"] = cardtype_id
 
     where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
     rows = session.exec(
@@ -330,12 +318,10 @@ def list_cards(
             f"LEFT JOIN card_type ct ON ct.id = c.cardtype_fk "
             f"LEFT JOIN rarity r ON r.id = c.rarity_fk "
             f"{where} ORDER BY s.code, c.number LIMIT :limit OFFSET :offset"
-        ).bindparams(**params)
+        ).bindparams(**filter_params, limit=limit, offset=offset)
     ).all()
     total = session.exec(
-        text(f"SELECT COUNT(*) FROM card c LEFT JOIN name nm ON nm.id = c.name_fk {where}").bindparams(
-            **{k: v for k, v in params.items() if k not in ("limit", "offset")}
-        )
+        text(f"SELECT COUNT(*) FROM card c LEFT JOIN name nm ON nm.id = c.name_fk {where}").bindparams(**filter_params)
     ).scalar()
 
     return CardListResponse(
@@ -367,18 +353,6 @@ def get_card(card_id: int, session: Session = Depends(get_session)):
     if not card:
         raise HTTPException(status_code=404, detail="Card not found")
     return _enrich(card, session)
-
-
-def _upsert_text_fk(session: Session, model, field: str, value: str | None) -> int | None:
-    if not value:
-        return None
-    existing = session.exec(select(model).where(getattr(model, field) == value)).first()
-    if existing:
-        return existing.id
-    obj = model(**{field: value})
-    session.add(obj)
-    session.flush()
-    return obj.id
 
 
 @router.post("/", response_model=CardDetail, status_code=201)
@@ -471,14 +445,9 @@ def delete_card(card_id: int, session: Session = Depends(get_session)):
     session.commit()
 
 
-class ImageUrlPayload(BaseModel):
-    url: str
-
-
 def _set_card_image(card: Card, raw: bytes, suffix: str, session: Session) -> None:
     """Save image bytes and link to the card's default Naip (creating one if absent)."""
-    filename = save_image_bytes(raw, suffix)
-    img = upsert_image_row(filename, session)
+    img = save_image(raw, suffix, session)
     naip = session.exec(select(Naip).where(Naip.card_fk == card.id, Naip.is_default == True)).first()  # noqa: E712
     if naip:
         replace_naip_image(naip, img.id, session)
@@ -508,7 +477,11 @@ async def upload_card_image_from_url(card_id: int, payload: ImageUrlPayload, ses
     except httpx.HTTPError as e:
         raise HTTPException(status_code=400, detail=f"Failed to fetch image: {e}")
     _set_card_image(card, raw, suffix, session)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(status_code=409, detail="Conflict setting default naip image; retry")
     session.refresh(card)
     return _enrich(card, session)
 
@@ -523,6 +496,10 @@ async def upload_card_image(card_id: int, file: UploadFile = File(...), session:
         raise HTTPException(status_code=400, detail="Only jpg, png, webp images are accepted")
     raw = await file.read()
     _set_card_image(card, raw, suffix, session)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(status_code=409, detail="Conflict setting default naip image; retry")
     session.refresh(card)
     return _enrich(card, session)

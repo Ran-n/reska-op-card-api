@@ -276,7 +276,9 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
     print_variant_cache: dict[str, PrintVariant] = {pv.symbol: pv for pv in session.exec(select(PrintVariant)).all()}
     _PRINT_VARIANT_SYMBOLS.update(print_variant_cache.keys())
 
-    en_lang = session.exec(select(Language).where(Language.code == "en")).one()
+    en_lang = session.exec(select(Language).where(Language.code == "en")).first()
+    if en_lang is None:
+        raise RuntimeError("Language 'en' not found — run 'alembic upgrade head' to apply seed data")
 
     set_type_cache: dict[str, SetType] = {}
 
@@ -333,6 +335,9 @@ def _persist(session: Session, sets_data: list[dict], cards_data: list[dict]) ->
             continue
 
         number = _card_number(cd["card_id"])
+        if number is None:
+            log.warning("Skipping card %r — cannot parse card number from id", cd["card_id"])
+            continue
         cat = (cd.get("category") or "").upper()
         symbol = _CARD_TYPE_MAP.get(cat, "CHARACTER")
         ct = card_type_cache.get(symbol)
