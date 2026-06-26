@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/30 00:00:00.000000
@@ -12,7 +12,7 @@ from pathlib import Path
 import blake3 as _blake3
 from sqlmodel import Session, select
 
-from optcg_api.models import Block, Image, Language, Naip, NaipSerial
+from reska_op_card_api.models import Block, Image, Language, Naip, NaipSerial
 
 IMAGES_DIR = Path(__file__).parent.parent.parent / "data" / "images"
 CARDS_DIR = IMAGES_DIR / "cards"

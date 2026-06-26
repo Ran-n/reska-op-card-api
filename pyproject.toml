@@ -1,7 +1,7 @@
 [project]
-name = "optcg-api"
+name = "reska-op-card-api"
 version = "0.1.0"
-description = "API for information of the One Piece TCG"
+description = "Reska card data API for the One Piece TCG"
 readme = "README.md"
 authors = [{ name = "Ran#" }]
 license = { file = "LICENSE" }

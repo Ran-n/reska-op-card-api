@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
@@ -9,8 +9,8 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
-from optcg_api.database import get_session
-from optcg_api.models import (
+from reska_op_card_api.database import get_session
+from reska_op_card_api.models import (
     Artist,
     Attribute,
     Block,

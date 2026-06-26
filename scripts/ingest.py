@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
@@ -27,8 +27,8 @@ from sqlmodel import Session, SQLModel, select
 # Add src/ to path so we can import the package without installing
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from optcg_api.database import engine, init_db  # noqa: E402, I001
-from optcg_api.models import (  # noqa: E402, I001
+from reska_op_card_api.database import engine, init_db  # noqa: E402, I001
+from reska_op_card_api.models import (  # noqa: E402, I001
     Attribute,
     Card,
     CardAttribute,

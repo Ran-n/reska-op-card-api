@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/30 00:00:00.000000
@@ -13,14 +13,14 @@ from pydantic import BaseModel, Field
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select, text
 
-from optcg_api._images import (
+from reska_op_card_api._images import (
     VALID_SUFFIXES,
     cleanup_orphaned_image,
     replace_naip_image,
     save_image,
 )
-from optcg_api.database import get_session
-from optcg_api.models import (
+from reska_op_card_api.database import get_session
+from reska_op_card_api.models import (
     Effect,
     Naip,
     NaipAttribute,
@@ -32,7 +32,7 @@ from optcg_api.models import (
     Name,
     Trigger,
 )
-from optcg_api.routers._common import ImageUrlPayload, LookupItem, _resolve_text, _upsert_text_fk
+from reska_op_card_api.routers._common import ImageUrlPayload, LookupItem, _resolve_text, _upsert_text_fk
 
 router = APIRouter(prefix="/naips", tags=["naips"])
 

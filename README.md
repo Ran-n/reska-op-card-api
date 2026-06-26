@@ -1,10 +1,10 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:26:17 )
-[//]: # (+ Revised: 	2026/06/03 16:48:45.793043 )
+[//]: # (+ Revised: 	2026/06/26 )
 [//]: # ( ---------------------------------------------------------------------- )
 
-# optcg_api
+# reska-op-card-api
 
 REST API for One Piece TCG card information.
 
@@ -38,7 +38,7 @@ The database and images are stored under `data/` (`data/optcg.db`, `data/images/
 ## Run
 
 ```sh
-uv run uvicorn optcg_api.main:app --reload
+uv run uvicorn reska_op_card_api.main:app --reload
 ```
 
 Interactive docs available at `http://localhost:8000/docs`.

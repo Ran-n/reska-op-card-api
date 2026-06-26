@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/12 16:56:47.000000
@@ -12,8 +12,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from optcg_api.database import init_db
-from optcg_api.routers import cards, lookups, naips, sets
+from reska_op_card_api.database import init_db
+from reska_op_card_api.routers import cards, lookups, naips, sets
 
 IMAGES_DIR = Path(__file__).parent.parent.parent / "data" / "images"
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)
@@ -25,7 +25,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="optcg-api", lifespan=lifespan)
+app = FastAPI(title="reska-op-card-api", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
