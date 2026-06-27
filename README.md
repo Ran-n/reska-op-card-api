@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:26:17 )
-[//]: # (+ Revised: 	2026/06/26 )
+[//]: # (+ Revised: 	2026/06/27 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # reska-op-card-api
@@ -38,7 +38,10 @@ The database and images are stored under `data/` (`data/optcg.db`, `data/images/
 ## Run
 
 ```sh
-uv run uvicorn reska_op_card_api.main:app --reload
+uv run api                        # localhost:8000, reload enabled
+uv run api --port 8001            # custom port
+uv run api --host 0.0.0.0         # bind all interfaces
+uv run api --help                 # all uvicorn options
 ```
 
 Interactive docs available at `http://localhost:8000/docs`.

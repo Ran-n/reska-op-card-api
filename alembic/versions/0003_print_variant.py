@@ -122,15 +122,18 @@ def upgrade() -> None:
     conn.execute(sa.text("CREATE INDEX ix_card_rarity_fk ON card (rarity_fk)"))
 
     # ── 4. Rebuild naip (rarity_fk → print_variant_fk) ───────────────────────
-    # Drop triggers that reference naip before rename — SQLite auto-updates
-    # trigger bodies on rename, which would leave them referencing naip_old
-    # after the old table is dropped.
+    # Drop triggers that reference naip before rename — SQLite 3.26+ auto-updates
+    # trigger bodies AND child-table FK definitions on rename; legacy_alter_table
+    # suppresses the FK rewrite so naip_color etc. keep referencing "naip" not
+    # "naip_old" after naip_old is dropped.
+    conn.execute(sa.text("PRAGMA legacy_alter_table = ON"))
     conn.execute(sa.text("DROP TRIGGER IF EXISTS trg_naip_update"))
     conn.execute(sa.text("DROP TRIGGER IF EXISTS trg_naip_serial_check_max_insert"))
     conn.execute(sa.text("DROP TRIGGER IF EXISTS trg_naip_serial_check_max_update"))
     conn.execute(sa.text("DROP INDEX IF EXISTS ix_naip_unique_print"))
     conn.execute(sa.text("DROP INDEX IF EXISTS ix_naip_one_default_per_card"))
     conn.execute(sa.text("ALTER TABLE naip RENAME TO naip_old"))
+    conn.execute(sa.text("PRAGMA legacy_alter_table = OFF"))
 
     conn.execute(
         sa.text(f"""
