@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/06/02 18:44:11.849285
+Revised: 2026/06/28 01:21:46.731200
 """
 
 from datetime import date, datetime
@@ -596,3 +596,17 @@ class BannedPair(SQLModel, table=True):
     card_a_fk: int = Field(foreign_key="card.id")
     card_b_fk: int = Field(foreign_key="card.id")
     format_fk: int | None = Field(default=None, foreign_key="format.id")
+
+
+# ── Auth ─────────────────────────────────────────────────────────────────────
+
+
+class ApiKey(SQLModel, table=True):
+    __tablename__ = "api_key"
+    __table_args__ = (Index("ix_api_key_key", "key", unique=True),)
+
+    id: int | None = Field(default=None, primary_key=True)
+    created_ts: datetime | None = Field(default=None, sa_column=_ts_col())
+    key: str
+    can_edit: bool = False
+    label: str | None = None

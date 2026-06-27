@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:27:41 )
-[//]: # (+ Revised: 	2026/06/12 17:19:23.164379 )
+[//]: # (+ Revised: 	2026/06/28 01:22:15.060897 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # Changelog
@@ -16,6 +16,10 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Added
 
+- API key authentication (`auth.py`): all endpoints now require an `X-API-Key` header; missing or unrecognised keys return 401
+- `api_key` table (`id`, `key`, `can_edit`, `label`, `created_ts`) storing API keys with read or edit permissions; migration `0008_api_keys`
+- `create-key` CLI entry point — generates a `secrets.token_urlsafe(32)` key, persists it to the DB, and prints it once; `--edit` flag grants edit permissions, `--label` attaches a human-readable label
+- Edit endpoints (`POST`, `PUT`, `DELETE`, image uploads) require a key with `can_edit = true`; read-only keys hitting these return 403
 - `routers/_common.py` shared module: `LookupItem`, `ImageUrlPayload`, `_resolve_text`, `_upsert_text_fk` — eliminates identical copy-paste between `cards.py` and `naips.py`
 - `CardWrite.number` validates `ge=1`; `CardWrite` and `NaipWrite` stats (`power`, `life`, `counter`, `cost`) validate `ge=0` — rejects negative card numbers and stats at the API boundary
 - FK indexes on `set` (`type_fk`, `language_fk`), `card` (`effect_fk`, `trigger_fk`, `block_fk`), `naip` (`card_fk`, `set_fk`, `artist_fk`, `language_fk`, `cardtype_fk`, `block_fk`), `print_variant` (`parent_fk`), `card_effect_history` (`card_fk`, `effect_fk`), and `card_trigger_history` (`card_fk`, `trigger_fk`); migration `0006_add_missing_indexes`

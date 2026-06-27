@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/30 00:00:00.000000
-Revised: 2026/05/30 00:00:00.000000
+Revised: 2026/06/28 01:21:46.981609
 """
 
 from pathlib import Path
@@ -32,6 +32,7 @@ from reska_op_card_api.models import (
     Name,
     Trigger,
 )
+from reska_op_card_api.auth import require_edit_key, require_read_key
 from reska_op_card_api.routers._common import ImageUrlPayload, LookupItem, _resolve_text, _upsert_text_fk
 
 router = APIRouter(prefix="/naips", tags=["naips"])
@@ -245,7 +246,7 @@ def _apply_write(naip: Naip, data: NaipWrite, session: Session) -> None:
 # ── Endpoints ────────────────────────────────────────────────────────────────
 
 
-@router.get("/{naip_id}", response_model=NaipDetail)
+@router.get("/{naip_id}", response_model=NaipDetail, dependencies=[Depends(require_read_key)])
 def get_naip(naip_id: int, session: Session = Depends(get_session)):
     naip = session.get(Naip, naip_id)
     if not naip:
@@ -253,7 +254,7 @@ def get_naip(naip_id: int, session: Session = Depends(get_session)):
     return _enrich_naip(naip, session)
 
 
-@router.post("/", response_model=NaipDetail, status_code=201)
+@router.post("/", response_model=NaipDetail, status_code=201, dependencies=[Depends(require_edit_key)])
 def create_naip(data: NaipWrite, session: Session = Depends(get_session)):
     naip = Naip()
     _apply_write(naip, data, session)
@@ -268,7 +269,7 @@ def create_naip(data: NaipWrite, session: Session = Depends(get_session)):
     return _enrich_naip(naip, session)
 
 
-@router.put("/{naip_id}", response_model=NaipDetail)
+@router.put("/{naip_id}", response_model=NaipDetail, dependencies=[Depends(require_edit_key)])
 def update_naip(naip_id: int, data: NaipWrite, session: Session = Depends(get_session)):
     naip = session.get(Naip, naip_id)
     if not naip:
@@ -285,7 +286,7 @@ def update_naip(naip_id: int, data: NaipWrite, session: Session = Depends(get_se
     return _enrich_naip(naip, session)
 
 
-@router.delete("/{naip_id}", status_code=204)
+@router.delete("/{naip_id}", status_code=204, dependencies=[Depends(require_edit_key)])
 def delete_naip(naip_id: int, session: Session = Depends(get_session)):
     naip = session.get(Naip, naip_id)
     if not naip:
@@ -307,7 +308,7 @@ def delete_naip(naip_id: int, session: Session = Depends(get_session)):
     session.commit()
 
 
-@router.post("/{naip_id}/image-url", response_model=NaipDetail)
+@router.post("/{naip_id}/image-url", response_model=NaipDetail, dependencies=[Depends(require_edit_key)])
 async def upload_naip_image_from_url(naip_id: int, payload: ImageUrlPayload, session: Session = Depends(get_session)):
     naip = session.get(Naip, naip_id)
     if not naip:
@@ -330,7 +331,7 @@ async def upload_naip_image_from_url(naip_id: int, payload: ImageUrlPayload, ses
     return _enrich_naip(naip, session)
 
 
-@router.post("/{naip_id}/image", response_model=NaipDetail)
+@router.post("/{naip_id}/image", response_model=NaipDetail, dependencies=[Depends(require_edit_key)])
 async def upload_naip_image(naip_id: int, file: UploadFile = File(...), session: Session = Depends(get_session)):
     naip = session.get(Naip, naip_id)
     if not naip:

@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/05/13 13:13:00.000000
+Revised: 2026/06/28 01:21:46.895503
 """
 
 from pathlib import Path
@@ -45,6 +45,7 @@ from reska_op_card_api.models import (
     PrintVariant,
     Trigger,
 )
+from reska_op_card_api.auth import require_edit_key, require_read_key
 from reska_op_card_api.routers._common import ImageUrlPayload, LookupItem, _resolve_text, _upsert_text_fk
 
 router = APIRouter(prefix="/cards", tags=["cards"])
@@ -281,7 +282,7 @@ def _sync_junctions(card: Card, data: CardWrite, session: Session):
 # ── Endpoints ────────────────────────────────────────────────────────────────
 
 
-@router.get("/", response_model=CardListResponse)
+@router.get("/", response_model=CardListResponse, dependencies=[Depends(require_read_key)])
 def list_cards(
     name: str | None = Query(None),
     set_id: int | None = Query(None),
@@ -347,7 +348,7 @@ def list_cards(
     )
 
 
-@router.get("/{card_id}", response_model=CardDetail)
+@router.get("/{card_id}", response_model=CardDetail, dependencies=[Depends(require_read_key)])
 def get_card(card_id: int, session: Session = Depends(get_session)):
     card = session.get(Card, card_id)
     if not card:
@@ -355,7 +356,7 @@ def get_card(card_id: int, session: Session = Depends(get_session)):
     return _enrich(card, session)
 
 
-@router.post("/", response_model=CardDetail, status_code=201)
+@router.post("/", response_model=CardDetail, status_code=201, dependencies=[Depends(require_edit_key)])
 def create_card(data: CardWrite, session: Session = Depends(get_session)):
     name_fk = _upsert_text_fk(session, Name, "name", data.name)
     effect_fk = _upsert_text_fk(session, Effect, "effect", data.effect)
@@ -381,7 +382,7 @@ def create_card(data: CardWrite, session: Session = Depends(get_session)):
     return _enrich(card, session)
 
 
-@router.put("/{card_id}", response_model=CardDetail)
+@router.put("/{card_id}", response_model=CardDetail, dependencies=[Depends(require_edit_key)])
 def update_card(card_id: int, data: CardWrite, session: Session = Depends(get_session)):
     card = session.get(Card, card_id)
     if not card:
@@ -405,7 +406,7 @@ def update_card(card_id: int, data: CardWrite, session: Session = Depends(get_se
     return _enrich(card, session)
 
 
-@router.delete("/{card_id}", status_code=204)
+@router.delete("/{card_id}", status_code=204, dependencies=[Depends(require_edit_key)])
 def delete_card(card_id: int, session: Session = Depends(get_session)):
     card = session.get(Card, card_id)
     if not card:
@@ -460,7 +461,7 @@ def _set_card_image(card: Card, raw: bytes, suffix: str, session: Session) -> No
         )
 
 
-@router.post("/{card_id}/image-url", response_model=CardDetail)
+@router.post("/{card_id}/image-url", response_model=CardDetail, dependencies=[Depends(require_edit_key)])
 async def upload_card_image_from_url(card_id: int, payload: ImageUrlPayload, session: Session = Depends(get_session)):
     card = session.get(Card, card_id)
     if not card:
@@ -486,7 +487,7 @@ async def upload_card_image_from_url(card_id: int, payload: ImageUrlPayload, ses
     return _enrich(card, session)
 
 
-@router.post("/{card_id}/image", response_model=CardDetail)
+@router.post("/{card_id}/image", response_model=CardDetail, dependencies=[Depends(require_edit_key)])
 async def upload_card_image(card_id: int, file: UploadFile = File(...), session: Session = Depends(get_session)):
     card = session.get(Card, card_id)
     if not card:

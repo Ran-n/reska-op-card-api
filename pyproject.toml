@@ -19,6 +19,7 @@ dependencies = [
 
 [project.scripts]
 api = "reska_op_card_api.cli:api"
+create-key = "reska_op_card_api.cli:create_key"
 
 [dependency-groups]
 dev = ["pytest>=9.0.2", "ruff>=0.15.7"]

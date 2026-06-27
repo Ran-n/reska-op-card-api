@@ -2,10 +2,11 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/06/09 08:02:18.392376
+Revised: 2026/06/28 01:21:47.151363
 """
 
 from fastapi import APIRouter, Depends
+from reska_op_card_api.auth import require_read_key
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
@@ -29,7 +30,7 @@ from reska_op_card_api.models import (
     Tribe,
 )
 
-router = APIRouter(prefix="/lookups", tags=["lookups"])
+router = APIRouter(prefix="/lookups", tags=["lookups"], dependencies=[Depends(require_read_key)])
 
 
 class LookupResponse(BaseModel):

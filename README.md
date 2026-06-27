@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:26:17 )
-[//]: # (+ Revised: 	2026/06/27 )
+[//]: # (+ Revised: 	2026/06/28 01:21:47.313085 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # reska-op-card-api
@@ -46,6 +46,25 @@ uv run api --help                 # all uvicorn options
 
 Interactive docs available at `http://localhost:8000/docs`.
 
+## Authentication
+
+All endpoints require an `X-API-Key` header. There are two key types:
+
+| Type | `can_edit` | Allowed operations |
+|------|-----------|-------------------|
+| Read | `false` | `GET` endpoints only |
+| Edit | `true` | All endpoints |
+
+Generate a key with the `create-key` CLI:
+
+```sh
+uv run create-key                        # read-only key
+uv run create-key --edit                 # edit key
+uv run create-key --edit --label ingest  # with a label
+```
+
+The key is printed once to stdout. Store it securely — it is not recoverable from the database.
+
 ## Data ingestion
 
 Populate the database by scraping the official card list:
@@ -59,40 +78,42 @@ Fetches every series from `en.onepiece-cardgame.com/cardlist/` and writes sets, 
 
 ## API
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /` | Health check |
-| `GET /cards/` | List cards (filter: `name`, `set_id`, `cardtype_id`; paginate: `offset`, `limit`) |
-| `POST /cards/` | Create a card |
-| `GET /cards/{id}` | Get card with enriched detail |
-| `PUT /cards/{id}` | Update a card |
-| `DELETE /cards/{id}` | Delete a card |
-| `POST /cards/{id}/image` | Upload card image (multipart file) |
-| `POST /cards/{id}/image-url` | Fetch and store card image from URL |
-| `GET /naips/{id}` | Get naip with enriched detail |
-| `POST /naips/` | Create a naip |
-| `PUT /naips/{id}` | Update a naip |
-| `DELETE /naips/{id}` | Delete a naip |
-| `POST /naips/{id}/image` | Upload naip image (multipart file) |
-| `POST /naips/{id}/image-url` | Fetch and store naip image from URL |
-| `GET /sets/` | List all sets |
-| `GET /sets/{id}` | Get a set |
-| `GET /images/{filename}` | Serve stored images (static) |
-| `GET /lookups/cardtypes` | Card types |
-| `GET /lookups/colors` | Colors |
-| `GET /lookups/tribes` | Tribes |
-| `GET /lookups/attributes` | Attributes |
-| `GET /lookups/rarities` | Rarities |
-| `GET /lookups/print-variants` | Print variants (STD, AA, TR, SP, GR, …) |
-| `GET /lookups/blocks` | Blocks |
-| `GET /lookups/formats` | Formats |
-| `GET /lookups/keywords` | Keywords |
-| `GET /lookups/reswords` | Restricted words |
-| `GET /lookups/artists` | Artists |
-| `GET /lookups/sets` | Sets (code + name) |
-| `GET /lookups/settypes` | Set types |
-| `GET /lookups/languages` | Languages |
-| `GET /lookups/regions` | Regions |
+All endpoints (except `GET /`) require `X-API-Key`. Edit endpoints additionally require a key with `can_edit = true`.
+
+| Endpoint | Auth | Description |
+|----------|------|-------------|
+| `GET /` | — | Health check |
+| `GET /cards/` | read | List cards (filter: `name`, `set_id`, `cardtype_id`; paginate: `offset`, `limit`) |
+| `POST /cards/` | edit | Create a card |
+| `GET /cards/{id}` | read | Get card with enriched detail |
+| `PUT /cards/{id}` | edit | Update a card |
+| `DELETE /cards/{id}` | edit | Delete a card |
+| `POST /cards/{id}/image` | edit | Upload card image (multipart file) |
+| `POST /cards/{id}/image-url` | edit | Fetch and store card image from URL |
+| `GET /naips/{id}` | read | Get naip with enriched detail |
+| `POST /naips/` | edit | Create a naip |
+| `PUT /naips/{id}` | edit | Update a naip |
+| `DELETE /naips/{id}` | edit | Delete a naip |
+| `POST /naips/{id}/image` | edit | Upload naip image (multipart file) |
+| `POST /naips/{id}/image-url` | edit | Fetch and store naip image from URL |
+| `GET /sets/` | read | List all sets |
+| `GET /sets/{id}` | read | Get a set |
+| `GET /images/{filename}` | — | Serve stored images (static) |
+| `GET /lookups/cardtypes` | read | Card types |
+| `GET /lookups/colors` | read | Colors |
+| `GET /lookups/tribes` | read | Tribes |
+| `GET /lookups/attributes` | read | Attributes |
+| `GET /lookups/rarities` | read | Rarities |
+| `GET /lookups/print-variants` | read | Print variants (STD, AA, TR, SP, GR, …) |
+| `GET /lookups/blocks` | read | Blocks |
+| `GET /lookups/formats` | read | Formats |
+| `GET /lookups/keywords` | read | Keywords |
+| `GET /lookups/reswords` | read | Restricted words |
+| `GET /lookups/artists` | read | Artists |
+| `GET /lookups/sets` | read | Sets (code + name) |
+| `GET /lookups/settypes` | read | Set types |
+| `GET /lookups/languages` | read | Languages |
+| `GET /lookups/regions` | read | Regions |
 
 ## Data model
 

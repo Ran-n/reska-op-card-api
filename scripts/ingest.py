@@ -129,7 +129,7 @@ def _int(val: Any) -> int | None:
         return None
     try:
         return int(s)
-    except ValueError, TypeError:
+    except (ValueError, TypeError):
         return None
 
 

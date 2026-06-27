@@ -2,19 +2,20 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/05/17 20:26:56.885669
+Revised: 2026/06/28 01:21:47.068595
 """
 
 from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException
+from reska_op_card_api.auth import require_read_key
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
 from reska_op_card_api.database import get_session
 from reska_op_card_api.models import Set
 
-router = APIRouter(prefix="/sets", tags=["sets"])
+router = APIRouter(prefix="/sets", tags=["sets"], dependencies=[Depends(require_read_key)])
 
 
 class SetResponse(BaseModel):
