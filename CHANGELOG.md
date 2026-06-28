@@ -16,10 +16,26 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Added
 
-- API key authentication (`auth.py`): all endpoints now require an `X-API-Key` header; missing or unrecognised keys return 401
-- `api_key` table (`id`, `key`, `can_edit`, `label`, `created_ts`) storing API keys with read or edit permissions; migration `0008_api_keys`
-- `create-key` CLI entry point — generates a `secrets.token_urlsafe(32)` key, persists it to the DB, and prints it once; `--edit` flag grants edit permissions, `--label` attaches a human-readable label
-- Edit endpoints (`POST`, `PUT`, `DELETE`, image uploads) require a key with `can_edit = true`; read-only keys hitting these return 403
+- `GET /naips/` list endpoint with pagination (`offset`, `limit`) and filters `card_fk`, `set_id`, `language_id`, `print_variant_id`, `is_default`; returns `NaipListResponse` (`rows`, `total`) where each `NaipListItem` carries set code, print variant symbol, language code, artist name, card name, and image path
+- API key authentication (`auth.py`): all endpoints now require an `X-API-Key` header or `?api_key=` query parameter; missing or unrecognised keys return 401; revoked keys also return 401
+- `api_key` table storing API keys with read or edit permissions; migration `0008_api_keys`; extended with `request_count`, `last_used_ts`, `revoked_ts` for usage tracking and soft-delete (migrations `0009`–`0015`)
+- `ApiKeyLog` model and `api_key_log` table — per-request access log recording `method`, `path`, and `status_code` for every authenticated request; indexed on `(api_key_fk, ts)`; a response middleware writes one row per request; migration `0011_api_key_log`
+- `create-key` CLI entry point — generates a `secrets.token_urlsafe(32)` key, hashes it with BLAKE3 before storage, and prints the raw key once; `--label LABEL` (required, must be unique among active keys); `--edit` flag grants edit permissions
+- `delete-key` CLI entry point — soft-revokes a key by label (`delete-key --label LABEL`); sets `revoked_ts` so the key stops authenticating but its logs are preserved
+- `list-keys` CLI entry point — prints all keys with label, permission level, request count, last-used timestamp, and created timestamp
+- Admin UI at `/admin` (dashboard) and `/admin/keys` (key manager) — Gruvbox-styled HTML UI protected by HTTP Basic auth (`ADMIN_USERNAME` / `ADMIN_PASSWORD` env vars); supports creating keys, revoking (soft-delete), restoring, and purging (hard-delete) keys; shows per-key request counts and last-used timestamps; table columns are client-sortable
+- `ADMIN_USERNAME` and `ADMIN_PASSWORD` env vars — HTTP Basic credentials for the `/admin` UI; returning 503 if either is unset
+- `PORT` env var — port used when TLS is configured (default `8443`); plain-HTTP fallback uses uvicorn's default `8000`
+- `python-dotenv` dependency — `.env` is loaded automatically on server and CLI startup; no manual `export` needed
+- `_RedactApiKey` uvicorn access-log filter — replaces `api_key=<value>` in logged URLs with `api_key=[REDACTED]` so raw keys never appear in server logs
+- HTTPS support: `SSL_CERTFILE` and `SSL_KEYFILE` env vars configure uvicorn TLS; falls back to plain HTTP when unset; locally trusted certs via mkcert, production certs via Certbot (see BACKLOG item 3)
+- Edit endpoints (`POST`, `PUT`, `DELETE`, image uploads) require a key with `can_edit = true`; read-only keys return 403
+
+### Changed
+
+- API keys are now stored as BLAKE3 hashes — the raw token is printed once on creation and never persisted; existing plain-text keys must be rotated (delete and re-create)
+- `create-key`: `--label` is now required (was optional); duplicate labels among active keys are rejected with a clear error
+- `ApiKey.label` is `NOT NULL` and unique among active (non-revoked) keys; uniqueness is enforced by a partial index (`WHERE revoked_ts IS NULL`), so a new key may reuse a label previously held by a revoked key; migrations `0010`, `0013`
 - `routers/_common.py` shared module: `LookupItem`, `ImageUrlPayload`, `_resolve_text`, `_upsert_text_fk` — eliminates identical copy-paste between `cards.py` and `naips.py`
 - `CardWrite.number` validates `ge=1`; `CardWrite` and `NaipWrite` stats (`power`, `life`, `counter`, `cost`) validate `ge=0` — rejects negative card numbers and stats at the API boundary
 - FK indexes on `set` (`type_fk`, `language_fk`), `card` (`effect_fk`, `trigger_fk`, `block_fk`), `naip` (`card_fk`, `set_fk`, `artist_fk`, `language_fk`, `cardtype_fk`, `block_fk`), `print_variant` (`parent_fk`), `card_effect_history` (`card_fk`, `effect_fk`), and `card_trigger_history` (`card_fk`, `trigger_fk`); migration `0006_add_missing_indexes`

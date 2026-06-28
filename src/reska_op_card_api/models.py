@@ -609,4 +609,19 @@ class ApiKey(SQLModel, table=True):
     created_ts: datetime | None = Field(default=None, sa_column=_ts_col())
     key: str
     can_edit: bool = False
-    label: str | None = None
+    label: str = Field(sa_column=sa.Column(sa.String, nullable=False))
+    request_count: int = Field(default=0, sa_column=sa.Column(sa.Integer, nullable=False, server_default="0"))
+    last_used_ts: datetime | None = Field(default=None, sa_column=sa.Column(sa.String, nullable=True))
+    revoked_ts: datetime | None = Field(default=None, sa_column=sa.Column(sa.String, nullable=True))
+
+
+class ApiKeyLog(SQLModel, table=True):
+    __tablename__ = "api_key_log"
+    __table_args__ = (Index("ix_api_key_log_key_ts", "api_key_fk", "ts"),)
+
+    id: int | None = Field(default=None, primary_key=True)
+    ts: datetime | None = Field(default=None, sa_column=_ts_col())
+    api_key_fk: int = Field(foreign_key="api_key.id")
+    method: str
+    path: str
+    status_code: int

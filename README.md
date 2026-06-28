@@ -27,6 +27,12 @@ REST API for One Piece TCG card information.
 uv sync
 ```
 
+Copy the example env file and fill in values:
+
+```sh
+cp .env.example .env
+```
+
 Apply database migrations:
 
 ```sh
@@ -35,35 +41,53 @@ uv run alembic upgrade head
 
 The database and images are stored under `data/` (`data/optcg.db`, `data/images/cards/`, `data/images/langs/`).
 
+## HTTPS (local dev)
+
+The API serves HTTPS when `SSL_CERTFILE` and `SSL_KEYFILE` are set in `.env`. If they are unset, it falls back to plain HTTP.
+
+Generate locally-trusted certs with [mkcert](https://github.com/FiloSottile/mkcert):
+
+```sh
+mkcert -install          # once — installs local CA into OS/browser trust store
+mkcert localhost 127.0.0.1
+```
+
+Move the generated files into `certs/` and set the paths in `.env` (see `.env.example`). The `certs/` directory is gitignored — never commit private keys.
+
 ## Run
 
 ```sh
-uv run api                        # localhost:8000, reload enabled
+uv run api                        # localhost:8000 (HTTPS if certs configured), reload enabled
 uv run api --port 8001            # custom port
 uv run api --host 0.0.0.0         # bind all interfaces
 uv run api --help                 # all uvicorn options
 ```
 
-Interactive docs available at `http://localhost:8000/docs`.
+Interactive docs available at `https://localhost:8443/docs` (or `http://localhost:8000/docs` without TLS).
 
 ## Authentication
 
-All endpoints require an `X-API-Key` header. There are two key types:
+All endpoints require an `X-API-Key` header or `?api_key=` query parameter. There are two key types:
 
 | Type | `can_edit` | Allowed operations |
 |------|-----------|-------------------|
 | Read | `false` | `GET` endpoints only |
 | Edit | `true` | All endpoints |
 
-Generate a key with the `create-key` CLI:
+### Key management (CLI)
 
 ```sh
-uv run create-key                        # read-only key
-uv run create-key --edit                 # edit key
-uv run create-key --edit --label ingest  # with a label
+uv run create-key --label ingest         # read-only key
+uv run create-key --label ci --edit      # edit key
+uv run list-keys                         # list all keys with usage stats
+uv run delete-key --label ingest         # revoke a key (soft-delete)
 ```
 
-The key is printed once to stdout. Store it securely — it is not recoverable from the database.
+The raw key is printed once to stdout on creation. Store it securely — only the BLAKE3 hash is stored in the database.
+
+### Key management (Admin UI)
+
+The web UI at `/admin/keys` lets you create, revoke, restore, and purge keys without the CLI. It requires HTTP Basic auth — set `ADMIN_USERNAME` and `ADMIN_PASSWORD` in `.env`.
 
 ## Data ingestion
 
@@ -83,6 +107,12 @@ All endpoints (except `GET /`) require `X-API-Key`. Edit endpoints additionally 
 | Endpoint | Auth | Description |
 |----------|------|-------------|
 | `GET /` | — | Health check |
+| `GET /admin` | Basic | Admin dashboard |
+| `GET /admin/keys` | Basic | Key manager UI — list, create, revoke, restore, purge |
+| `POST /admin/keys` | Basic | Create a key (form submission) |
+| `POST /admin/keys/{id}/delete` | Basic | Revoke a key (soft-delete) |
+| `POST /admin/keys/{id}/restore` | Basic | Restore a revoked key |
+| `POST /admin/keys/{id}/purge` | Basic | Permanently delete a key and its logs |
 | `GET /cards/` | read | List cards (filter: `name`, `set_id`, `cardtype_id`; paginate: `offset`, `limit`) |
 | `POST /cards/` | edit | Create a card |
 | `GET /cards/{id}` | read | Get card with enriched detail |
@@ -90,6 +120,7 @@ All endpoints (except `GET /`) require `X-API-Key`. Edit endpoints additionally 
 | `DELETE /cards/{id}` | edit | Delete a card |
 | `POST /cards/{id}/image` | edit | Upload card image (multipart file) |
 | `POST /cards/{id}/image-url` | edit | Fetch and store card image from URL |
+| `GET /naips/` | read | List naips (filter: `card_fk`, `set_id`, `language_id`, `print_variant_id`, `is_default`; paginate: `offset`, `limit`) |
 | `GET /naips/{id}` | read | Get naip with enriched detail |
 | `POST /naips/` | edit | Create a naip |
 | `PUT /naips/{id}` | edit | Update a naip |

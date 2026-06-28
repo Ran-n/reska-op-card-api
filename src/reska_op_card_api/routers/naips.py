@@ -8,7 +8,7 @@ Revised: 2026/06/28 01:21:46.981609
 from pathlib import Path
 
 import httpx
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from pydantic import BaseModel, Field
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select, text
@@ -76,6 +76,28 @@ class NaipDetail(BaseModel):
     attrs: list[LookupItem] = []
     keywords: list[LookupItem] = []
     reswords: list[LookupItem] = []
+
+
+class NaipListItem(BaseModel):
+    id: int
+    card_fk: int
+    set_fk: int
+    set_code: str | None = None
+    print_variant_fk: int
+    print_variant_symbol: str | None = None
+    language_fk: int | None = None
+    language_code: str | None = None
+    is_default: bool
+    is_foil: bool
+    is_errata: bool
+    artist_name: str | None = None
+    name: str | None = None
+    image_path: str | None = None
+
+
+class NaipListResponse(BaseModel):
+    rows: list[NaipListItem]
+    total: int
 
 
 class NaipWrite(BaseModel):
@@ -244,6 +266,79 @@ def _apply_write(naip: Naip, data: NaipWrite, session: Session) -> None:
 
 
 # ── Endpoints ────────────────────────────────────────────────────────────────
+
+
+@router.get("/", response_model=NaipListResponse, dependencies=[Depends(require_read_key)])
+def list_naips(
+    card_fk: int | None = Query(None),
+    set_id: int | None = Query(None),
+    language_id: int | None = Query(None),
+    print_variant_id: int | None = Query(None),
+    is_default: bool | None = Query(None),
+    offset: int = Query(0, ge=0),
+    limit: int = Query(60, ge=1, le=200),
+    session: Session = Depends(get_session),
+):
+    conditions = []
+    filter_params: dict = {}
+    if card_fk is not None:
+        conditions.append("n.card_fk = :card_fk")
+        filter_params["card_fk"] = card_fk
+    if set_id is not None:
+        conditions.append("n.set_fk = :set_id")
+        filter_params["set_id"] = set_id
+    if language_id is not None:
+        conditions.append("n.language_fk = :language_id")
+        filter_params["language_id"] = language_id
+    if print_variant_id is not None:
+        conditions.append("n.print_variant_fk = :print_variant_id")
+        filter_params["print_variant_id"] = print_variant_id
+    if is_default is not None:
+        conditions.append("n.is_default = :is_default")
+        filter_params["is_default"] = int(is_default)
+
+    where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
+    rows = session.exec(
+        text(
+            "SELECT n.id, n.card_fk, n.set_fk, s.code, n.print_variant_fk, pv.symbol, "
+            "n.language_fk, l.code, n.is_default, n.is_foil, n.is_errata, "
+            "a.name, nm.name, img.path "
+            "FROM naip n "
+            'LEFT JOIN "set" s ON s.id = n.set_fk '
+            "LEFT JOIN print_variant pv ON pv.id = n.print_variant_fk "
+            "LEFT JOIN language l ON l.id = n.language_fk "
+            "LEFT JOIN artist a ON a.id = n.artist_fk "
+            "LEFT JOIN name nm ON nm.id = n.name_fk "
+            "LEFT JOIN image img ON img.id = n.image_fk "
+            f"{where} ORDER BY n.card_fk, n.set_fk, n.sort_order LIMIT :limit OFFSET :offset"
+        ).bindparams(**filter_params, limit=limit, offset=offset)
+    ).all()
+    total = session.exec(
+        text(f"SELECT COUNT(*) FROM naip n {where}").bindparams(**filter_params)
+    ).scalar()
+
+    return NaipListResponse(
+        rows=[
+            NaipListItem(
+                id=r[0],
+                card_fk=r[1],
+                set_fk=r[2],
+                set_code=r[3],
+                print_variant_fk=r[4],
+                print_variant_symbol=r[5],
+                language_fk=r[6],
+                language_code=r[7],
+                is_default=bool(r[8]),
+                is_foil=bool(r[9]),
+                is_errata=bool(r[10]),
+                artist_name=r[11],
+                name=r[12],
+                image_path=r[13],
+            )
+            for r in rows
+        ],
+        total=total or 0,
+    )
 
 
 @router.get("/{naip_id}", response_model=NaipDetail, dependencies=[Depends(require_read_key)])
