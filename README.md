@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:26:17 )
-[//]: # (+ Revised: 	2026/06/28 01:21:47.313085 )
+[//]: # (+ Revised: 	2026/06/29 10:20:02.220056 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # reska-op-card-api
@@ -57,13 +57,10 @@ Move the generated files into `certs/` and set the paths in `.env` (see `.env.ex
 ## Run
 
 ```sh
-uv run api                        # localhost:8000 (HTTPS if certs configured), reload enabled
-uv run api --port 8001            # custom port
-uv run api --host 0.0.0.0         # bind all interfaces
-uv run api --help                 # all uvicorn options
+uv run api
 ```
 
-Interactive docs available at `https://localhost:8443/docs` (or `http://localhost:8000/docs` without TLS).
+The port is controlled by the `PORT` env var (default `8443` with TLS, `8000` without). Interactive docs at `https://localhost:8443/docs` (or `http://localhost:8000/docs` without TLS).
 
 ## Authentication
 
@@ -113,22 +110,22 @@ All endpoints (except `GET /`) require `X-API-Key`. Edit endpoints additionally 
 | `POST /admin/keys/{id}/delete` | Basic | Revoke a key (soft-delete) |
 | `POST /admin/keys/{id}/restore` | Basic | Restore a revoked key |
 | `POST /admin/keys/{id}/purge` | Basic | Permanently delete a key and its logs |
-| `GET /cards/` | read | List cards (filter: `name`, `set_id`, `cardtype_id`; paginate: `offset`, `limit`) |
+| `GET /cards/` | read | List cards (filter: `name`, `set_id`, `cardtype_id`; paginate: `offset`, `limit`; expand: `set`, `cardtype`, `rarity`) |
 | `POST /cards/` | edit | Create a card |
-| `GET /cards/{id}` | read | Get card with enriched detail |
+| `GET /cards/{id}` | read | Get card detail (expand: `set`, `cardtype`, `rarity`, `block`) |
 | `PUT /cards/{id}` | edit | Update a card |
 | `DELETE /cards/{id}` | edit | Delete a card |
-| `POST /cards/{id}/image` | edit | Upload card image (multipart file) |
-| `POST /cards/{id}/image-url` | edit | Fetch and store card image from URL |
-| `GET /naips/` | read | List naips (filter: `card_fk`, `set_id`, `language_id`, `print_variant_id`, `is_default`; paginate: `offset`, `limit`) |
-| `GET /naips/{id}` | read | Get naip with enriched detail |
+| `POST /cards/{id}/image` | edit | Upload card image (multipart file, max 10 MB) |
+| `POST /cards/{id}/image-url` | edit | Fetch and store card image from URL (max 10 MB) |
+| `GET /naips/` | read | List naips (filter: `card_fk`, `set_id`, `language_id`, `print_variant_id`, `is_default`; paginate: `offset`, `limit`; expand: `card`, `set`, `print_variant`, `language`, `artist`) |
+| `GET /naips/{id}` | read | Get naip detail (expand: `card`, `set`, `artist`, `print_variant`, `language`, `cardtype`, `block`) |
 | `POST /naips/` | edit | Create a naip |
 | `PUT /naips/{id}` | edit | Update a naip |
 | `DELETE /naips/{id}` | edit | Delete a naip |
-| `POST /naips/{id}/image` | edit | Upload naip image (multipart file) |
-| `POST /naips/{id}/image-url` | edit | Fetch and store naip image from URL |
-| `GET /sets/` | read | List all sets |
-| `GET /sets/{id}` | read | Get a set |
+| `POST /naips/{id}/image` | edit | Upload naip image (multipart file, max 10 MB) |
+| `POST /naips/{id}/image-url` | edit | Fetch and store naip image from URL (max 10 MB) |
+| `GET /sets/` | read | List all sets (expand: `language`, `parent`, `type`) |
+| `GET /sets/{id}` | read | Get a set (expand: `language`, `parent`, `type`) |
 | `GET /images/{filename}` | — | Serve stored images (static) |
 | `GET /lookups/cardtypes` | read | Card types |
 | `GET /lookups/colors` | read | Colors |
@@ -145,6 +142,18 @@ All endpoints (except `GET /`) require `X-API-Key`. Edit endpoints additionally 
 | `GET /lookups/settypes` | read | Set types |
 | `GET /lookups/languages` | read | Languages |
 | `GET /lookups/regions` | read | Regions |
+
+### Expand parameter
+
+FK fields in list and detail responses default to bare integers. Pass `?expand=field1,field2,...` to inline the related object instead:
+
+```sh
+GET /cards/42?expand=set,cardtype,rarity
+GET /naips/?expand=card,set,print_variant&card_fk=1
+GET /sets/?expand=language,parent,type
+```
+
+Expanded fields return an object (`{ "id": ..., "code": ..., "name": ... }`) instead of a plain `int`. Fields not listed in `expand` remain as integers.
 
 ## Data model
 
