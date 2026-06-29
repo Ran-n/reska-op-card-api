@@ -1,8 +1,13 @@
+#!/usr/bin/env python3
+"""
+Authors: Ran# <ran.hash@proton.me>
+Created: 2026/06/28
+"""
+
 import os
 import secrets
 import sys
 
-import uvicorn
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -11,24 +16,33 @@ _HTTPS_PORT = int(os.environ.get("PORT", "8443"))
 
 
 def api():
-    import uvicorn.main
+    import uvicorn
 
     certfile = os.environ.get("SSL_CERTFILE")
     keyfile = os.environ.get("SSL_KEYFILE")
 
-    if certfile and keyfile:
+    # Resolve relative cert paths against CWD before reload forks change directory
+    if certfile:
+        certfile = str(os.path.abspath(certfile))
+    if keyfile:
+        keyfile = str(os.path.abspath(keyfile))
+
+    if certfile and keyfile and os.path.isfile(certfile) and os.path.isfile(keyfile):
         print(f"TLS enabled — https://localhost:{_HTTPS_PORT}")
-        uvicorn.main.main([
+        uvicorn.run(
             "reska_op_card_api.main:app",
-            "--reload",
-            "--port", str(_HTTPS_PORT),
-            "--ssl-certfile", certfile,
-            "--ssl-keyfile", keyfile,
-            *sys.argv[1:],
-        ])
+            host="127.0.0.1",
+            port=_HTTPS_PORT,
+            ssl_certfile=certfile,
+            ssl_keyfile=keyfile,
+            reload=True,
+        )
     else:
-        print("WARNING: SSL_CERTFILE/SSL_KEYFILE not set — running on plain HTTP")
-        uvicorn.main.main(["reska_op_card_api.main:app", "--reload", *sys.argv[1:]])
+        if certfile or keyfile:
+            print("WARNING: SSL cert/key file(s) not found — running on plain HTTP")
+        else:
+            print("WARNING: SSL_CERTFILE/SSL_KEYFILE not set — running on plain HTTP")
+        uvicorn.run("reska_op_card_api.main:app", reload=True)
 
 
 def create_key():

@@ -1,7 +1,7 @@
 [//]: # ( ---------------------------------------------------------------------- )
 [//]: # (+ Authors: 	Ran# <ran.hash@proton.me> )
 [//]: # (+ Created: 	2026/05/12 16:27:41 )
-[//]: # (+ Revised: 	2026/06/28 01:22:15.060897 )
+[//]: # (+ Revised: 	2026/06/29 10:01:03.794835 )
 [//]: # ( ---------------------------------------------------------------------- )
 
 # Changelog
@@ -15,6 +15,38 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ## [Unreleased]
 
 ### Added
+
+- `?expand=field1,field2,...` query parameter on `GET /cards/`, `GET /cards/{id}`, `GET /naips/`, `GET /naips/{id}`, `GET /sets/`, `GET /sets/{id}` — when a field name is listed, the corresponding FK integer is replaced with a full inline object (`ExpandedSet`, `ExpandedCardType`, etc.) instead of a bare FK
+- `Expanded*` Pydantic models in `_common.py`: `ExpandedSet`, `ExpandedCardType`, `ExpandedRarity`, `ExpandedPrintVariant`, `ExpandedLanguage`, `ExpandedBlock`, `ExpandedSetType`, `ExpandedArtist`, `ExpandedCard` — used as the expanded side of polymorphic `int | Expanded*` response fields
+- `_expand_*_bulk()` helpers in `_common.py` — one bulk `IN (...)` query per expand type, batching all FK lookups for a list response into a single round-trip; `ExpandedCard` bulk loader also resolves name/effect/trigger dedup tables and all five M2M junctions in one pass
+- `MAX_IMAGE_BYTES = 10 MB` constant in `_images.py`; all image upload endpoints (cards and naips, both file and URL) return 413 when the payload exceeds 10 MB
+- `ImageUrlPayload` URL scheme validator (`field_validator`) — rejects non-http/https URLs with 422 before any network request is made
+- `tests/` pytest suite: 51 tests covering auth (missing/invalid/revoked key, read-only 403), cards CRUD (list, filter, create, get, update, delete, validation errors), naips CRUD (list, filters, create, get, update, delete, validation), sets (list, get), and all 15 lookup endpoints; uses `SQLModel.metadata.create_all()` + in-memory seed data to avoid SQLite batch-migration edge cases; `conftest.py` patches both `database.engine` and `main.engine` so the access-log middleware targets the test DB
+
+### Changed
+
+- `CardDetail`: `set_fk`, `cardtype_fk`, `rarity_fk` replaced by polymorphic `set`, `cardtype`, `rarity` fields; `block` added as direct `int | ExpandedBlock` field; `blocks: list[LookupItem]` removed; flat denormalized strings `set_code`, `set_name`, `cardtype_name`, `cardtype_symbol`, `rarity_name`, `rarity_symbol` removed
+- `CardListItem`: `set_fk`, `cardtype_fk` replaced by `set`, `cardtype`; `rarity` field added; flat `set_code`, `cardtype_name`, `rarity_symbol` removed
+- `NaipDetail`: `card_fk`, `set_fk`, `artist_fk`, `print_variant_fk`, `language_fk`, `cardtype_fk`, `block_fk` replaced by polymorphic `card`, `set`, `artist`, `print_variant`, `language`, `cardtype`, `block`; flat `artist_name`, `print_variant_name`, `print_variant_symbol`, `set_code`, `cardtype_name`, `cardtype_symbol`, `language_code` removed
+- `NaipListItem`: same FK → polymorphic field replacement as `NaipDetail`; `set_code`, `print_variant_symbol`, `language_code`, `artist_name` removed
+- `SetResponse`: `language_fk`, `parent_fk`, `type_fk` replaced by `language`, `parent`, `type`
+- `CardWrite.name`: `min_length=1` added — blank card names are now rejected at the API boundary
+- `_upsert_text_fk`: strips leading/trailing whitespace from the value before lookup or insert
+- `auth.py`: WARNING log emitted on each rejected auth attempt, recording method and path
+- `main.py` `_log_api_key_access` middleware: exceptions during access-log DB writes are caught and logged rather than propagated to the client
+- `main.py` `_RedactApiKey` log filter: now redacts `new_key=` in addition to `api_key=` in uvicorn access-log lines
+- `cli.py`: cert paths resolved to absolute paths before `--reload` forks the process; cert file existence checked with `os.path.isfile()` before enabling TLS; uses `uvicorn.run()` instead of `uvicorn.main.main()`; error message distinguishes "files not found" from "env vars not set"
+- `pyproject.toml`: build system switched from `setuptools` to `hatchling`; `preview = true` added to `[tool.ruff]`
+- `main.py`: `load_dotenv()` moved to after all imports to satisfy ruff E402 (no longer splits the import block); `redirect_slashes=False` added to `FastAPI()` constructor
+- `cli.py`: unused top-level `import uvicorn` removed (F401); file header added
+- Import blocks sorted (I001) in `auth.py`, `cards.py`, `lookups.py`, `naips.py`, `sets.py` — local `reska_op_card_api.*` imports separated into their own group after third-party
+- `admin.py`: three E501 lines shortened — banner title split across two HTML lines, `.page-heading` CSS expanded to multi-line, SVG `<svg>` attribute wrapped at `stroke-width`
+
+### Fixed
+
+- `create_card`, `update_card`: `IntegrityError` on commit now returns 409 instead of 500 for duplicate card number in the same set
+
+### Previous entries
 
 - `GET /naips/` list endpoint with pagination (`offset`, `limit`) and filters `card_fk`, `set_id`, `language_id`, `print_variant_id`, `is_default`; returns `NaipListResponse` (`rows`, `total`) where each `NaipListItem` carries set code, print variant symbol, language code, artist name, card name, and image path
 - API key authentication (`auth.py`): all endpoints now require an `X-API-Key` header or `?api_key=` query parameter; missing or unrecognised keys return 401; revoked keys also return 401

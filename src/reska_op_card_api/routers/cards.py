@@ -1,8 +1,8 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/06/28 01:21:46.895503
+Revised: 2026/06/29 08:55:36.299211
 """
 
 from pathlib import Path
@@ -14,15 +14,16 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select, text
 
 from reska_op_card_api._images import (
+    MAX_IMAGE_BYTES,
     VALID_SUFFIXES,
     cleanup_orphaned_image,
     replace_naip_image,
     save_image,
 )
+from reska_op_card_api.auth import require_edit_key, require_read_key
 from reska_op_card_api.database import get_session
 from reska_op_card_api.models import (
     BannedPair,
-    Block,
     Card,
     CardAttribute,
     CardBan,
@@ -45,8 +46,21 @@ from reska_op_card_api.models import (
     PrintVariant,
     Trigger,
 )
-from reska_op_card_api.auth import require_edit_key, require_read_key
-from reska_op_card_api.routers._common import ImageUrlPayload, LookupItem, _resolve_text, _upsert_text_fk
+from reska_op_card_api.routers._common import (
+    ExpandedBlock,
+    ExpandedCardType,
+    ExpandedRarity,
+    ExpandedSet,
+    ImageUrlPayload,
+    LookupItem,
+    _expand_blocks_bulk,
+    _expand_cardtypes_bulk,
+    _expand_rarities_bulk,
+    _expand_sets_bulk,
+    _resolve_text,
+    _stripe,
+    _upsert_text_fk,
+)
 
 router = APIRouter(prefix="/cards", tags=["cards"])
 
@@ -70,9 +84,10 @@ class NaipItem(BaseModel):
 
 class CardDetail(BaseModel):
     id: int
-    set_fk: int
-    cardtype_fk: int
-    rarity_fk: int | None = None
+    set: int | ExpandedSet
+    cardtype: int | ExpandedCardType
+    rarity: int | ExpandedRarity | None = None
+    block: int | ExpandedBlock | None = None
     number: int
     name: str
     effect: str | None = None
@@ -81,16 +96,9 @@ class CardDetail(BaseModel):
     life: int | None = None
     counter: int | None = None
     cost: int | None = None
-    set_code: str | None = None
-    set_name: str | None = None
-    cardtype_name: str | None = None
-    cardtype_symbol: str | None = None
-    rarity_name: str | None = None
-    rarity_symbol: str | None = None
     colors: list[LookupItem] = []
     tribes: list[LookupItem] = []
     attrs: list[LookupItem] = []
-    blocks: list[LookupItem] = []
     formats: list[LookupItem] = []
     keywords: list[LookupItem] = []
     reswords: list[LookupItem] = []
@@ -99,18 +107,16 @@ class CardDetail(BaseModel):
 
 class CardListItem(BaseModel):
     id: int
-    set_fk: int
-    cardtype_fk: int
+    set: int | ExpandedSet
+    cardtype: int | ExpandedCardType
+    rarity: int | ExpandedRarity | None = None
     number: int
     name: str
     cost: int | None = None
     power: int | None = None
     counter: int | None = None
-    set_code: str | None = None
-    cardtype_name: str | None = None
-    colors: str | None = None
-    rarity_symbol: str | None = None
     image_path: str | None = None
+    colors: str | None = None
 
 
 class CardListResponse(BaseModel):
@@ -123,7 +129,7 @@ class CardWrite(BaseModel):
     cardtype_fk: int
     rarity_fk: int | None = None
     number: int = Field(ge=1)
-    name: str
+    name: str = Field(min_length=1)
     effect: str | None = None
     trigger: str | None = None
     power: int | None = Field(default=None, ge=0)
@@ -149,17 +155,8 @@ class CardWrite(BaseModel):
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
 
-def _enrich(card: Card, session: Session) -> CardDetail:
-    row = session.exec(
-        text(
-            "SELECT s.code, s.name, ct.name, ct.symbol, r.name, r.symbol "
-            'FROM "set" s '
-            "JOIN card_type ct ON ct.id = :ct "
-            "LEFT JOIN rarity r ON r.id = :rid "
-            "WHERE s.id = :s"
-        ).bindparams(ct=card.cardtype_fk, s=card.set_fk, rid=card.rarity_fk)
-    ).first()
-    set_code, set_name, ct_name, ct_sym, rarity_name, rarity_sym = row if row else (None, None, None, None, None, None)
+def _enrich(card: Card, session: Session, expand: set[str] | None = None) -> CardDetail:
+    expand = expand or set()
 
     card_name = _resolve_text(session, Name, card.name_fk, "name") or ""
     effect = _resolve_text(session, Effect, card.effect_fk, "effect")
@@ -211,8 +208,6 @@ def _enrich(card: Card, session: Session) -> CardDetail:
             "JOIN card_attribute ca ON ca.attribute_fk = a.id WHERE ca.card_fk = :cid"
         ).bindparams(cid=card.id)
     ).all()
-    block_obj = session.get(Block, card.block_fk) if card.block_fk else None
-    block_rows = [(block_obj.id, block_obj.name)] if block_obj else []
     format_rows = session.exec(
         text(
             "SELECT f.id, f.name FROM format f JOIN card_format cf ON cf.format_fk = f.id WHERE cf.card_fk = :cid"
@@ -229,11 +224,17 @@ def _enrich(card: Card, session: Session) -> CardDetail:
         ).bindparams(cid=card.id)
     ).all()
 
+    set_map = _expand_sets_bulk([card.set_fk], session) if "set" in expand else {}
+    ct_map = _expand_cardtypes_bulk([card.cardtype_fk], session) if "cardtype" in expand else {}
+    rarity_map = _expand_rarities_bulk([card.rarity_fk], session) if "rarity" in expand else {}
+    block_map = _expand_blocks_bulk([card.block_fk], session) if "block" in expand else {}
+
     return CardDetail(
         id=card.id,
-        set_fk=card.set_fk,
-        cardtype_fk=card.cardtype_fk,
-        rarity_fk=card.rarity_fk,
+        set=set_map.get(card.set_fk, card.set_fk),
+        cardtype=ct_map.get(card.cardtype_fk, card.cardtype_fk),
+        rarity=_stripe(card.rarity_fk, "rarity", expand, rarity_map),
+        block=_stripe(card.block_fk, "block", expand, block_map),
         number=card.number,
         name=card_name,
         effect=effect,
@@ -242,16 +243,9 @@ def _enrich(card: Card, session: Session) -> CardDetail:
         life=card.life,
         counter=card.counter,
         cost=card.cost,
-        set_code=set_code,
-        set_name=set_name,
-        cardtype_name=ct_name,
-        cardtype_symbol=ct_sym,
-        rarity_name=rarity_name,
-        rarity_symbol=rarity_sym,
         colors=[LookupItem(id=r[0], name=r[1]) for r in color_rows],
         tribes=[LookupItem(id=r[0], name=r[1]) for r in tribe_rows],
         attrs=[LookupItem(id=r[0], name=r[1]) for r in attr_rows],
-        blocks=[LookupItem(id=r[0], name=r[1]) for r in block_rows],
         formats=[LookupItem(id=r[0], name=r[1]) for r in format_rows],
         keywords=[LookupItem(id=r[0], name=r[1]) for r in kw_rows],
         reswords=[LookupItem(id=r[0], name=r[1]) for r in rw_rows],
@@ -287,6 +281,7 @@ def list_cards(
     name: str | None = Query(None),
     set_id: int | None = Query(None),
     cardtype_id: int | None = Query(None),
+    expand: str | None = Query(None),
     offset: int = Query(0, ge=0),
     limit: int = Query(60, ge=1, le=200),
     session: Session = Depends(get_session),
@@ -306,41 +301,40 @@ def list_cards(
     where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
     rows = session.exec(
         text(
-            f"SELECT c.id, c.set_fk, c.cardtype_fk, c.number, nm.name, c.cost, c.power, c.counter, "
-            f"s.code, ct.name, "
+            f"SELECT c.id, c.set_fk, c.cardtype_fk, c.rarity_fk, c.number, nm.name, c.cost, c.power, c.counter, "
             f"(SELECT GROUP_CONCAT(co.name, ',') FROM color co "
             f" JOIN card_color cc ON cc.color_fk = co.id WHERE cc.card_fk = c.id), "
-            f"r.symbol, "
             f"(SELECT img.path FROM naip n LEFT JOIN image img ON img.id = n.image_fk "
             f" WHERE n.card_fk = c.id AND n.is_default = 1 LIMIT 1) "
             f"FROM card c "
             f"LEFT JOIN name nm ON nm.id = c.name_fk "
-            f'LEFT JOIN "set" s ON s.id = c.set_fk '
-            f"LEFT JOIN card_type ct ON ct.id = c.cardtype_fk "
-            f"LEFT JOIN rarity r ON r.id = c.rarity_fk "
-            f"{where} ORDER BY s.code, c.number LIMIT :limit OFFSET :offset"
+            f"{where} ORDER BY c.set_fk, c.number LIMIT :limit OFFSET :offset"
         ).bindparams(**filter_params, limit=limit, offset=offset)
     ).all()
     total = session.exec(
         text(f"SELECT COUNT(*) FROM card c LEFT JOIN name nm ON nm.id = c.name_fk {where}").bindparams(**filter_params)
     ).scalar()
 
+    expand_set = {e.strip() for e in expand.split(",")} if expand else set()
+
+    set_map = _expand_sets_bulk([r[1] for r in rows], session) if "set" in expand_set else {}
+    ct_map = _expand_cardtypes_bulk([r[2] for r in rows], session) if "cardtype" in expand_set else {}
+    rarity_map = _expand_rarities_bulk([r[3] for r in rows], session) if "rarity" in expand_set else {}
+
     return CardListResponse(
         rows=[
             CardListItem(
                 id=r[0],
-                set_fk=r[1],
-                cardtype_fk=r[2],
-                number=r[3],
-                name=r[4] or "",
-                cost=r[5],
-                power=r[6],
-                counter=r[7],
-                set_code=r[8],
-                cardtype_name=r[9],
-                colors=r[10],
-                rarity_symbol=r[11],
-                image_path=r[12],
+                set=set_map.get(r[1], r[1]),
+                cardtype=ct_map.get(r[2], r[2]),
+                rarity=_stripe(r[3], "rarity", expand_set, rarity_map),
+                number=r[4],
+                name=r[5] or "",
+                cost=r[6],
+                power=r[7],
+                counter=r[8],
+                colors=r[9],
+                image_path=r[10],
             )
             for r in rows
         ],
@@ -349,11 +343,12 @@ def list_cards(
 
 
 @router.get("/{card_id}", response_model=CardDetail, dependencies=[Depends(require_read_key)])
-def get_card(card_id: int, session: Session = Depends(get_session)):
+def get_card(card_id: int, expand: str | None = Query(None), session: Session = Depends(get_session)):
     card = session.get(Card, card_id)
     if not card:
         raise HTTPException(status_code=404, detail="Card not found")
-    return _enrich(card, session)
+    expand_set = {e.strip() for e in expand.split(",")} if expand else set()
+    return _enrich(card, session, expand_set)
 
 
 @router.post("/", response_model=CardDetail, status_code=201, dependencies=[Depends(require_edit_key)])
@@ -377,7 +372,11 @@ def create_card(data: CardWrite, session: Session = Depends(get_session)):
     session.add(card)
     session.flush()
     _sync_junctions(card, data, session)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(status_code=409, detail="A card with this number already exists in this set")
     session.refresh(card)
     return _enrich(card, session)
 
@@ -401,7 +400,11 @@ def update_card(card_id: int, data: CardWrite, session: Session = Depends(get_se
     session.add(card)
     session.flush()
     _sync_junctions(card, data, session)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(status_code=409, detail="A card with this number already exists in this set")
     session.refresh(card)
     return _enrich(card, session)
 
@@ -477,6 +480,8 @@ async def upload_card_image_from_url(card_id: int, payload: ImageUrlPayload, ses
             raw = resp.content
     except httpx.HTTPError as e:
         raise HTTPException(status_code=400, detail=f"Failed to fetch image: {e}")
+    if len(raw) > MAX_IMAGE_BYTES:
+        raise HTTPException(status_code=413, detail="Image exceeds the 10 MB limit")
     _set_card_image(card, raw, suffix, session)
     try:
         session.commit()
@@ -496,6 +501,8 @@ async def upload_card_image(card_id: int, file: UploadFile = File(...), session:
     if suffix not in VALID_SUFFIXES:
         raise HTTPException(status_code=400, detail="Only jpg, png, webp images are accepted")
     raw = await file.read()
+    if len(raw) > MAX_IMAGE_BYTES:
+        raise HTTPException(status_code=413, detail="Image exceeds the 10 MB limit")
     _set_card_image(card, raw, suffix, session)
     try:
         session.commit()

@@ -1,8 +1,8 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/30 00:00:00.000000
-Revised: 2026/06/28 01:21:46.981609
+Revised: 2026/06/29 08:55:36.299211
 """
 
 from pathlib import Path
@@ -14,11 +14,13 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select, text
 
 from reska_op_card_api._images import (
+    MAX_IMAGE_BYTES,
     VALID_SUFFIXES,
     cleanup_orphaned_image,
     replace_naip_image,
     save_image,
 )
+from reska_op_card_api.auth import require_edit_key, require_read_key
 from reska_op_card_api.database import get_session
 from reska_op_card_api.models import (
     Effect,
@@ -32,8 +34,27 @@ from reska_op_card_api.models import (
     Name,
     Trigger,
 )
-from reska_op_card_api.auth import require_edit_key, require_read_key
-from reska_op_card_api.routers._common import ImageUrlPayload, LookupItem, _resolve_text, _upsert_text_fk
+from reska_op_card_api.routers._common import (
+    ExpandedArtist,
+    ExpandedBlock,
+    ExpandedCard,
+    ExpandedCardType,
+    ExpandedLanguage,
+    ExpandedPrintVariant,
+    ExpandedSet,
+    ImageUrlPayload,
+    LookupItem,
+    _expand_artists_bulk,
+    _expand_blocks_bulk,
+    _expand_cards_bulk,
+    _expand_cardtypes_bulk,
+    _expand_languages_bulk,
+    _expand_print_variants_bulk,
+    _expand_sets_bulk,
+    _resolve_text,
+    _stripe,
+    _upsert_text_fk,
+)
 
 router = APIRouter(prefix="/naips", tags=["naips"])
 
@@ -43,15 +64,15 @@ router = APIRouter(prefix="/naips", tags=["naips"])
 
 class NaipDetail(BaseModel):
     id: int
-    card_fk: int
-    set_fk: int
-    artist_fk: int | None = None
-    print_variant_fk: int
-    language_fk: int | None = None
+    card: int | ExpandedCard
+    set: int | ExpandedSet
+    artist: int | ExpandedArtist | None = None
+    print_variant: int | ExpandedPrintVariant
+    language: int | ExpandedLanguage | None = None
     image_fk: int | None = None
     image_path: str | None = None
-    cardtype_fk: int | None = None
-    block_fk: int | None = None
+    cardtype: int | ExpandedCardType | None = None
+    block: int | ExpandedBlock | None = None
     is_default: bool = False
     is_errata: bool = False
     is_foil: bool = False
@@ -64,13 +85,6 @@ class NaipDetail(BaseModel):
     name: str | None = None
     effect: str | None = None
     trigger: str | None = None
-    artist_name: str | None = None
-    print_variant_name: str | None = None
-    print_variant_symbol: str | None = None
-    set_code: str | None = None
-    cardtype_name: str | None = None
-    cardtype_symbol: str | None = None
-    language_code: str | None = None
     colors: list[LookupItem] = []
     tribes: list[LookupItem] = []
     attrs: list[LookupItem] = []
@@ -80,17 +94,14 @@ class NaipDetail(BaseModel):
 
 class NaipListItem(BaseModel):
     id: int
-    card_fk: int
-    set_fk: int
-    set_code: str | None = None
-    print_variant_fk: int
-    print_variant_symbol: str | None = None
-    language_fk: int | None = None
-    language_code: str | None = None
+    card: int | ExpandedCard
+    set: int | ExpandedSet
+    print_variant: int | ExpandedPrintVariant
+    language: int | ExpandedLanguage | None = None
+    artist: int | ExpandedArtist | None = None
     is_default: bool
     is_foil: bool
     is_errata: bool
-    artist_name: str | None = None
     name: str | None = None
     image_path: str | None = None
 
@@ -153,23 +164,13 @@ def _sync_naip_junctions(naip: Naip, data: NaipWrite, session: Session) -> None:
             session.add(model(**{"naip_fk": naip.id, fk_field: fk_id}))
 
 
-def _enrich_naip(naip: Naip, session: Session) -> NaipDetail:
-    row = session.exec(
-        text(
-            "SELECT a.name, pv.name, pv.symbol, s.code, ct.name, ct.symbol, l.code, img.path "
-            "FROM naip n "
-            "LEFT JOIN artist a ON a.id = n.artist_fk "
-            "LEFT JOIN print_variant pv ON pv.id = n.print_variant_fk "
-            'LEFT JOIN "set" s ON s.id = n.set_fk '
-            "LEFT JOIN card_type ct ON ct.id = n.cardtype_fk "
-            "LEFT JOIN language l ON l.id = n.language_fk "
-            "LEFT JOIN image img ON img.id = n.image_fk "
-            "WHERE n.id = :nid"
-        ).bindparams(nid=naip.id)
-    ).first()
-    artist_name, pv_name, pv_symbol, set_code, ct_name, ct_sym, lang_code, image_path = (
-        row if row else (None, None, None, None, None, None, None, None)
-    )
+def _enrich_naip(naip: Naip, session: Session, expand: set[str] | None = None) -> NaipDetail:
+    expand = expand or set()
+
+    image_path: str | None = None
+    if naip.image_fk:
+        row = session.exec(text("SELECT path FROM image WHERE id = :id").bindparams(id=naip.image_fk)).first()
+        image_path = row[0] if row else None
 
     name = _resolve_text(session, Name, naip.name_fk, "name")
     effect = _resolve_text(session, Effect, naip.effect_fk, "effect")
@@ -202,17 +203,25 @@ def _enrich_naip(naip: Naip, session: Session) -> NaipDetail:
         ).bindparams(nid=naip.id)
     ).all()
 
+    card_map = _expand_cards_bulk([naip.card_fk], session) if "card" in expand else {}
+    set_map = _expand_sets_bulk([naip.set_fk], session) if "set" in expand else {}
+    artist_map = _expand_artists_bulk([naip.artist_fk], session) if "artist" in expand else {}
+    pv_map = _expand_print_variants_bulk([naip.print_variant_fk], session) if "print_variant" in expand else {}
+    lang_map = _expand_languages_bulk([naip.language_fk], session) if "language" in expand else {}
+    ct_map = _expand_cardtypes_bulk([naip.cardtype_fk], session) if "cardtype" in expand else {}
+    block_map = _expand_blocks_bulk([naip.block_fk], session) if "block" in expand else {}
+
     return NaipDetail(
         id=naip.id,
-        card_fk=naip.card_fk,
-        set_fk=naip.set_fk,
-        artist_fk=naip.artist_fk,
-        print_variant_fk=naip.print_variant_fk,
-        language_fk=naip.language_fk,
+        card=card_map.get(naip.card_fk, naip.card_fk),
+        set=set_map.get(naip.set_fk, naip.set_fk),
+        artist=_stripe(naip.artist_fk, "artist", expand, artist_map),
+        print_variant=pv_map.get(naip.print_variant_fk, naip.print_variant_fk),
+        language=_stripe(naip.language_fk, "language", expand, lang_map),
         image_fk=naip.image_fk,
         image_path=image_path,
-        cardtype_fk=naip.cardtype_fk,
-        block_fk=naip.block_fk,
+        cardtype=_stripe(naip.cardtype_fk, "cardtype", expand, ct_map),
+        block=_stripe(naip.block_fk, "block", expand, block_map),
         is_default=naip.is_default,
         is_errata=naip.is_errata,
         is_foil=naip.is_foil,
@@ -225,13 +234,6 @@ def _enrich_naip(naip: Naip, session: Session) -> NaipDetail:
         name=name,
         effect=effect,
         trigger=trigger,
-        artist_name=artist_name,
-        print_variant_name=pv_name,
-        print_variant_symbol=pv_symbol,
-        set_code=set_code,
-        cardtype_name=ct_name,
-        cardtype_symbol=ct_sym,
-        language_code=lang_code,
         colors=[LookupItem(id=r[0], name=r[1]) for r in color_rows],
         tribes=[LookupItem(id=r[0], name=r[1]) for r in tribe_rows],
         attrs=[LookupItem(id=r[0], name=r[1]) for r in attr_rows],
@@ -275,6 +277,7 @@ def list_naips(
     language_id: int | None = Query(None),
     print_variant_id: int | None = Query(None),
     is_default: bool | None = Query(None),
+    expand: str | None = Query(None),
     offset: int = Query(0, ge=0),
     limit: int = Query(60, ge=1, le=200),
     session: Session = Depends(get_session),
@@ -300,40 +303,39 @@ def list_naips(
     where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
     rows = session.exec(
         text(
-            "SELECT n.id, n.card_fk, n.set_fk, s.code, n.print_variant_fk, pv.symbol, "
-            "n.language_fk, l.code, n.is_default, n.is_foil, n.is_errata, "
-            "a.name, nm.name, img.path "
+            "SELECT n.id, n.card_fk, n.set_fk, n.print_variant_fk, n.language_fk, "
+            "n.is_default, n.is_foil, n.is_errata, "
+            "nm.name, img.path, n.artist_fk "
             "FROM naip n "
-            'LEFT JOIN "set" s ON s.id = n.set_fk '
-            "LEFT JOIN print_variant pv ON pv.id = n.print_variant_fk "
-            "LEFT JOIN language l ON l.id = n.language_fk "
-            "LEFT JOIN artist a ON a.id = n.artist_fk "
             "LEFT JOIN name nm ON nm.id = n.name_fk "
             "LEFT JOIN image img ON img.id = n.image_fk "
             f"{where} ORDER BY n.card_fk, n.set_fk, n.sort_order LIMIT :limit OFFSET :offset"
         ).bindparams(**filter_params, limit=limit, offset=offset)
     ).all()
-    total = session.exec(
-        text(f"SELECT COUNT(*) FROM naip n {where}").bindparams(**filter_params)
-    ).scalar()
+    total = session.exec(text(f"SELECT COUNT(*) FROM naip n {where}").bindparams(**filter_params)).scalar()
+
+    expand_set = {e.strip() for e in expand.split(",")} if expand else set()
+
+    card_map = _expand_cards_bulk([r[1] for r in rows], session) if "card" in expand_set else {}
+    set_map = _expand_sets_bulk([r[2] for r in rows], session) if "set" in expand_set else {}
+    pv_map = _expand_print_variants_bulk([r[3] for r in rows], session) if "print_variant" in expand_set else {}
+    lang_map = _expand_languages_bulk([r[4] for r in rows], session) if "language" in expand_set else {}
+    artist_map = _expand_artists_bulk([r[10] for r in rows], session) if "artist" in expand_set else {}
 
     return NaipListResponse(
         rows=[
             NaipListItem(
                 id=r[0],
-                card_fk=r[1],
-                set_fk=r[2],
-                set_code=r[3],
-                print_variant_fk=r[4],
-                print_variant_symbol=r[5],
-                language_fk=r[6],
-                language_code=r[7],
-                is_default=bool(r[8]),
-                is_foil=bool(r[9]),
-                is_errata=bool(r[10]),
-                artist_name=r[11],
-                name=r[12],
-                image_path=r[13],
+                card=card_map.get(r[1], r[1]),
+                set=set_map.get(r[2], r[2]),
+                print_variant=pv_map.get(r[3], r[3]),
+                language=_stripe(r[4], "language", expand_set, lang_map),
+                artist=_stripe(r[10], "artist", expand_set, artist_map),
+                is_default=bool(r[5]),
+                is_foil=bool(r[6]),
+                is_errata=bool(r[7]),
+                name=r[8],
+                image_path=r[9],
             )
             for r in rows
         ],
@@ -342,11 +344,12 @@ def list_naips(
 
 
 @router.get("/{naip_id}", response_model=NaipDetail, dependencies=[Depends(require_read_key)])
-def get_naip(naip_id: int, session: Session = Depends(get_session)):
+def get_naip(naip_id: int, expand: str | None = Query(None), session: Session = Depends(get_session)):
     naip = session.get(Naip, naip_id)
     if not naip:
         raise HTTPException(status_code=404, detail="Naip not found")
-    return _enrich_naip(naip, session)
+    expand_set = {e.strip() for e in expand.split(",")} if expand else set()
+    return _enrich_naip(naip, session, expand_set)
 
 
 @router.post("/", response_model=NaipDetail, status_code=201, dependencies=[Depends(require_edit_key)])
@@ -419,6 +422,8 @@ async def upload_naip_image_from_url(naip_id: int, payload: ImageUrlPayload, ses
             raw = resp.content
     except httpx.HTTPError as e:
         raise HTTPException(status_code=400, detail=f"Failed to fetch image: {e}")
+    if len(raw) > MAX_IMAGE_BYTES:
+        raise HTTPException(status_code=413, detail="Image exceeds the 10 MB limit")
     img = save_image(raw, suffix, session)
     replace_naip_image(naip, img.id, session)
     session.commit()
@@ -435,6 +440,8 @@ async def upload_naip_image(naip_id: int, file: UploadFile = File(...), session:
     if suffix not in VALID_SUFFIXES:
         raise HTTPException(status_code=400, detail="Only jpg, png, webp images are accepted")
     raw = await file.read()
+    if len(raw) > MAX_IMAGE_BYTES:
+        raise HTTPException(status_code=413, detail="Image exceeds the 10 MB limit")
     img = save_image(raw, suffix, session)
     replace_naip_image(naip, img.id, session)
     session.commit()

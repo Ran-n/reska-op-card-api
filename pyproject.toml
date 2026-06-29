@@ -28,14 +28,16 @@ list-keys = "reska_op_card_api.cli:list_keys"
 dev = ["pytest>=9.0.2", "ruff>=0.15.7"]
 
 [build-system]
-requires = ["setuptools"]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.hatch.build.targets.wheel]
+packages = ["src/reska_op_card_api"]
 
 [tool.ruff]
 line-length = 120
 target-version = "py314"
+preview = true
 exclude = ["alembic/versions"]
 
 [tool.ruff.lint]

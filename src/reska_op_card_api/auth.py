@@ -4,15 +4,18 @@ Authors: Ran# <ran.hash@proton.me>
 Created: 2026/06/28
 """
 
+import logging
+
 import blake3
-from sqlalchemy import func, update
 from fastapi import Depends, HTTPException, Query, Request, Security
 from fastapi.security import APIKeyHeader
+from sqlalchemy import func, update
 from sqlmodel import Session, select
 
 from reska_op_card_api.database import get_session
 from reska_op_card_api.models import ApiKey
 
+_log = logging.getLogger(__name__)
 _key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
 
@@ -29,6 +32,7 @@ def _resolve_key(
     key_hash = blake3.blake3(key.encode()).hexdigest()
     record = session.exec(select(ApiKey).where(ApiKey.key == key_hash)).first()
     if not record or record.revoked_ts is not None:
+        _log.warning("auth rejected: %s %s", request.method, request.url.path)
         raise HTTPException(status_code=401, detail="Invalid API key")
     session.execute(
         update(ApiKey)

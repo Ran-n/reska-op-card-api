@@ -61,7 +61,7 @@ def _render(
     rows = ""
     for k in sorted(keys, key=lambda k: k.label.lower()):
         is_deleted = k.revoked_ts is not None
-        row_class = " class=\"tr-deleted\"" if is_deleted else ""
+        row_class = ' class="tr-deleted"' if is_deleted else ""
         if is_deleted:
             perm = "revoked"
             perm_class = "badge-revoked"
@@ -114,7 +114,8 @@ def _render(
     if new_key:
         new_key_html = f"""
         <div class="banner banner-success">
-          <div class="banner-title">Key created for <em>{html.escape(new_label or "")}</em> — copy it now, it won't be shown again</div>
+          <div class="banner-title">Key created for <em>{html.escape(new_label or "")}</em>
+          — copy it now, it won&#x27;t be shown again</div>
           <div class="key-row">
             <code id="new-key">{html.escape(new_key)}</code>
             <button class="btn-copy" onclick="copyKey(this)">Copy</button>
@@ -714,7 +715,10 @@ def _render_dashboard() -> str:
       border-radius: 5px; padding: 3px 9px;
     }}
     .page {{ max-width: 860px; margin: 0 auto; padding: 2.5rem 2rem; }}
-    .page-heading {{ font-size: 1.35rem; font-weight: 700; letter-spacing: -.02em; color: var(--text); margin-bottom: .35rem; }}
+    .page-heading {{
+      font-size: 1.35rem; font-weight: 700; letter-spacing: -.02em;
+      color: var(--text); margin-bottom: .35rem;
+    }}
     .page-sub {{ font-size: .85rem; color: var(--text-2); margin-bottom: 2rem; }}
     .grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }}
     .tile {{
@@ -738,7 +742,8 @@ def _render_dashboard() -> str:
 <body>
   <header class="topbar">
     <div class="logo">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
         <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
       </svg>

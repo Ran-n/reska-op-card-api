@@ -1,15 +1,15 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/06/28 01:21:47.151363
+Revised: 2026/06/29 07:49:05.010136
 """
 
 from fastapi import APIRouter, Depends
-from reska_op_card_api.auth import require_read_key
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
+from reska_op_card_api.auth import require_read_key
 from reska_op_card_api.database import get_session
 from reska_op_card_api.models import (
     Artist,

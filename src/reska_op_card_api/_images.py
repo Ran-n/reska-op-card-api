@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/30 00:00:00.000000
@@ -19,6 +19,7 @@ CARDS_DIR = IMAGES_DIR / "cards"
 CARDS_DIR.mkdir(parents=True, exist_ok=True)
 
 VALID_SUFFIXES = frozenset({".jpg", ".jpeg", ".png", ".webp"})
+MAX_IMAGE_BYTES = 10 * 1024 * 1024  # 10 MB
 
 
 def save_image(raw: bytes, suffix: str, session: Session) -> Image:
