@@ -2,11 +2,19 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/06/12 13:37:30.058204
-Revised: 2026/06/29 08:55:36.299211
+Revised: 2026/06/30 13:59:19.383733
 """
 
 from pydantic import BaseModel, field_validator
 from sqlmodel import Session, select, text
+
+
+def _parse_expand(expand: str | None, all_fields: set[str]) -> set[str]:
+    """Parse a comma-separated ``expand`` query param; ``all`` expands every supported field."""
+    if not expand:
+        return set()
+    requested = {e.strip() for e in expand.split(",")}
+    return set(all_fields) if "all" in requested else requested
 
 
 class LookupItem(BaseModel):
@@ -294,6 +302,63 @@ def _expand_cards_bulk(card_fks: list[int | None], session: Session) -> dict[int
                 getattr(cards[card_fk_val], attr_name).append(LookupItem(id=item_id, name=item_name))
 
     return cards
+
+
+_NAIP_JUNCTION_SPECS = [
+    ("naip_color", "naip_fk", "color_fk", "color", "colors"),
+    ("naip_tribe", "naip_fk", "tribe_fk", "tribe", "tribes"),
+    ("naip_attribute", "naip_fk", "attribute_fk", "attribute", "attrs"),
+    ("naip_keyword", "naip_fk", "keyword_fk", "keyword", "keywords"),
+    ("naip_resword", "naip_fk", "resword_fk", "resword", "reswords"),
+]
+
+
+def _bulk_naip_extras(naip_ids: list[int], session: Session, expand: set[str] | None = None) -> dict[int, dict]:
+    """Batch-resolve effect/trigger text and junction tags for a set of naip ids.
+
+    Junction tag lists (colors/tribes/attrs/keywords/reswords) are only populated for keys
+    present in ``expand``, mirroring the FK-field expand convention.
+    """
+    expand = expand or set()
+    extras: dict[int, dict] = {
+        nid: {"effect": None, "trigger": None, "colors": [], "tribes": [], "attrs": [], "keywords": [], "reswords": []}
+        for nid in naip_ids
+    }
+    if not naip_ids:
+        return extras
+    id_list = ",".join(str(i) for i in naip_ids)
+
+    fk_rows = session.exec(text(f"SELECT id, effect_fk, trigger_fk FROM naip WHERE id IN ({id_list})")).all()
+    effect_fks = [r[1] for r in fk_rows if r[1]]
+    trigger_fks = [r[2] for r in fk_rows if r[2]]
+    effect_map: dict[int, str] = {}
+    trigger_map: dict[int, str] = {}
+    if effect_fks:
+        fk_str = ",".join(str(i) for i in set(effect_fks))
+        for r in session.exec(text(f"SELECT id, effect FROM effect WHERE id IN ({fk_str})")).all():
+            effect_map[r[0]] = r[1]
+    if trigger_fks:
+        fk_str = ",".join(str(i) for i in set(trigger_fks))
+        for r in session.exec(text(f'SELECT id, "trigger" FROM "trigger" WHERE id IN ({fk_str})')).all():
+            trigger_map[r[0]] = r[1]
+    for nid, efk, tfk in fk_rows:
+        extras[nid]["effect"] = effect_map.get(efk) if efk else None
+        extras[nid]["trigger"] = trigger_map.get(tfk) if tfk else None
+
+    for junc_table, fk_col, item_fk_col, item_table, attr_name in _NAIP_JUNCTION_SPECS:
+        if attr_name not in expand:
+            continue
+        rows = session.exec(
+            text(
+                f"SELECT j.{fk_col}, t.id, t.name FROM {item_table} t "
+                f"JOIN {junc_table} j ON j.{item_fk_col} = t.id "
+                f"WHERE j.{fk_col} IN ({id_list})"
+            )
+        ).all()
+        for naip_fk_val, item_id, item_name in rows:
+            extras[naip_fk_val][attr_name].append(LookupItem(id=item_id, name=item_name))
+
+    return extras
 
 
 def _stripe(fk: int | None, key: str, expand_set: set[str], expand_map: dict):

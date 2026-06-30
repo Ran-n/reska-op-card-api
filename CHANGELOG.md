@@ -16,6 +16,11 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Added
 
+- `NaipItem` (embedded in `GET /cards/{id}` and `GET /cards/?expand=naips`) gains `language`, `cardtype`, `block`, `sort_order`, `serial_max`, `power`, `life`, `counter`, `cost`, `effect`, `trigger`, `colors`, `tribes`, `attrs`, `keywords`, `reswords` — closes the gap that previously forced clients to re-fetch each naip individually via `GET /naips/{id}` to populate an edit panel
+- `NaipListItem` (`GET /naips/`) gains the same fields as `NaipItem`, achieving parity with `NaipDetail`
+- `CardListItem` (`GET /cards/`) gains `block`, `effect`, `trigger`, `life`, `tribes`, `attrs`, `formats`, `keywords`, `reswords`, achieving parity with `CardDetail`
+- Junction tag lists (`colors`, `tribes`, `attrs`, `formats`, `keywords`, `reswords`) on card and naip responses now follow the FK `expand` convention: omitted from `expand` they return `[]`; listed, they return the populated tag array, batched via one `IN (...)` query per junction table; on `GET /cards/{id}?expand=naips,colors` a junction key applies to both the card itself and each embedded naip
+- `_bulk_naip_extras()` (`_common.py`, shared by `cards.py` and `naips.py`) and `_bulk_card_extras()` (`cards.py`) — batch helpers resolving effect/trigger text and junction tags for a set of naip/card ids, mirroring `_expand_cards_bulk`'s `IN (...)` pattern; both accept an `expand` set gating which junction queries run
 - `?expand=field1,field2,...` query parameter on `GET /cards/`, `GET /cards/{id}`, `GET /naips/`, `GET /naips/{id}`, `GET /sets/`, `GET /sets/{id}` — when a field name is listed, the corresponding FK integer is replaced with a full inline object (`ExpandedSet`, `ExpandedCardType`, etc.) instead of a bare FK
 - `Expanded*` Pydantic models in `_common.py`: `ExpandedSet`, `ExpandedCardType`, `ExpandedRarity`, `ExpandedPrintVariant`, `ExpandedLanguage`, `ExpandedBlock`, `ExpandedSetType`, `ExpandedArtist`, `ExpandedCard` — used as the expanded side of polymorphic `int | Expanded*` response fields
 - `_expand_*_bulk()` helpers in `_common.py` — one bulk `IN (...)` query per expand type, batching all FK lookups for a list response into a single round-trip; `ExpandedCard` bulk loader also resolves name/effect/trigger dedup tables and all five M2M junctions in one pass
@@ -25,6 +30,7 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Changed
 
+- `CardListItem.colors`: comma-joined string replaced by `list[LookupItem]`, consistent with `CardDetail.colors`; gated behind `expand=colors` like the other junction tag lists
 - `CardDetail`: `set_fk`, `cardtype_fk`, `rarity_fk` replaced by polymorphic `set`, `cardtype`, `rarity` fields; `block` added as direct `int | ExpandedBlock` field; `blocks: list[LookupItem]` removed; flat denormalized strings `set_code`, `set_name`, `cardtype_name`, `cardtype_symbol`, `rarity_name`, `rarity_symbol` removed
 - `CardListItem`: `set_fk`, `cardtype_fk` replaced by `set`, `cardtype`; `rarity` field added; flat `set_code`, `cardtype_name`, `rarity_symbol` removed
 - `NaipDetail`: `card_fk`, `set_fk`, `artist_fk`, `print_variant_fk`, `language_fk`, `cardtype_fk`, `block_fk` replaced by polymorphic `card`, `set`, `artist`, `print_variant`, `language`, `cardtype`, `block`; flat `artist_name`, `print_variant_name`, `print_variant_symbol`, `set_code`, `cardtype_name`, `cardtype_symbol`, `language_code` removed

@@ -7,7 +7,7 @@ Created: 2026/06/29
 import pytest
 from sqlmodel import Session
 
-from reska_op_card_api.models import Set
+from reska_op_card_api.models import Color, Set
 
 
 @pytest.fixture(scope="module")
@@ -58,6 +58,42 @@ def test_list_cards_name_filter(client, read_key, created_card):
     r = client.get(f"/cards/?name={name[:5]}", headers={"X-API-Key": read_key})
     assert r.status_code == 200
     assert r.json()["total"] >= 1
+
+
+def test_list_cards_includes_card_detail_fields(test_engine, client, edit_key, read_key, test_set, seed):
+    with Session(test_engine) as s:
+        color = Color(name="Blue Test")
+        s.add(color)
+        s.commit()
+        s.refresh(color)
+        color_id = color.id
+
+    payload = {
+        "set_fk": test_set,
+        "cardtype_fk": seed["cardtype_fk"],
+        "number": 42,
+        "name": "Nico Robin",
+        "life": 5,
+        "effect": "List endpoint card effect",
+        "trigger": "List endpoint card trigger",
+        "colors": [color_id],
+    }
+    r = client.post("/cards/", json=payload, headers={"X-API-Key": edit_key})
+    assert r.status_code == 201
+    card_id = r.json()["id"]
+
+    r = client.get(f"/cards/?set_id={test_set}", headers={"X-API-Key": read_key})
+    assert r.status_code == 200
+    row = next(row for row in r.json()["rows"] if row["id"] == card_id)
+    assert row["life"] == 5
+    assert row["effect"] == "List endpoint card effect"
+    assert row["trigger"] == "List endpoint card trigger"
+    assert row["colors"] == []
+
+    r = client.get(f"/cards/?set_id={test_set}&expand=colors", headers={"X-API-Key": read_key})
+    assert r.status_code == 200
+    row = next(row for row in r.json()["rows"] if row["id"] == card_id)
+    assert any(c["id"] == color_id for c in row["colors"])
 
 
 # ── Create ───────────────────────────────────────────────────────────────────
@@ -129,6 +165,23 @@ def test_get_card_found(client, read_key, created_card):
 def test_get_card_not_found(client, read_key):
     r = client.get("/cards/999999", headers={"X-API-Key": read_key})
     assert r.status_code == 404
+
+
+def test_get_card_expand_all(client, read_key, created_card):
+    r = client.get(f"/cards/{created_card['id']}?expand=all", headers={"X-API-Key": read_key})
+    assert r.status_code == 200
+    data = r.json()
+    assert isinstance(data["set"], dict)
+    assert isinstance(data["cardtype"], dict)
+
+
+def test_list_cards_expand_all(client, read_key, created_card):
+    r = client.get(f"/cards/?name={created_card['name'][:5]}&expand=all", headers={"X-API-Key": read_key})
+    assert r.status_code == 200
+    data = r.json()
+    row = next(row for row in data["rows"] if row["id"] == created_card["id"])
+    assert isinstance(row["set"], dict)
+    assert isinstance(row["cardtype"], dict)
 
 
 # ── Update ───────────────────────────────────────────────────────────────────

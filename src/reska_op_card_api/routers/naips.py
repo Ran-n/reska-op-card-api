@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/30 00:00:00.000000
-Revised: 2026/06/29 08:55:36.299211
+Revised: 2026/06/30 12:51:50.528531
 """
 
 from pathlib import Path
@@ -44,6 +44,7 @@ from reska_op_card_api.routers._common import (
     ExpandedSet,
     ImageUrlPayload,
     LookupItem,
+    _bulk_naip_extras,
     _expand_artists_bulk,
     _expand_blocks_bulk,
     _expand_cards_bulk,
@@ -51,12 +52,25 @@ from reska_op_card_api.routers._common import (
     _expand_languages_bulk,
     _expand_print_variants_bulk,
     _expand_sets_bulk,
+    _parse_expand,
     _resolve_text,
     _stripe,
     _upsert_text_fk,
 )
 
 router = APIRouter(prefix="/naips", tags=["naips"])
+
+_JUNCTION_EXPAND_FIELDS = {"colors", "tribes", "attrs", "keywords", "reswords"}
+_DETAIL_EXPAND_FIELDS = {
+    "card",
+    "set",
+    "artist",
+    "print_variant",
+    "language",
+    "cardtype",
+    "block",
+} | _JUNCTION_EXPAND_FIELDS
+_LIST_EXPAND_FIELDS = {"card", "set", "print_variant", "language", "artist"} | _JUNCTION_EXPAND_FIELDS
 
 
 # ── Response / write models ──────────────────────────────────────────────────
@@ -99,11 +113,26 @@ class NaipListItem(BaseModel):
     print_variant: int | ExpandedPrintVariant
     language: int | ExpandedLanguage | None = None
     artist: int | ExpandedArtist | None = None
+    cardtype: int | None = None
+    block: int | None = None
     is_default: bool
     is_foil: bool
     is_errata: bool
+    sort_order: int | None = None
+    serial_max: int | None = None
+    power: int | None = None
+    life: int | None = None
+    counter: int | None = None
+    cost: int | None = None
     name: str | None = None
+    effect: str | None = None
+    trigger: str | None = None
     image_path: str | None = None
+    colors: list[LookupItem] = []
+    tribes: list[LookupItem] = []
+    attrs: list[LookupItem] = []
+    keywords: list[LookupItem] = []
+    reswords: list[LookupItem] = []
 
 
 class NaipListResponse(BaseModel):
@@ -176,32 +205,54 @@ def _enrich_naip(naip: Naip, session: Session, expand: set[str] | None = None) -
     effect = _resolve_text(session, Effect, naip.effect_fk, "effect")
     trigger = _resolve_text(session, Trigger, naip.trigger_fk, "trigger")
 
-    color_rows = session.exec(
-        text(
-            "SELECT co.id, co.name FROM color co JOIN naip_color nc ON nc.color_fk = co.id WHERE nc.naip_fk = :nid"
-        ).bindparams(nid=naip.id)
-    ).all()
-    tribe_rows = session.exec(
-        text(
-            "SELECT t.id, t.name FROM tribe t JOIN naip_tribe nt ON nt.tribe_fk = t.id WHERE nt.naip_fk = :nid"
-        ).bindparams(nid=naip.id)
-    ).all()
-    attr_rows = session.exec(
-        text(
-            "SELECT a.id, a.name FROM attribute a "
-            "JOIN naip_attribute na ON na.attribute_fk = a.id WHERE na.naip_fk = :nid"
-        ).bindparams(nid=naip.id)
-    ).all()
-    kw_rows = session.exec(
-        text(
-            "SELECT k.id, k.name FROM keyword k JOIN naip_keyword nk ON nk.keyword_fk = k.id WHERE nk.naip_fk = :nid"
-        ).bindparams(nid=naip.id)
-    ).all()
-    rw_rows = session.exec(
-        text(
-            "SELECT r.id, r.name FROM resword r JOIN naip_resword nr ON nr.resword_fk = r.id WHERE nr.naip_fk = :nid"
-        ).bindparams(nid=naip.id)
-    ).all()
+    color_rows = (
+        session.exec(
+            text(
+                "SELECT co.id, co.name FROM color co JOIN naip_color nc ON nc.color_fk = co.id WHERE nc.naip_fk = :nid"
+            ).bindparams(nid=naip.id)
+        ).all()
+        if "colors" in expand
+        else []
+    )
+    tribe_rows = (
+        session.exec(
+            text(
+                "SELECT t.id, t.name FROM tribe t JOIN naip_tribe nt ON nt.tribe_fk = t.id WHERE nt.naip_fk = :nid"
+            ).bindparams(nid=naip.id)
+        ).all()
+        if "tribes" in expand
+        else []
+    )
+    attr_rows = (
+        session.exec(
+            text(
+                "SELECT a.id, a.name FROM attribute a "
+                "JOIN naip_attribute na ON na.attribute_fk = a.id WHERE na.naip_fk = :nid"
+            ).bindparams(nid=naip.id)
+        ).all()
+        if "attrs" in expand
+        else []
+    )
+    kw_rows = (
+        session.exec(
+            text(
+                "SELECT k.id, k.name FROM keyword k "
+                "JOIN naip_keyword nk ON nk.keyword_fk = k.id WHERE nk.naip_fk = :nid"
+            ).bindparams(nid=naip.id)
+        ).all()
+        if "keywords" in expand
+        else []
+    )
+    rw_rows = (
+        session.exec(
+            text(
+                "SELECT r.id, r.name FROM resword r "
+                "JOIN naip_resword nr ON nr.resword_fk = r.id WHERE nr.naip_fk = :nid"
+            ).bindparams(nid=naip.id)
+        ).all()
+        if "reswords" in expand
+        else []
+    )
 
     card_map = _expand_cards_bulk([naip.card_fk], session) if "card" in expand else {}
     set_map = _expand_sets_bulk([naip.set_fk], session) if "set" in expand else {}
@@ -305,7 +356,8 @@ def list_naips(
         text(
             "SELECT n.id, n.card_fk, n.set_fk, n.print_variant_fk, n.language_fk, "
             "n.is_default, n.is_foil, n.is_errata, "
-            "nm.name, img.path, n.artist_fk "
+            "nm.name, img.path, n.artist_fk, n.cardtype_fk, n.block_fk, "
+            "n.sort_order, n.serial_max, n.power, n.life, n.counter, n.cost "
             "FROM naip n "
             "LEFT JOIN name nm ON nm.id = n.name_fk "
             "LEFT JOIN image img ON img.id = n.image_fk "
@@ -314,13 +366,14 @@ def list_naips(
     ).all()
     total = session.exec(text(f"SELECT COUNT(*) FROM naip n {where}").bindparams(**filter_params)).scalar()
 
-    expand_set = {e.strip() for e in expand.split(",")} if expand else set()
+    expand_set = _parse_expand(expand, _LIST_EXPAND_FIELDS)
 
     card_map = _expand_cards_bulk([r[1] for r in rows], session) if "card" in expand_set else {}
     set_map = _expand_sets_bulk([r[2] for r in rows], session) if "set" in expand_set else {}
     pv_map = _expand_print_variants_bulk([r[3] for r in rows], session) if "print_variant" in expand_set else {}
     lang_map = _expand_languages_bulk([r[4] for r in rows], session) if "language" in expand_set else {}
     artist_map = _expand_artists_bulk([r[10] for r in rows], session) if "artist" in expand_set else {}
+    naip_extras = _bulk_naip_extras([r[0] for r in rows], session, expand_set)
 
     return NaipListResponse(
         rows=[
@@ -331,11 +384,20 @@ def list_naips(
                 print_variant=pv_map.get(r[3], r[3]),
                 language=_stripe(r[4], "language", expand_set, lang_map),
                 artist=_stripe(r[10], "artist", expand_set, artist_map),
+                cardtype=r[11],
+                block=r[12],
                 is_default=bool(r[5]),
                 is_foil=bool(r[6]),
                 is_errata=bool(r[7]),
+                sort_order=r[13],
+                serial_max=r[14],
+                power=r[15],
+                life=r[16],
+                counter=r[17],
+                cost=r[18],
                 name=r[8],
                 image_path=r[9],
+                **naip_extras[r[0]],
             )
             for r in rows
         ],
@@ -348,7 +410,7 @@ def get_naip(naip_id: int, expand: str | None = Query(None), session: Session = 
     naip = session.get(Naip, naip_id)
     if not naip:
         raise HTTPException(status_code=404, detail="Naip not found")
-    expand_set = {e.strip() for e in expand.split(",")} if expand else set()
+    expand_set = _parse_expand(expand, _DETAIL_EXPAND_FIELDS)
     return _enrich_naip(naip, session, expand_set)
 
 

@@ -110,15 +110,15 @@ All endpoints (except `GET /`) require `X-API-Key`. Edit endpoints additionally 
 | `POST /admin/keys/{id}/delete` | Basic | Revoke a key (soft-delete) |
 | `POST /admin/keys/{id}/restore` | Basic | Restore a revoked key |
 | `POST /admin/keys/{id}/purge` | Basic | Permanently delete a key and its logs |
-| `GET /cards/` | read | List cards (filter: `name`, `set_id`, `cardtype_id`; paginate: `offset`, `limit`; expand: `set`, `cardtype`, `rarity`) |
+| `GET /cards/` | read | List cards (filter: `name`, `set_id`, `cardtype_id`; paginate: `offset`, `limit`; expand: `set`, `cardtype`, `rarity`, `naips`, `colors`, `tribes`, `attrs`, `formats`, `keywords`, `reswords`) |
 | `POST /cards/` | edit | Create a card |
-| `GET /cards/{id}` | read | Get card detail (expand: `set`, `cardtype`, `rarity`, `block`) |
+| `GET /cards/{id}` | read | Get card detail (expand: `set`, `cardtype`, `rarity`, `block`, `naips`, `colors`, `tribes`, `attrs`, `formats`, `keywords`, `reswords`) |
 | `PUT /cards/{id}` | edit | Update a card |
 | `DELETE /cards/{id}` | edit | Delete a card |
 | `POST /cards/{id}/image` | edit | Upload card image (multipart file, max 10 MB) |
 | `POST /cards/{id}/image-url` | edit | Fetch and store card image from URL (max 10 MB) |
-| `GET /naips/` | read | List naips (filter: `card_fk`, `set_id`, `language_id`, `print_variant_id`, `is_default`; paginate: `offset`, `limit`; expand: `card`, `set`, `print_variant`, `language`, `artist`) |
-| `GET /naips/{id}` | read | Get naip detail (expand: `card`, `set`, `artist`, `print_variant`, `language`, `cardtype`, `block`) |
+| `GET /naips/` | read | List naips (filter: `card_fk`, `set_id`, `language_id`, `print_variant_id`, `is_default`; paginate: `offset`, `limit`; expand: `card`, `set`, `print_variant`, `language`, `artist`, `colors`, `tribes`, `attrs`, `keywords`, `reswords`) |
+| `GET /naips/{id}` | read | Get naip detail (expand: `card`, `set`, `artist`, `print_variant`, `language`, `cardtype`, `block`, `colors`, `tribes`, `attrs`, `keywords`, `reswords`) |
 | `POST /naips/` | edit | Create a naip |
 | `PUT /naips/{id}` | edit | Update a naip |
 | `DELETE /naips/{id}` | edit | Delete a naip |
@@ -154,6 +154,8 @@ GET /sets/?expand=language,parent,type
 ```
 
 Expanded fields return an object (`{ "id": ..., "code": ..., "name": ... }`) instead of a plain `int`. Fields not listed in `expand` remain as integers.
+
+Junction tag lists (`colors`, `tribes`, `attrs`, `formats`, `keywords`, `reswords`) follow the same convention: omitted from `expand` they return `[]`; listed in `expand` they return the full tag array. On `GET /cards/{id}` and `GET /cards/?expand=naips`, tag keys in `expand` apply to both the card itself and each embedded naip.
 
 ## Data model
 

@@ -135,7 +135,6 @@ def _render(
     label_value = f'value="{html.escape(input_label)}"' if input_label else ""
     toggle_href = "/admin/keys?show_deleted=0" if show_deleted else "/admin/keys"
     toggle_label = "Hide revoked" if show_deleted else f"Show revoked ({deleted_count})"
-    toggle_html = f'<a class="toggle-link" href="{toggle_href}">{toggle_label}</a>'
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -145,6 +144,7 @@ def _render(
   <title>Key Manager · reska-op-card-api</title>
   <link rel="icon" type="image/svg+xml" href="/static/admin-keys.svg">
   <style>
+    @keyframes spin {{ to {{ transform: rotate(360deg); }} }}
     *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
 
     :root {{
@@ -360,6 +360,27 @@ def _render(
     }}
     .toggle-link:hover {{ color: var(--text-2); }}
 
+    .btn-refresh {{
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-3);
+      border-radius: 8px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      line-height: 1;
+      transition: color .1s, border-color .1s, background .1s, transform .1s;
+      flex-shrink: 0;
+    }}
+    .btn-refresh:hover {{ color: var(--text-2); border-color: var(--text-3); background: var(--surface-hi); }}
+    .btn-refresh:active {{ transform: scale(.88); background: var(--border-sub); }}
+    .btn-refresh.loading {{ pointer-events: none; }}
+    .btn-refresh.loading .icon-refresh {{ animation: spin .6s linear infinite; display: inline-block; }}
+    .btn-refresh:disabled {{ opacity: .45; cursor: default; }}
+
     /* ── Create form ── */
     .form-row {{ display: flex; gap: .875rem; align-items: flex-end; flex-wrap: wrap; }}
     .field {{ display: flex; flex-direction: column; gap: .35rem; }}
@@ -525,19 +546,19 @@ def _render(
     <div class="stats">
       <div class="stat">
         <div class="stat-label">Total Keys</div>
-        <div class="stat-value">{total_count}</div>
+        <div class="stat-value" id="stat-total">{total_count}</div>
       </div>
       <div class="stat">
         <div class="stat-label">Active Keys</div>
-        <div class="stat-value">{active_count}</div>
+        <div class="stat-value" id="stat-active">{active_count}</div>
       </div>
       <div class="stat">
         <div class="stat-label">Revoked</div>
-        <div class="stat-value">{deleted_count}</div>
+        <div class="stat-value" id="stat-revoked">{deleted_count}</div>
       </div>
       <div class="stat">
         <div class="stat-label">Total Requests</div>
-        <div class="stat-value">{total_requests}</div>
+        <div class="stat-value" id="stat-requests">{total_requests}</div>
       </div>
     </div>
 
@@ -566,9 +587,12 @@ def _render(
 
     <div class="card">
       <div class="card-header">
+        <button class="btn-refresh" id="refresh-btn" type="button" onclick="refreshTable()" title="Refresh keys">
+          <span class="icon-refresh">↻</span>
+        </button>
         <h2 class="card-title">Keys</h2>
-        <span class="pill">{active_count} active</span>
-        {toggle_html}
+        <span class="pill" id="pill-active">{active_count} active</span>
+        <a class="toggle-link" id="toggle-link" href="{toggle_href}">{toggle_label}</a>
       </div>
       <div style="overflow-x:auto">
       <table>
@@ -584,7 +608,7 @@ def _render(
             <th></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="keys-tbody">
           {rows}{empty_row}
         </tbody>
       </table>
@@ -602,17 +626,53 @@ def _render(
       }});
     }}
 
-    (function () {{
-      let sortCol = null, sortAsc = true;
+    async function refreshTable() {{
+      const btn = document.getElementById('refresh-btn');
+      btn.disabled = true;
+      btn.classList.add('loading');
+      try {{
+        const res = await fetch(window.location.href, {{credentials: 'include'}});
+        if (!res.ok) throw new Error(res.status);
+        const text = await res.text();
+        const doc = new DOMParser().parseFromString(text, 'text/html');
+        const swap = (id) => {{
+          const src = doc.getElementById(id);
+          const dst = document.getElementById(id);
+          if (src && dst) dst.innerHTML = src.innerHTML;
+        }};
+        swap('keys-tbody');
+        swap('stat-total');
+        swap('stat-active');
+        swap('stat-revoked');
+        swap('stat-requests');
+        swap('pill-active');
+        const newToggle = doc.getElementById('toggle-link');
+        const curToggle = document.getElementById('toggle-link');
+        if (newToggle && curToggle) {{
+          curToggle.href = newToggle.href;
+          curToggle.textContent = newToggle.textContent;
+        }}
+        initSort();
+      }} catch (e) {{
+        console.error('Refresh failed:', e);
+      }} finally {{
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }}
+    }}
+
+    let _sortCol = null, _sortAsc = true;
+
+    function initSort() {{
       const ths = document.querySelectorAll('th[data-col]');
-      const tbody = document.querySelector('tbody');
+      const tbody = document.getElementById('keys-tbody');
       const origOrder = Array.from(tbody.querySelectorAll('tr'));
 
       function applySort(col, type, asc) {{
         const rows = Array.from(tbody.querySelectorAll('tr'));
         rows.sort((a, b) => {{
-          const av = a.cells[col] ? a.cells[col].textContent.trim().replace(/\s+/g, ' ') : '';
-          const bv = b.cells[col] ? b.cells[col].textContent.trim().replace(/\s+/g, ' ') : '';
+          const av = a.cells[col] ? a.cells[col].textContent.trim().replace(/\\s+/g, ' ') : '';
+          const bv = b.cells[col] ? b.cells[col].textContent.trim().replace(/\\s+/g, ' ') : '';
           let cmp = type === 'num' ? (+av || 0) - (+bv || 0)
                                    : av.localeCompare(bv, undefined, {{sensitivity: 'base', numeric: true}});
           return asc ? cmp : -cmp;
@@ -621,25 +681,29 @@ def _render(
       }}
 
       function clearSort() {{
-        sortCol = null;
+        _sortCol = null;
         ths.forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
         origOrder.forEach(r => tbody.appendChild(r));
       }}
 
       ths.forEach(th => {{
+        th.onclick = null;
+        th.oncontextmenu = null;
         th.addEventListener('click', () => {{
           const col = +th.dataset.col;
           const type = th.dataset.type;
-          if (sortCol === col) {{ sortAsc = !sortAsc; }} else {{ sortCol = col; sortAsc = true; }}
+          if (_sortCol === col) {{ _sortAsc = !_sortAsc; }} else {{ _sortCol = col; _sortAsc = true; }}
           ths.forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
-          th.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
-          applySort(col, type, sortAsc);
+          th.classList.add(_sortAsc ? 'sort-asc' : 'sort-desc');
+          applySort(col, type, _sortAsc);
         }});
         th.addEventListener('contextmenu', e => {{
-          if (sortCol === +th.dataset.col) {{ e.preventDefault(); clearSort(); }}
+          if (_sortCol === +th.dataset.col) {{ e.preventDefault(); clearSort(); }}
         }});
       }});
-    }})();
+    }}
+
+    initSort();
   </script>
 </body>
 </html>"""

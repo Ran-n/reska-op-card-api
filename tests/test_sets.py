@@ -37,3 +37,16 @@ def test_get_set_found(client, read_key, a_set):
 def test_get_set_not_found(client, read_key):
     r = client.get("/sets/999999", headers={"X-API-Key": read_key})
     assert r.status_code == 404
+
+
+def test_get_set_expand_all(client, read_key, a_set):
+    r = client.get(f"/sets/{a_set}?expand=all", headers={"X-API-Key": read_key})
+    assert r.status_code == 200
+    assert isinstance(r.json()["language"], dict)
+
+
+def test_list_sets_expand_all(client, read_key, a_set):
+    r = client.get("/sets/?expand=all", headers={"X-API-Key": read_key})
+    assert r.status_code == 200
+    row = next(row for row in r.json() if row["id"] == a_set)
+    assert isinstance(row["language"], dict)

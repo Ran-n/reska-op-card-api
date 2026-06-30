@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/06/29 08:55:36.299211
+Revised: 2026/06/30 12:51:50.611715
 """
 
 from datetime import date
@@ -21,10 +21,13 @@ from reska_op_card_api.routers._common import (
     _expand_languages_bulk,
     _expand_sets_bulk,
     _expand_settypes_bulk,
+    _parse_expand,
     _stripe,
 )
 
 router = APIRouter(prefix="/sets", tags=["sets"], dependencies=[Depends(require_read_key)])
+
+_EXPAND_FIELDS = {"language", "parent", "type"}
 
 
 class SetResponse(BaseModel):
@@ -54,7 +57,7 @@ def _build_set_response(s: Set, expand_set: set[str], lang_map: dict, parent_map
 @router.get("/", response_model=list[SetResponse])
 def list_sets(expand: str | None = Query(None), session: Session = Depends(get_session)):
     sets = session.exec(select(Set)).all()
-    expand_set = {e.strip() for e in expand.split(",")} if expand else set()
+    expand_set = _parse_expand(expand, _EXPAND_FIELDS)
 
     lang_map = _expand_languages_bulk([s.language_fk for s in sets], session) if "language" in expand_set else {}
     parent_map = _expand_sets_bulk([s.parent_fk for s in sets], session) if "parent" in expand_set else {}
@@ -68,7 +71,7 @@ def get_set(set_id: int, expand: str | None = Query(None), session: Session = De
     s = session.get(Set, set_id)
     if not s:
         raise HTTPException(status_code=404, detail="Set not found")
-    expand_set = {e.strip() for e in expand.split(",")} if expand else set()
+    expand_set = _parse_expand(expand, _EXPAND_FIELDS)
 
     lang_map = _expand_languages_bulk([s.language_fk], session) if "language" in expand_set else {}
     parent_map = _expand_sets_bulk([s.parent_fk], session) if "parent" in expand_set else {}
