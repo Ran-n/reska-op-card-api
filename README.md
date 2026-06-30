@@ -84,7 +84,7 @@ The raw key is printed once to stdout on creation. Store it securely — only th
 
 ### Key management (Admin UI)
 
-The web UI at `/admin/keys` lets you create, revoke, restore, and purge keys without the CLI. It requires HTTP Basic auth — set `ADMIN_USERNAME` and `ADMIN_PASSWORD` in `.env`.
+The web UI at `/admin/keys` lets you create, revoke, restore, reset request counts, and purge keys without the CLI. It requires HTTP Basic auth — set `ADMIN_USERNAME` and `ADMIN_PASSWORD` in `.env`.
 
 ## Data ingestion
 
@@ -105,10 +105,11 @@ All endpoints (except `GET /`) require `X-API-Key`. Edit endpoints additionally 
 |----------|------|-------------|
 | `GET /` | — | Health check |
 | `GET /admin` | Basic | Admin dashboard |
-| `GET /admin/keys` | Basic | Key manager UI — list, create, revoke, restore, purge |
+| `GET /admin/keys` | Basic | Key manager UI — list, create, revoke, restore, reset, purge |
 | `POST /admin/keys` | Basic | Create a key (form submission) |
 | `POST /admin/keys/{id}/delete` | Basic | Revoke a key (soft-delete) |
 | `POST /admin/keys/{id}/restore` | Basic | Restore a revoked key |
+| `POST /admin/keys/{id}/reset` | Basic | Reset a key's request count to 0 |
 | `POST /admin/keys/{id}/purge` | Basic | Permanently delete a key and its logs |
 | `GET /cards/` | read | List cards (filter: `name`, `set_id`, `cardtype_id`; paginate: `offset`, `limit`; expand: `set`, `cardtype`, `rarity`, `naips`, `colors`, `tribes`, `attrs`, `formats`, `keywords`, `reswords`) |
 | `POST /cards/` | edit | Create a card |

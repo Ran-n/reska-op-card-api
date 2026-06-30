@@ -82,6 +82,55 @@ def test_list_naips_filter_is_default(client, read_key, created_naip):
     assert all(row["is_default"] for row in data["rows"])
 
 
+def test_list_naips_search_filter(client, read_key, created_naip, naip_card):
+    r = client.get(f"/naips/?card_fk={naip_card}&search=Nami", headers={"X-API-Key": read_key})
+    assert r.status_code == 200
+    assert any(row["id"] == created_naip["id"] for row in r.json()["rows"])
+
+
+def test_list_naips_foil_filter(test_engine, client, edit_key, read_key, naip_set, naip_card, seed):
+    payload = {
+        "card_fk": naip_card,
+        "set_fk": naip_set,
+        "print_variant_fk": seed["print_variant_fk"],
+        "is_foil": True,
+    }
+    r = client.post("/naips/", json=payload, headers={"X-API-Key": edit_key})
+    foil_naip_id = r.json()["id"]
+
+    r = client.get(f"/naips/?card_fk={naip_card}&foil=true", headers={"X-API-Key": read_key})
+    assert r.status_code == 200
+    rows = r.json()["rows"]
+    assert any(row["id"] == foil_naip_id for row in rows)
+    assert all(row["is_foil"] for row in rows)
+
+
+def test_list_naips_color_names_any_filter(test_engine, client, edit_key, read_key, naip_set, naip_card, seed):
+    with Session(test_engine) as s:
+        color = Color(name="Naip Filter Color")
+        s.add(color)
+        s.commit()
+        s.refresh(color)
+        color_id = color.id
+
+    payload = {
+        "card_fk": naip_card,
+        "set_fk": naip_set,
+        "print_variant_fk": seed["print_variant_fk"],
+        "colors": [color_id],
+    }
+    r = client.post("/naips/", json=payload, headers={"X-API-Key": edit_key})
+    naip_id = r.json()["id"]
+
+    r = client.get(f"/naips/?card_fk={naip_card}&color_names_any=Naip Filter Color", headers={"X-API-Key": read_key})
+    assert r.status_code == 200
+    assert any(row["id"] == naip_id for row in r.json()["rows"])
+
+    r = client.get(f"/naips/?card_fk={naip_card}&color_names_any=Nonexistent Color", headers={"X-API-Key": read_key})
+    assert r.status_code == 200
+    assert all(row["id"] != naip_id for row in r.json()["rows"])
+
+
 def test_list_cards_expand_naips(client, read_key, created_naip, naip_card):
     r = client.get(f"/cards/?set_id={created_naip['set']}&expand=naips", headers={"X-API-Key": read_key})
     assert r.status_code == 200
@@ -137,7 +186,7 @@ def test_get_card_expand_naips_includes_naip_detail_fields(
     assert naip_row["serial_max"] == 100
     assert naip_row["effect"] == "Test naip effect"
     assert naip_row["trigger"] == "Test naip trigger"
-    assert naip_row["colors"] == []
+    assert naip_row["colors"] == [color_id]
 
     r = client.get(f"/cards/{naip_card}?expand=naips,colors", headers={"X-API-Key": read_key})
     assert r.status_code == 200
@@ -162,7 +211,7 @@ def test_list_naips_includes_naip_detail_fields(client, read_key, edit_key, naip
     row = next(n for n in r.json()["rows"] if n["id"] == naip_id)
     assert row["power"] == 4000
     assert row["effect"] == "List endpoint effect"
-    assert row["colors"] == []
+    assert row["colors"] == []  # no colors were assigned to this naip
 
 
 # ── Create ───────────────────────────────────────────────────────────────────
@@ -218,7 +267,9 @@ def test_get_naip_expand_all(client, read_key, created_naip):
     assert isinstance(data["print_variant"], dict)
 
 
-def test_get_naip_junction_lists_require_expand(test_engine, client, read_key, edit_key, naip_card, naip_set, seed):
+def test_get_naip_junction_lists_ids_unless_expanded(
+    test_engine, client, read_key, edit_key, naip_card, naip_set, seed
+):
     with Session(test_engine) as s:
         color = Color(name="Yellow Test")
         s.add(color)
@@ -238,7 +289,7 @@ def test_get_naip_junction_lists_require_expand(test_engine, client, read_key, e
 
     r = client.get(f"/naips/{naip_id}", headers={"X-API-Key": read_key})
     assert r.status_code == 200
-    assert r.json()["colors"] == []
+    assert r.json()["colors"] == [color_id]
 
     r = client.get(f"/naips/{naip_id}?expand=colors", headers={"X-API-Key": read_key})
     assert r.status_code == 200

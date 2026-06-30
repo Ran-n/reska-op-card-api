@@ -603,7 +603,11 @@ class BannedPair(SQLModel, table=True):
 
 class ApiKey(SQLModel, table=True):
     __tablename__ = "api_key"
-    __table_args__ = (Index("ix_api_key_key", "key", unique=True),)
+    __table_args__ = (
+        Index("ix_api_key_key", "key", unique=True),
+        # Partial unique index: a label may be reused once its prior key is revoked.
+        Index("ix_api_key_label_active", "label", unique=True, sqlite_where=sa.text("revoked_ts IS NULL")),
+    )
 
     id: int | None = Field(default=None, primary_key=True)
     created_ts: datetime | None = Field(default=None, sa_column=_ts_col())

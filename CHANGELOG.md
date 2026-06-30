@@ -16,10 +16,13 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Added
 
+- `POST /admin/keys/{id}/reset` — resets a key's `request_count` to 0; was previously only a button in the admin UI with no backing route (404 on click); now implemented, audit-logged, and tested
+- `tests/test_admin.py`: 15 tests covering the admin dashboard and key manager — unconfigured 503, missing/wrong Basic auth 401, create (happy path + duplicate-label error), reset, delete/restore, purge, and 404 paths for all key-id-targeted routes
+- Audit logging (`logging.getLogger(__name__)`, INFO level) on every admin mutation in `admin.py`: key creation, revocation, restore, reset, and purge each log the acting admin username, key id, and label; failed Basic auth attempts logged at WARNING with the attempted username
 - `NaipItem` (embedded in `GET /cards/{id}` and `GET /cards/?expand=naips`) gains `language`, `cardtype`, `block`, `sort_order`, `serial_max`, `power`, `life`, `counter`, `cost`, `effect`, `trigger`, `colors`, `tribes`, `attrs`, `keywords`, `reswords` — closes the gap that previously forced clients to re-fetch each naip individually via `GET /naips/{id}` to populate an edit panel
 - `NaipListItem` (`GET /naips/`) gains the same fields as `NaipItem`, achieving parity with `NaipDetail`
 - `CardListItem` (`GET /cards/`) gains `block`, `effect`, `trigger`, `life`, `tribes`, `attrs`, `formats`, `keywords`, `reswords`, achieving parity with `CardDetail`
-- Junction tag lists (`colors`, `tribes`, `attrs`, `formats`, `keywords`, `reswords`) on card and naip responses now follow the FK `expand` convention: omitted from `expand` they return `[]`; listed, they return the populated tag array, batched via one `IN (...)` query per junction table; on `GET /cards/{id}?expand=naips,colors` a junction key applies to both the card itself and each embedded naip
+- Junction tag lists (`colors`, `tribes`, `attrs`, `formats`, `keywords`, `reswords`) on card and naip responses now follow the FK `expand` convention: omitted from `expand` they return `list[int]` (FK ids only); listed, they return the populated `list[LookupItem]` tag array, batched via one `IN (...)` query per junction table; on `GET /cards/{id}?expand=naips,colors` a junction key applies to both the card itself and each embedded naip
 - `_bulk_naip_extras()` (`_common.py`, shared by `cards.py` and `naips.py`) and `_bulk_card_extras()` (`cards.py`) — batch helpers resolving effect/trigger text and junction tags for a set of naip/card ids, mirroring `_expand_cards_bulk`'s `IN (...)` pattern; both accept an `expand` set gating which junction queries run
 - `?expand=field1,field2,...` query parameter on `GET /cards/`, `GET /cards/{id}`, `GET /naips/`, `GET /naips/{id}`, `GET /sets/`, `GET /sets/{id}` — when a field name is listed, the corresponding FK integer is replaced with a full inline object (`ExpandedSet`, `ExpandedCardType`, etc.) instead of a bare FK
 - `Expanded*` Pydantic models in `_common.py`: `ExpandedSet`, `ExpandedCardType`, `ExpandedRarity`, `ExpandedPrintVariant`, `ExpandedLanguage`, `ExpandedBlock`, `ExpandedSetType`, `ExpandedArtist`, `ExpandedCard` — used as the expanded side of polymorphic `int | Expanded*` response fields
@@ -50,7 +53,12 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Fixed
 
+- Admin UI "Reset" button (`/admin/keys/{id}/reset`) previously had no backend route and returned 404; the route now exists
+- `models.py`: `ApiKey` was missing the `ix_api_key_label_active` partial unique index (`label` unique `WHERE revoked_ts IS NULL`) that migration `0013` creates in production — schema drift meant `SQLModel.metadata.create_all()` (used by the test DB) silently allowed duplicate active labels that production would reject with a 409; model now matches the migrated schema
+- Migration `0016_restore_naip_junction_indexes`: restores FK indexes on `naip_color`, `naip_tribe`, `naip_attribute`, `naip_keyword`, `naip_resword`, `naip_serial` that `0007_fix_naip_junction_fk`'s table-rebuild silently dropped (the rebuild's raw `CREATE TABLE` never recreated the indexes `0001_initial` had originally created); these tables are queried heavily by `_bulk_naip_extras`, so the regression affected every expand-junction query on naips since `0007` was applied
+- `_enrich` (`cards.py`) and `_enrich_naip` (`naips.py`) reimplemented the same per-junction-table SQL already covered by `_bulk_card_extras`/`_bulk_naip_extras`; both now delegate to the bulk helper (called with a single-id list) instead of duplicating ~110/~90 lines of near-identical query logic
 - `create_card`, `update_card`: `IntegrityError` on commit now returns 409 instead of 500 for duplicate card number in the same set
+- Junction tag lists (`colors`, `tribes`, `attrs`, `formats`, `keywords`, `reswords`) on `CardDetail`, `CardListItem`, `NaipDetail`, `NaipListItem`, and the embedded `NaipItem` now return `list[int]` (FK ids only) when the field is not in `expand`, instead of incorrectly returning `[]`; matches the existing `naips` field convention (`list[int]` unexpanded, `list[LookupItem]`/`list[NaipItem]` expanded) — `[]` is only ever returned for a genuinely empty relation, never as a stand-in for "not expanded"
 
 ### Previous entries
 

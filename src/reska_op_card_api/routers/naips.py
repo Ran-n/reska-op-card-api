@@ -52,6 +52,8 @@ from reska_op_card_api.routers._common import (
     _expand_languages_bulk,
     _expand_print_variants_bulk,
     _expand_sets_bulk,
+    _in_filter,
+    _parse_csv,
     _parse_expand,
     _resolve_text,
     _stripe,
@@ -99,11 +101,11 @@ class NaipDetail(BaseModel):
     name: str | None = None
     effect: str | None = None
     trigger: str | None = None
-    colors: list[LookupItem] = []
-    tribes: list[LookupItem] = []
-    attrs: list[LookupItem] = []
-    keywords: list[LookupItem] = []
-    reswords: list[LookupItem] = []
+    colors: list[int] | list[LookupItem] = []
+    tribes: list[int] | list[LookupItem] = []
+    attrs: list[int] | list[LookupItem] = []
+    keywords: list[int] | list[LookupItem] = []
+    reswords: list[int] | list[LookupItem] = []
 
 
 class NaipListItem(BaseModel):
@@ -128,11 +130,11 @@ class NaipListItem(BaseModel):
     effect: str | None = None
     trigger: str | None = None
     image_path: str | None = None
-    colors: list[LookupItem] = []
-    tribes: list[LookupItem] = []
-    attrs: list[LookupItem] = []
-    keywords: list[LookupItem] = []
-    reswords: list[LookupItem] = []
+    colors: list[int] | list[LookupItem] = []
+    tribes: list[int] | list[LookupItem] = []
+    attrs: list[int] | list[LookupItem] = []
+    keywords: list[int] | list[LookupItem] = []
+    reswords: list[int] | list[LookupItem] = []
 
 
 class NaipListResponse(BaseModel):
@@ -202,57 +204,7 @@ def _enrich_naip(naip: Naip, session: Session, expand: set[str] | None = None) -
         image_path = row[0] if row else None
 
     name = _resolve_text(session, Name, naip.name_fk, "name")
-    effect = _resolve_text(session, Effect, naip.effect_fk, "effect")
-    trigger = _resolve_text(session, Trigger, naip.trigger_fk, "trigger")
-
-    color_rows = (
-        session.exec(
-            text(
-                "SELECT co.id, co.name FROM color co JOIN naip_color nc ON nc.color_fk = co.id WHERE nc.naip_fk = :nid"
-            ).bindparams(nid=naip.id)
-        ).all()
-        if "colors" in expand
-        else []
-    )
-    tribe_rows = (
-        session.exec(
-            text(
-                "SELECT t.id, t.name FROM tribe t JOIN naip_tribe nt ON nt.tribe_fk = t.id WHERE nt.naip_fk = :nid"
-            ).bindparams(nid=naip.id)
-        ).all()
-        if "tribes" in expand
-        else []
-    )
-    attr_rows = (
-        session.exec(
-            text(
-                "SELECT a.id, a.name FROM attribute a "
-                "JOIN naip_attribute na ON na.attribute_fk = a.id WHERE na.naip_fk = :nid"
-            ).bindparams(nid=naip.id)
-        ).all()
-        if "attrs" in expand
-        else []
-    )
-    kw_rows = (
-        session.exec(
-            text(
-                "SELECT k.id, k.name FROM keyword k "
-                "JOIN naip_keyword nk ON nk.keyword_fk = k.id WHERE nk.naip_fk = :nid"
-            ).bindparams(nid=naip.id)
-        ).all()
-        if "keywords" in expand
-        else []
-    )
-    rw_rows = (
-        session.exec(
-            text(
-                "SELECT r.id, r.name FROM resword r "
-                "JOIN naip_resword nr ON nr.resword_fk = r.id WHERE nr.naip_fk = :nid"
-            ).bindparams(nid=naip.id)
-        ).all()
-        if "reswords" in expand
-        else []
-    )
+    extras = _bulk_naip_extras([naip.id], session, expand)[naip.id]
 
     card_map = _expand_cards_bulk([naip.card_fk], session) if "card" in expand else {}
     set_map = _expand_sets_bulk([naip.set_fk], session) if "set" in expand else {}
@@ -283,13 +235,13 @@ def _enrich_naip(naip: Naip, session: Session, expand: set[str] | None = None) -
         counter=naip.counter,
         cost=naip.cost,
         name=name,
-        effect=effect,
-        trigger=trigger,
-        colors=[LookupItem(id=r[0], name=r[1]) for r in color_rows],
-        tribes=[LookupItem(id=r[0], name=r[1]) for r in tribe_rows],
-        attrs=[LookupItem(id=r[0], name=r[1]) for r in attr_rows],
-        keywords=[LookupItem(id=r[0], name=r[1]) for r in kw_rows],
-        reswords=[LookupItem(id=r[0], name=r[1]) for r in rw_rows],
+        effect=extras["effect"],
+        trigger=extras["trigger"],
+        colors=extras["colors"],
+        tribes=extras["tribes"],
+        attrs=extras["attrs"],
+        keywords=extras["keywords"],
+        reswords=extras["reswords"],
     )
 
 
@@ -318,6 +270,166 @@ def _apply_write(naip: Naip, data: NaipWrite, session: Session) -> None:
     session.add(naip)
 
 
+# ── Faceted filtering (mirrors logpiece's FilterSpec semantics, naip-flat view) ───────────────
+
+
+def _build_naip_filters(
+    search: str | None,
+    color_names_any: str | None,
+    color_names_exact: str | None,
+    card_type_names: str | None,
+    rarity_symbols: str | None,
+    set_type_names: str | None,
+    set_codes: str | None,
+    tribe_names: str | None,
+    attribute_names: str | None,
+    keyword_names: str | None,
+    resword_names: str | None,
+    format_names: str | None,
+    artist_names: str | None,
+    block_names: str | None,
+    language_names: str | None,
+    cost_min: int | None,
+    cost_max: int | None,
+    power_min: int | None,
+    power_max: int | None,
+    counter_min: int | None,
+    counter_max: int | None,
+    life_min: int | None,
+    life_max: int | None,
+    number_min: int | None,
+    number_max: int | None,
+    errata: bool | None,
+    serial: bool | None,
+    foil: bool | None,
+    print_variant_symbols: str | None,
+) -> tuple[list[str], dict]:
+    conditions: list[str] = []
+    params: dict = {}
+
+    if search:
+        conditions.append(
+            "(COALESCE(nm.name, cnm.name) LIKE :search "
+            'OR EXISTS (SELECT 1 FROM "set" s2 WHERE s2.id = n.set_fk AND s2.code LIKE :search) '
+            "OR EXISTS (SELECT 1 FROM card_type ct2 WHERE ct2.id = c.cardtype_fk AND ct2.name LIKE :search) "
+            "OR EXISTS (SELECT 1 FROM naip_color nc2 JOIN color co2 ON co2.id = nc2.color_fk "
+            "WHERE nc2.naip_fk = n.id AND co2.name LIKE :search))"
+        )
+        params["search"] = f"%{search}%"
+
+    any_names = _parse_csv(color_names_any)
+    if any_names:
+        sql, p = _in_filter("co.name", any_names, "canyn")
+        conditions.append(
+            "EXISTS (SELECT 1 FROM naip_color nc JOIN color co ON co.id = nc.color_fk "
+            f"WHERE nc.naip_fk = n.id AND {sql})"
+        )
+        params.update(p)
+
+    exact_names = _parse_csv(color_names_exact)
+    if exact_names:
+        sql, p = _in_filter("co3.name", exact_names, "cexn")
+        conditions.append(
+            "(SELECT COUNT(DISTINCT nc3.color_fk) FROM naip_color nc3 WHERE nc3.naip_fk = n.id) = :n_exact_colors "
+            "AND NOT EXISTS (SELECT 1 FROM naip_color nc4 JOIN color co3 ON co3.id = nc4.color_fk "
+            f"WHERE nc4.naip_fk = n.id AND NOT {sql})"
+        )
+        params.update(p)
+        params["n_exact_colors"] = len(exact_names)
+
+    type_names = _parse_csv(card_type_names)
+    if type_names:
+        sql, p = _in_filter("name", type_names, "ctn")
+        conditions.append(f"c.cardtype_fk IN (SELECT id FROM card_type WHERE {sql})")
+        params.update(p)
+
+    rarities = _parse_csv(rarity_symbols)
+    if rarities:
+        sql, p = _in_filter("symbol", rarities, "rar")
+        conditions.append(f"c.rarity_fk IN (SELECT id FROM rarity WHERE {sql})")
+        params.update(p)
+
+    set_types = _parse_csv(set_type_names)
+    if set_types:
+        sql, p = _in_filter("name", set_types, "stn")
+        conditions.append(f'n.set_fk IN (SELECT id FROM "set" WHERE type_fk IN (SELECT id FROM set_type WHERE {sql}))')
+        params.update(p)
+
+    codes = _parse_csv(set_codes)
+    if codes:
+        sql, p = _in_filter("code", codes, "setc")
+        conditions.append(f'n.set_fk IN (SELECT id FROM "set" WHERE {sql})')
+        params.update(p)
+
+    for csv_param, junction, item_fk, item_table, prefix in (
+        (tribe_names, "card_tribe", "tribe_fk", "tribe", "trb"),
+        (attribute_names, "card_attribute", "attribute_fk", "attribute", "atb"),
+        (keyword_names, "card_keyword", "keyword_fk", "keyword", "kwd"),
+        (resword_names, "card_resword", "resword_fk", "resword", "rwd"),
+        (format_names, "card_format", "format_fk", "format", "fmt"),
+    ):
+        names = _parse_csv(csv_param)
+        if not names:
+            continue
+        sql, p = _in_filter("t.name", names, prefix)
+        conditions.append(
+            f"EXISTS (SELECT 1 FROM {junction} j JOIN {item_table} t ON t.id = j.{item_fk} "
+            f"WHERE j.card_fk = n.card_fk AND {sql})"
+        )
+        params.update(p)
+
+    artists = _parse_csv(artist_names)
+    if artists:
+        sql, p = _in_filter("name", artists, "art")
+        conditions.append(f"n.artist_fk IN (SELECT id FROM artist WHERE {sql})")
+        params.update(p)
+
+    blocks = _parse_csv(block_names)
+    if blocks:
+        sql, p = _in_filter("name", blocks, "blk")
+        conditions.append(f"c.block_fk IN (SELECT id FROM block WHERE {sql})")
+        params.update(p)
+
+    languages = _parse_csv(language_names)
+    if languages:
+        sql, p = _in_filter("name", languages, "lng")
+        conditions.append(
+            f'n.set_fk IN (SELECT id FROM "set" WHERE language_fk IN (SELECT id FROM language WHERE {sql}))'
+        )
+        params.update(p)
+
+    for col, lo, hi in (
+        ("c.cost", cost_min, cost_max),
+        ("c.power", power_min, power_max),
+        ("c.counter", counter_min, counter_max),
+        ("c.life", life_min, life_max),
+        ("c.number", number_min, number_max),
+    ):
+        if lo is not None:
+            key = f"{col.replace('.', '_')}_min"
+            conditions.append(f"{col} >= :{key}")
+            params[key] = lo
+        if hi is not None:
+            key = f"{col.replace('.', '_')}_max"
+            conditions.append(f"{col} <= :{key}")
+            params[key] = hi
+
+    if errata:
+        conditions.append("n.is_errata = 1")
+    if serial:
+        conditions.append("n.serial_max IS NOT NULL")
+    if foil:
+        conditions.append("n.is_foil = 1")
+
+    pvs = _parse_csv(print_variant_symbols)
+    if pvs:
+        sql, p = _in_filter("symbol", pvs, "pvs")
+        conditions.append(f"n.print_variant_fk IN (SELECT id FROM print_variant WHERE {sql})")
+        params.update(p)
+
+    return conditions, params
+
+
 # ── Endpoints ────────────────────────────────────────────────────────────────
 
 
@@ -328,6 +440,35 @@ def list_naips(
     language_id: int | None = Query(None),
     print_variant_id: int | None = Query(None),
     is_default: bool | None = Query(None),
+    search: str | None = Query(None),
+    color_names_any: str | None = Query(None),
+    color_names_exact: str | None = Query(None),
+    card_type_names: str | None = Query(None),
+    rarity_symbols: str | None = Query(None),
+    set_type_names: str | None = Query(None),
+    set_codes: str | None = Query(None),
+    tribe_names: str | None = Query(None),
+    attribute_names: str | None = Query(None),
+    keyword_names: str | None = Query(None),
+    resword_names: str | None = Query(None),
+    format_names: str | None = Query(None),
+    artist_names: str | None = Query(None),
+    block_names: str | None = Query(None),
+    language_names: str | None = Query(None),
+    cost_min: int | None = Query(None),
+    cost_max: int | None = Query(None),
+    power_min: int | None = Query(None),
+    power_max: int | None = Query(None),
+    counter_min: int | None = Query(None),
+    counter_max: int | None = Query(None),
+    life_min: int | None = Query(None),
+    life_max: int | None = Query(None),
+    number_min: int | None = Query(None),
+    number_max: int | None = Query(None),
+    errata: bool | None = Query(None),
+    serial: bool | None = Query(None),
+    foil: bool | None = Query(None),
+    print_variant_symbols: str | None = Query(None),
     expand: str | None = Query(None),
     offset: int = Query(0, ge=0),
     limit: int = Query(60, ge=1, le=200),
@@ -350,21 +491,60 @@ def list_naips(
     if is_default is not None:
         conditions.append("n.is_default = :is_default")
         filter_params["is_default"] = int(is_default)
+    extra_conditions, extra_params = _build_naip_filters(
+        search,
+        color_names_any,
+        color_names_exact,
+        card_type_names,
+        rarity_symbols,
+        set_type_names,
+        set_codes,
+        tribe_names,
+        attribute_names,
+        keyword_names,
+        resword_names,
+        format_names,
+        artist_names,
+        block_names,
+        language_names,
+        cost_min,
+        cost_max,
+        power_min,
+        power_max,
+        counter_min,
+        counter_max,
+        life_min,
+        life_max,
+        number_min,
+        number_max,
+        errata,
+        serial,
+        foil,
+        print_variant_symbols,
+    )
+    conditions.extend(extra_conditions)
+    filter_params.update(extra_params)
 
     where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
+    # The card + card-name joins only feed the new faceted filters above (cardtype/rarity/cost/
+    # block/etc. and the search fallback) — always present so `where` can reference c.*/cnm.* freely.
+    joins = (
+        "LEFT JOIN name nm ON nm.id = n.name_fk "
+        "LEFT JOIN image img ON img.id = n.image_fk "
+        "LEFT JOIN card c ON c.id = n.card_fk "
+        "LEFT JOIN name cnm ON cnm.id = c.name_fk "
+    )
     rows = session.exec(
         text(
             "SELECT n.id, n.card_fk, n.set_fk, n.print_variant_fk, n.language_fk, "
             "n.is_default, n.is_foil, n.is_errata, "
             "nm.name, img.path, n.artist_fk, n.cardtype_fk, n.block_fk, "
             "n.sort_order, n.serial_max, n.power, n.life, n.counter, n.cost "
-            "FROM naip n "
-            "LEFT JOIN name nm ON nm.id = n.name_fk "
-            "LEFT JOIN image img ON img.id = n.image_fk "
+            f"FROM naip n {joins}"
             f"{where} ORDER BY n.card_fk, n.set_fk, n.sort_order LIMIT :limit OFFSET :offset"
         ).bindparams(**filter_params, limit=limit, offset=offset)
     ).all()
-    total = session.exec(text(f"SELECT COUNT(*) FROM naip n {where}").bindparams(**filter_params)).scalar()
+    total = session.exec(text(f"SELECT COUNT(*) FROM naip n {joins}{where}").bindparams(**filter_params)).scalar()
 
     expand_set = _parse_expand(expand, _LIST_EXPAND_FIELDS)
 

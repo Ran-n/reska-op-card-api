@@ -2,7 +2,7 @@
 """
 Authors: Ran# <ran.hash@proton.me>
 Created: 2026/05/13 13:13:00.000000
-Revised: 2026/06/30 13:53:12.208034
+Revised: 2026/06/30 14:36:29.648947
 """
 
 from pathlib import Path
@@ -58,6 +58,8 @@ from reska_op_card_api.routers._common import (
     _expand_cardtypes_bulk,
     _expand_rarities_bulk,
     _expand_sets_bulk,
+    _in_filter,
+    _parse_csv,
     _parse_expand,
     _resolve_text,
     _stripe,
@@ -97,11 +99,11 @@ class NaipItem(BaseModel):
     cost: int | None = None
     effect: str | None = None
     trigger: str | None = None
-    colors: list[LookupItem] = []
-    tribes: list[LookupItem] = []
-    attrs: list[LookupItem] = []
-    keywords: list[LookupItem] = []
-    reswords: list[LookupItem] = []
+    colors: list[int] | list[LookupItem] = []
+    tribes: list[int] | list[LookupItem] = []
+    attrs: list[int] | list[LookupItem] = []
+    keywords: list[int] | list[LookupItem] = []
+    reswords: list[int] | list[LookupItem] = []
 
 
 class CardDetail(BaseModel):
@@ -118,12 +120,12 @@ class CardDetail(BaseModel):
     life: int | None = None
     counter: int | None = None
     cost: int | None = None
-    colors: list[LookupItem] = []
-    tribes: list[LookupItem] = []
-    attrs: list[LookupItem] = []
-    formats: list[LookupItem] = []
-    keywords: list[LookupItem] = []
-    reswords: list[LookupItem] = []
+    colors: list[int] | list[LookupItem] = []
+    tribes: list[int] | list[LookupItem] = []
+    attrs: list[int] | list[LookupItem] = []
+    formats: list[int] | list[LookupItem] = []
+    keywords: list[int] | list[LookupItem] = []
+    reswords: list[int] | list[LookupItem] = []
     naips: list[int] | list[NaipItem] = []
 
 
@@ -142,12 +144,12 @@ class CardListItem(BaseModel):
     life: int | None = None
     counter: int | None = None
     image_path: str | None = None
-    colors: list[LookupItem] = []
-    tribes: list[LookupItem] = []
-    attrs: list[LookupItem] = []
-    formats: list[LookupItem] = []
-    keywords: list[LookupItem] = []
-    reswords: list[LookupItem] = []
+    colors: list[int] | list[LookupItem] = []
+    tribes: list[int] | list[LookupItem] = []
+    attrs: list[int] | list[LookupItem] = []
+    formats: list[int] | list[LookupItem] = []
+    keywords: list[int] | list[LookupItem] = []
+    reswords: list[int] | list[LookupItem] = []
     naips: list[int] | list[NaipItem] = []
 
 
@@ -199,8 +201,9 @@ _CARD_JUNCTION_SPECS = [
 def _bulk_card_extras(card_ids: list[int], session: Session, expand: set[str] | None = None) -> dict[int, dict]:
     """Batch-resolve block_fk, effect/trigger text, and junction tags for a set of card ids.
 
-    Junction tag lists are only populated for keys present in ``expand``, mirroring the
-    FK-field expand convention.
+    Junction tag lists contain FK ids only unless the corresponding key is present in
+    ``expand``, in which case they contain the full ``LookupItem`` objects — mirroring the
+    FK-field expand convention (never an empty list as a stand-in for "not expanded").
     """
     expand = expand or set()
     extras: dict[int, dict] = {
@@ -240,17 +243,22 @@ def _bulk_card_extras(card_ids: list[int], session: Session, expand: set[str] | 
         extras[cid]["trigger"] = trigger_map.get(tfk) if tfk else None
 
     for junc_table, fk_col, item_fk_col, item_table, attr_name in _CARD_JUNCTION_SPECS:
-        if attr_name not in expand:
-            continue
-        rows = session.exec(
-            text(
-                f"SELECT j.{fk_col}, t.id, t.name FROM {item_table} t "
-                f"JOIN {junc_table} j ON j.{item_fk_col} = t.id "
-                f"WHERE j.{fk_col} IN ({id_list})"
-            )
-        ).all()
-        for card_fk_val, item_id, item_name in rows:
-            extras[card_fk_val][attr_name].append(LookupItem(id=item_id, name=item_name))
+        if attr_name in expand:
+            rows = session.exec(
+                text(
+                    f"SELECT j.{fk_col}, t.id, t.name FROM {item_table} t "
+                    f"JOIN {junc_table} j ON j.{item_fk_col} = t.id "
+                    f"WHERE j.{fk_col} IN ({id_list})"
+                )
+            ).all()
+            for card_fk_val, item_id, item_name in rows:
+                extras[card_fk_val][attr_name].append(LookupItem(id=item_id, name=item_name))
+        else:
+            rows = session.exec(
+                text(f"SELECT j.{fk_col}, j.{item_fk_col} FROM {junc_table} j WHERE j.{fk_col} IN ({id_list})")
+            ).all()
+            for card_fk_val, item_id in rows:
+                extras[card_fk_val][attr_name].append(item_id)
 
     return extras
 
@@ -259,8 +267,7 @@ def _enrich(card: Card, session: Session, expand: set[str] | None = None) -> Car
     expand = expand or set()
 
     card_name = _resolve_text(session, Name, card.name_fk, "name") or ""
-    effect = _resolve_text(session, Effect, card.effect_fk, "effect")
-    trigger = _resolve_text(session, Trigger, card.trigger_fk, "trigger")
+    extras = _bulk_card_extras([card.id], session, expand)[card.id]
 
     naips: list[int] | list[NaipItem]
     if "naips" in expand:
@@ -311,64 +318,6 @@ def _enrich(card: Card, session: Session, expand: set[str] | None = None) -> Car
             r[0] for r in session.exec(text("SELECT id FROM naip WHERE card_fk = :cid").bindparams(cid=card.id)).all()
         ]
 
-    color_rows = (
-        session.exec(
-            text(
-                "SELECT co.id, co.name FROM color co JOIN card_color cc ON cc.color_fk = co.id WHERE cc.card_fk = :cid"
-            ).bindparams(cid=card.id)
-        ).all()
-        if "colors" in expand
-        else []
-    )
-    tribe_rows = (
-        session.exec(
-            text(
-                "SELECT t.id, t.name FROM tribe t JOIN card_tribe ct ON ct.tribe_fk = t.id WHERE ct.card_fk = :cid"
-            ).bindparams(cid=card.id)
-        ).all()
-        if "tribes" in expand
-        else []
-    )
-    attr_rows = (
-        session.exec(
-            text(
-                "SELECT a.id, a.name FROM attribute a "
-                "JOIN card_attribute ca ON ca.attribute_fk = a.id WHERE ca.card_fk = :cid"
-            ).bindparams(cid=card.id)
-        ).all()
-        if "attrs" in expand
-        else []
-    )
-    format_rows = (
-        session.exec(
-            text(
-                "SELECT f.id, f.name FROM format f JOIN card_format cf ON cf.format_fk = f.id WHERE cf.card_fk = :cid"
-            ).bindparams(cid=card.id)
-        ).all()
-        if "formats" in expand
-        else []
-    )
-    kw_rows = (
-        session.exec(
-            text(
-                "SELECT k.id, k.name FROM keyword k "
-                "JOIN card_keyword ck ON ck.keyword_fk = k.id WHERE ck.card_fk = :cid"
-            ).bindparams(cid=card.id)
-        ).all()
-        if "keywords" in expand
-        else []
-    )
-    rw_rows = (
-        session.exec(
-            text(
-                "SELECT r.id, r.name FROM resword r "
-                "JOIN card_resword cr ON cr.resword_fk = r.id WHERE cr.card_fk = :cid"
-            ).bindparams(cid=card.id)
-        ).all()
-        if "reswords" in expand
-        else []
-    )
-
     set_map = _expand_sets_bulk([card.set_fk], session) if "set" in expand else {}
     ct_map = _expand_cardtypes_bulk([card.cardtype_fk], session) if "cardtype" in expand else {}
     rarity_map = _expand_rarities_bulk([card.rarity_fk], session) if "rarity" in expand else {}
@@ -379,21 +328,21 @@ def _enrich(card: Card, session: Session, expand: set[str] | None = None) -> Car
         set=set_map.get(card.set_fk, card.set_fk),
         cardtype=ct_map.get(card.cardtype_fk, card.cardtype_fk),
         rarity=_stripe(card.rarity_fk, "rarity", expand, rarity_map),
-        block=_stripe(card.block_fk, "block", expand, block_map),
+        block=_stripe(extras["block"], "block", expand, block_map),
         number=card.number,
         name=card_name,
-        effect=effect,
-        trigger=trigger,
+        effect=extras["effect"],
+        trigger=extras["trigger"],
         power=card.power,
         life=card.life,
         counter=card.counter,
         cost=card.cost,
-        colors=[LookupItem(id=r[0], name=r[1]) for r in color_rows],
-        tribes=[LookupItem(id=r[0], name=r[1]) for r in tribe_rows],
-        attrs=[LookupItem(id=r[0], name=r[1]) for r in attr_rows],
-        formats=[LookupItem(id=r[0], name=r[1]) for r in format_rows],
-        keywords=[LookupItem(id=r[0], name=r[1]) for r in kw_rows],
-        reswords=[LookupItem(id=r[0], name=r[1]) for r in rw_rows],
+        colors=extras["colors"],
+        tribes=extras["tribes"],
+        attrs=extras["attrs"],
+        formats=extras["formats"],
+        keywords=extras["keywords"],
+        reswords=extras["reswords"],
         naips=naips,
     )
 
@@ -475,6 +424,170 @@ def _sync_junctions(card: Card, data: CardWrite, session: Session):
     session.add(card)
 
 
+# ── Faceted filtering (mirrors logpiece's FilterSpec semantics) ───────────────
+
+# is_foil / print_variant are always-false for a card-level row (the card row only ever
+# reflects its default naip's serial/artist, never foil or print_variant — see logpiece's
+# fetch_cards()). Filtering on either therefore excludes everything, exactly like the client.
+_CARD_ALWAYS_FALSE_FIELDS = ("foil", "print_variant_symbols")
+
+
+def _build_card_filters(
+    search: str | None,
+    color_names_any: str | None,
+    color_names_exact: str | None,
+    card_type_names: str | None,
+    rarity_symbols: str | None,
+    set_type_names: str | None,
+    set_codes: str | None,
+    tribe_names: str | None,
+    attribute_names: str | None,
+    keyword_names: str | None,
+    resword_names: str | None,
+    format_names: str | None,
+    artist_names: str | None,
+    block_names: str | None,
+    language_names: str | None,
+    cost_min: int | None,
+    cost_max: int | None,
+    power_min: int | None,
+    power_max: int | None,
+    counter_min: int | None,
+    counter_max: int | None,
+    life_min: int | None,
+    life_max: int | None,
+    number_min: int | None,
+    number_max: int | None,
+    errata: bool | None,
+    serial: bool | None,
+    foil: bool | None,
+    print_variant_symbols: str | None,
+) -> tuple[list[str], dict]:
+    conditions: list[str] = []
+    params: dict = {}
+
+    if search:
+        conditions.append(
+            "(nm.name LIKE :search "
+            'OR EXISTS (SELECT 1 FROM "set" s2 WHERE s2.id = c.set_fk AND s2.code LIKE :search) '
+            "OR EXISTS (SELECT 1 FROM card_type ct2 WHERE ct2.id = c.cardtype_fk AND ct2.name LIKE :search) "
+            "OR EXISTS (SELECT 1 FROM card_color cc2 JOIN color co2 ON co2.id = cc2.color_fk "
+            "WHERE cc2.card_fk = c.id AND co2.name LIKE :search))"
+        )
+        params["search"] = f"%{search}%"
+
+    any_names = _parse_csv(color_names_any)
+    if any_names:
+        sql, p = _in_filter("co.name", any_names, "canyc")
+        conditions.append(
+            "EXISTS (SELECT 1 FROM card_color cc JOIN color co ON co.id = cc.color_fk "
+            f"WHERE cc.card_fk = c.id AND {sql})"
+        )
+        params.update(p)
+
+    exact_names = _parse_csv(color_names_exact)
+    if exact_names:
+        sql, p = _in_filter("co3.name", exact_names, "cexc")
+        conditions.append(
+            "(SELECT COUNT(DISTINCT cc3.color_fk) FROM card_color cc3 WHERE cc3.card_fk = c.id) = :n_exact_colors "
+            "AND NOT EXISTS (SELECT 1 FROM card_color cc4 JOIN color co3 ON co3.id = cc4.color_fk "
+            f"WHERE cc4.card_fk = c.id AND NOT {sql})"
+        )
+        params.update(p)
+        params["n_exact_colors"] = len(exact_names)
+
+    type_names = _parse_csv(card_type_names)
+    if type_names:
+        sql, p = _in_filter("name", type_names, "ctn")
+        conditions.append(f"c.cardtype_fk IN (SELECT id FROM card_type WHERE {sql})")
+        params.update(p)
+
+    rarities = _parse_csv(rarity_symbols)
+    if rarities:
+        sql, p = _in_filter("symbol", rarities, "rar")
+        conditions.append(f"c.rarity_fk IN (SELECT id FROM rarity WHERE {sql})")
+        params.update(p)
+
+    set_types = _parse_csv(set_type_names)
+    if set_types:
+        sql, p = _in_filter("name", set_types, "stn")
+        conditions.append(f'c.set_fk IN (SELECT id FROM "set" WHERE type_fk IN (SELECT id FROM set_type WHERE {sql}))')
+        params.update(p)
+
+    codes = _parse_csv(set_codes)
+    if codes:
+        sql, p = _in_filter("code", codes, "setc")
+        conditions.append(f'c.set_fk IN (SELECT id FROM "set" WHERE {sql})')
+        params.update(p)
+
+    for csv_param, junction, item_fk, item_table, prefix in (
+        (tribe_names, "card_tribe", "tribe_fk", "tribe", "trb"),
+        (attribute_names, "card_attribute", "attribute_fk", "attribute", "atb"),
+        (keyword_names, "card_keyword", "keyword_fk", "keyword", "kwd"),
+        (resword_names, "card_resword", "resword_fk", "resword", "rwd"),
+        (format_names, "card_format", "format_fk", "format", "fmt"),
+    ):
+        names = _parse_csv(csv_param)
+        if not names:
+            continue
+        sql, p = _in_filter("t.name", names, prefix)
+        conditions.append(
+            f"EXISTS (SELECT 1 FROM {junction} j JOIN {item_table} t ON t.id = j.{item_fk} "
+            f"WHERE j.card_fk = c.id AND {sql})"
+        )
+        params.update(p)
+
+    artists = _parse_csv(artist_names)
+    if artists:
+        sql, p = _in_filter("a.name", artists, "art")
+        conditions.append(
+            "EXISTS (SELECT 1 FROM naip n2 JOIN artist a ON a.id = n2.artist_fk "
+            f"WHERE n2.card_fk = c.id AND n2.is_default = 1 AND {sql})"
+        )
+        params.update(p)
+
+    blocks = _parse_csv(block_names)
+    if blocks:
+        sql, p = _in_filter("name", blocks, "blk")
+        conditions.append(f"c.block_fk IN (SELECT id FROM block WHERE {sql})")
+        params.update(p)
+
+    languages = _parse_csv(language_names)
+    if languages:
+        sql, p = _in_filter("name", languages, "lng")
+        conditions.append(
+            f'c.set_fk IN (SELECT id FROM "set" WHERE language_fk IN (SELECT id FROM language WHERE {sql}))'
+        )
+        params.update(p)
+
+    for col, lo, hi in (
+        ("c.cost", cost_min, cost_max),
+        ("c.power", power_min, power_max),
+        ("c.counter", counter_min, counter_max),
+        ("c.life", life_min, life_max),
+        ("c.number", number_min, number_max),
+    ):
+        if lo is not None:
+            key = f"{col.replace('.', '_')}_min"
+            conditions.append(f"{col} >= :{key}")
+            params[key] = lo
+        if hi is not None:
+            key = f"{col.replace('.', '_')}_max"
+            conditions.append(f"{col} <= :{key}")
+            params[key] = hi
+
+    if errata:
+        conditions.append("EXISTS (SELECT 1 FROM naip n3 WHERE n3.card_fk = c.id AND n3.is_errata = 1)")
+    if serial:
+        conditions.append(
+            "EXISTS (SELECT 1 FROM naip n4 WHERE n4.card_fk = c.id AND n4.is_default = 1 AND n4.serial_max IS NOT NULL)"
+        )
+    if foil or _parse_csv(print_variant_symbols):
+        conditions.append("0 = 1")
+
+    return conditions, params
+
+
 # ── Endpoints ────────────────────────────────────────────────────────────────
 
 
@@ -483,6 +596,35 @@ def list_cards(
     name: str | None = Query(None),
     set_id: int | None = Query(None),
     cardtype_id: int | None = Query(None),
+    search: str | None = Query(None),
+    color_names_any: str | None = Query(None),
+    color_names_exact: str | None = Query(None),
+    card_type_names: str | None = Query(None),
+    rarity_symbols: str | None = Query(None),
+    set_type_names: str | None = Query(None),
+    set_codes: str | None = Query(None),
+    tribe_names: str | None = Query(None),
+    attribute_names: str | None = Query(None),
+    keyword_names: str | None = Query(None),
+    resword_names: str | None = Query(None),
+    format_names: str | None = Query(None),
+    artist_names: str | None = Query(None),
+    block_names: str | None = Query(None),
+    language_names: str | None = Query(None),
+    cost_min: int | None = Query(None),
+    cost_max: int | None = Query(None),
+    power_min: int | None = Query(None),
+    power_max: int | None = Query(None),
+    counter_min: int | None = Query(None),
+    counter_max: int | None = Query(None),
+    life_min: int | None = Query(None),
+    life_max: int | None = Query(None),
+    number_min: int | None = Query(None),
+    number_max: int | None = Query(None),
+    errata: bool | None = Query(None),
+    serial: bool | None = Query(None),
+    foil: bool | None = Query(None),
+    print_variant_symbols: str | None = Query(None),
     expand: str | None = Query(None),
     offset: int = Query(0, ge=0),
     limit: int = Query(60, ge=1, le=200),
@@ -499,6 +641,39 @@ def list_cards(
     if cardtype_id is not None:
         conditions.append("c.cardtype_fk = :cardtype_id")
         filter_params["cardtype_id"] = cardtype_id
+    extra_conditions, extra_params = _build_card_filters(
+        search,
+        color_names_any,
+        color_names_exact,
+        card_type_names,
+        rarity_symbols,
+        set_type_names,
+        set_codes,
+        tribe_names,
+        attribute_names,
+        keyword_names,
+        resword_names,
+        format_names,
+        artist_names,
+        block_names,
+        language_names,
+        cost_min,
+        cost_max,
+        power_min,
+        power_max,
+        counter_min,
+        counter_max,
+        life_min,
+        life_max,
+        number_min,
+        number_max,
+        errata,
+        serial,
+        foil,
+        print_variant_symbols,
+    )
+    conditions.extend(extra_conditions)
+    filter_params.update(extra_params)
 
     where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
     rows = session.exec(

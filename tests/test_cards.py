@@ -88,7 +88,7 @@ def test_list_cards_includes_card_detail_fields(test_engine, client, edit_key, r
     assert row["life"] == 5
     assert row["effect"] == "List endpoint card effect"
     assert row["trigger"] == "List endpoint card trigger"
-    assert row["colors"] == []
+    assert row["colors"] == [color_id]
 
     r = client.get(f"/cards/?set_id={test_set}&expand=colors", headers={"X-API-Key": read_key})
     assert r.status_code == 200
@@ -173,6 +173,66 @@ def test_get_card_expand_all(client, read_key, created_card):
     data = r.json()
     assert isinstance(data["set"], dict)
     assert isinstance(data["cardtype"], dict)
+
+
+def test_list_cards_search_filter(client, read_key, created_card):
+    name = created_card["name"]
+    r = client.get(f"/cards/?search={name[:5]}", headers={"X-API-Key": read_key})
+    assert r.status_code == 200
+    assert any(row["id"] == created_card["id"] for row in r.json()["rows"])
+
+
+def test_list_cards_cost_range_filter(client, edit_key, read_key, test_set, seed):
+    payload = {
+        "set_fk": test_set,
+        "cardtype_fk": seed["cardtype_fk"],
+        "number": 60,
+        "name": "Cost Range Card",
+        "cost": 7,
+    }
+    r = client.post("/cards/", json=payload, headers={"X-API-Key": edit_key})
+    card_id = r.json()["id"]
+
+    r = client.get(f"/cards/?set_id={test_set}&cost_min=7&cost_max=7", headers={"X-API-Key": read_key})
+    assert r.status_code == 200
+    assert any(row["id"] == card_id for row in r.json()["rows"])
+
+    r = client.get(f"/cards/?set_id={test_set}&cost_min=8", headers={"X-API-Key": read_key})
+    assert r.status_code == 200
+    assert all(row["id"] != card_id for row in r.json()["rows"])
+
+
+def test_list_cards_color_names_any_filter(test_engine, client, edit_key, read_key, test_set, seed):
+    with Session(test_engine) as s:
+        color = Color(name="Filter Test Color")
+        s.add(color)
+        s.commit()
+        s.refresh(color)
+        color_id = color.id
+
+    payload = {
+        "set_fk": test_set,
+        "cardtype_fk": seed["cardtype_fk"],
+        "number": 61,
+        "name": "Color Filter Card",
+        "colors": [color_id],
+    }
+    r = client.post("/cards/", json=payload, headers={"X-API-Key": edit_key})
+    card_id = r.json()["id"]
+
+    r = client.get(f"/cards/?set_id={test_set}&color_names_any=Filter Test Color", headers={"X-API-Key": read_key})
+    assert r.status_code == 200
+    assert any(row["id"] == card_id for row in r.json()["rows"])
+
+    r = client.get(f"/cards/?set_id={test_set}&color_names_any=Nonexistent Color", headers={"X-API-Key": read_key})
+    assert r.status_code == 200
+    assert all(row["id"] != card_id for row in r.json()["rows"])
+
+
+def test_list_cards_errata_filter_excludes_non_errata(client, read_key, created_card):
+    r = client.get("/cards/?errata=true", headers={"X-API-Key": read_key})
+    assert r.status_code == 200
+    assert all(row["id"] != created_card["id"] for row in r.json()["rows"])
 
 
 def test_list_cards_expand_all(client, read_key, created_card):

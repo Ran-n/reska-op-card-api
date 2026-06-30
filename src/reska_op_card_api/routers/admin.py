@@ -5,6 +5,7 @@ Created: 2026/06/28
 """
 
 import html
+import logging
 import os
 import secrets
 from urllib.parse import urlencode
@@ -22,9 +23,10 @@ from reska_op_card_api.models import ApiKey
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 _basic = HTTPBasic()
+_log = logging.getLogger(__name__)
 
 
-def _require_admin(credentials: HTTPBasicCredentials = Depends(_basic)) -> None:
+def _require_admin(credentials: HTTPBasicCredentials = Depends(_basic)) -> str:
     admin_user = os.environ.get("ADMIN_USERNAME", "")
     admin_pw = os.environ.get("ADMIN_PASSWORD", "")
     if not admin_user or not admin_pw:
@@ -32,11 +34,13 @@ def _require_admin(credentials: HTTPBasicCredentials = Depends(_basic)) -> None:
     user_ok = secrets.compare_digest(credentials.username.encode(), admin_user.encode())
     pw_ok = secrets.compare_digest(credentials.password.encode(), admin_pw.encode())
     if not user_ok or not pw_ok:
+        _log.warning("admin auth rejected for username=%s", credentials.username)
         raise HTTPException(
             status_code=401,
             detail="Unauthorized",
             headers={"WWW-Authenticate": 'Basic realm="Admin"'},
         )
+    return credentials.username
 
 
 def _fmt_ts(ts) -> str:
@@ -86,6 +90,11 @@ def _render(
             </form>"""
         else:
             action_cell = f"""
+            <form method="post" action="/admin/keys/{k.id}/reset"
+                  onsubmit="return confirm('Reset request count for [{label_esc}] to 0?')"
+                  style="display:contents">
+              <button class="btn-sm btn-reset" type="submit">Reset</button>
+            </form>
             <form method="post" action="/admin/keys/{k.id}/delete"
                   onsubmit="return confirm('Revoke key [{label_esc}]?')"
                   style="display:contents">
@@ -462,6 +471,12 @@ def _render(
       color: #b8bb26;
     }}
     .btn-restore:hover {{ background: rgba(184,187,38,.08); border-color: rgba(184,187,38,.38); }}
+    .btn-reset {{
+      background: transparent;
+      border: 1px solid rgba(131,165,152,.28);
+      color: #83a598;
+    }}
+    .btn-reset:hover {{ background: rgba(131,165,152,.1); border-color: rgba(131,165,152,.5); }}
 
     /* ── Banners ── */
     .banner {{
@@ -830,7 +845,7 @@ def _render_dashboard() -> str:
 
 @router.get("", response_class=HTMLResponse)
 @router.get("/", response_class=HTMLResponse)
-def admin_dashboard(_: None = Depends(_require_admin)):
+def admin_dashboard(_: str = Depends(_require_admin)):
     return _render_dashboard()
 
 
@@ -841,7 +856,7 @@ def list_keys(
     new_label: str | None = Query(default=None),
     error: str | None = Query(default=None),
     input_label: str | None = Query(default=None),
-    _: None = Depends(_require_admin),
+    _: str = Depends(_require_admin),
     session: Session = Depends(get_session),
 ):
     stmt = select(ApiKey) if show_deleted else select(ApiKey).where(ApiKey.revoked_ts == None)  # noqa: E711
@@ -864,7 +879,7 @@ def list_keys(
 def create_key(
     label: str = Form(...),
     can_edit: bool = Form(default=False),
-    _: None = Depends(_require_admin),
+    admin_user: str = Depends(_require_admin),
     session: Session = Depends(get_session),
 ):
     raw_key = secrets.token_urlsafe(32)
@@ -875,9 +890,11 @@ def create_key(
         session.commit()
     except IntegrityError:
         session.rollback()
+        _log.warning("admin=%s create_key failed: label '%s' already in use", admin_user, label)
         qs = urlencode({"error": f"Label '{label}' is already in use.", "input_label": label})
         return RedirectResponse(f"/admin/keys?{qs}", status_code=303)
 
+    _log.info("admin=%s created key id=%s label=%s can_edit=%s", admin_user, record.id, label, can_edit)
     qs = urlencode({"new_key": raw_key, "new_label": label})
     return RedirectResponse(f"/admin/keys?{qs}", status_code=303)
 
@@ -885,7 +902,7 @@ def create_key(
 @router.post("/keys/{key_id}/delete")
 def delete_key(
     key_id: int,
-    _: None = Depends(_require_admin),
+    admin_user: str = Depends(_require_admin),
     session: Session = Depends(get_session),
 ):
     record = session.get(ApiKey, key_id)
@@ -894,13 +911,14 @@ def delete_key(
     record.revoked_ts = func.strftime("%Y-%m-%d %H:%M:%f", "now")
     session.add(record)
     session.commit()
+    _log.info("admin=%s revoked key id=%s label=%s", admin_user, key_id, record.label)
     return RedirectResponse("/admin/keys", status_code=303)
 
 
 @router.post("/keys/{key_id}/restore")
 def restore_key(
     key_id: int,
-    _: None = Depends(_require_admin),
+    admin_user: str = Depends(_require_admin),
     session: Session = Depends(get_session),
 ):
     record = session.get(ApiKey, key_id)
@@ -909,18 +927,37 @@ def restore_key(
     record.revoked_ts = None
     session.add(record)
     session.commit()
+    _log.info("admin=%s restored key id=%s label=%s", admin_user, key_id, record.label)
+    return RedirectResponse("/admin/keys", status_code=303)
+
+
+@router.post("/keys/{key_id}/reset")
+def reset_key(
+    key_id: int,
+    admin_user: str = Depends(_require_admin),
+    session: Session = Depends(get_session),
+):
+    record = session.get(ApiKey, key_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="Key not found")
+    record.request_count = 0
+    session.add(record)
+    session.commit()
+    _log.info("admin=%s reset request_count for key id=%s label=%s", admin_user, key_id, record.label)
     return RedirectResponse("/admin/keys", status_code=303)
 
 
 @router.post("/keys/{key_id}/purge")
 def purge_key(
     key_id: int,
-    _: None = Depends(_require_admin),
+    admin_user: str = Depends(_require_admin),
     session: Session = Depends(get_session),
 ):
     record = session.get(ApiKey, key_id)
     if not record:
         raise HTTPException(status_code=404, detail="Key not found")
+    label = record.label
     session.delete(record)
     session.commit()
+    _log.info("admin=%s purged key id=%s label=%s", admin_user, key_id, label)
     return RedirectResponse("/admin/keys", status_code=303)

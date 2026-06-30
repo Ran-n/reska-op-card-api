@@ -17,6 +17,20 @@ def _parse_expand(expand: str | None, all_fields: set[str]) -> set[str]:
     return set(all_fields) if "all" in requested else requested
 
 
+def _parse_csv(raw: str | None) -> list[str]:
+    """Parse a comma-separated query param into a list of stripped, non-empty tokens."""
+    if not raw:
+        return []
+    return [t.strip() for t in raw.split(",") if t.strip()]
+
+
+def _in_filter(column_expr: str, values: list[str], prefix: str) -> tuple[str, dict]:
+    """Build a parameterized ``column_expr IN (:prefix0, :prefix1, ...)`` fragment."""
+    names = [f"{prefix}{i}" for i in range(len(values))]
+    sql = f"{column_expr} IN ({','.join(f':{n}' for n in names)})"
+    return sql, dict(zip(names, values, strict=True))
+
+
 class LookupItem(BaseModel):
     id: int
     name: str
@@ -316,8 +330,10 @@ _NAIP_JUNCTION_SPECS = [
 def _bulk_naip_extras(naip_ids: list[int], session: Session, expand: set[str] | None = None) -> dict[int, dict]:
     """Batch-resolve effect/trigger text and junction tags for a set of naip ids.
 
-    Junction tag lists (colors/tribes/attrs/keywords/reswords) are only populated for keys
-    present in ``expand``, mirroring the FK-field expand convention.
+    Junction tag lists (colors/tribes/attrs/keywords/reswords) contain FK ids only unless the
+    corresponding key is present in ``expand``, in which case they contain full ``LookupItem``
+    objects — mirroring the FK-field expand convention (never an empty list as a stand-in for
+    "not expanded").
     """
     expand = expand or set()
     extras: dict[int, dict] = {
@@ -346,17 +362,22 @@ def _bulk_naip_extras(naip_ids: list[int], session: Session, expand: set[str] | 
         extras[nid]["trigger"] = trigger_map.get(tfk) if tfk else None
 
     for junc_table, fk_col, item_fk_col, item_table, attr_name in _NAIP_JUNCTION_SPECS:
-        if attr_name not in expand:
-            continue
-        rows = session.exec(
-            text(
-                f"SELECT j.{fk_col}, t.id, t.name FROM {item_table} t "
-                f"JOIN {junc_table} j ON j.{item_fk_col} = t.id "
-                f"WHERE j.{fk_col} IN ({id_list})"
-            )
-        ).all()
-        for naip_fk_val, item_id, item_name in rows:
-            extras[naip_fk_val][attr_name].append(LookupItem(id=item_id, name=item_name))
+        if attr_name in expand:
+            rows = session.exec(
+                text(
+                    f"SELECT j.{fk_col}, t.id, t.name FROM {item_table} t "
+                    f"JOIN {junc_table} j ON j.{item_fk_col} = t.id "
+                    f"WHERE j.{fk_col} IN ({id_list})"
+                )
+            ).all()
+            for naip_fk_val, item_id, item_name in rows:
+                extras[naip_fk_val][attr_name].append(LookupItem(id=item_id, name=item_name))
+        else:
+            rows = session.exec(
+                text(f"SELECT j.{fk_col}, j.{item_fk_col} FROM {junc_table} j WHERE j.{fk_col} IN ({id_list})")
+            ).all()
+            for naip_fk_val, item_id in rows:
+                extras[naip_fk_val][attr_name].append(item_id)
 
     return extras
 
